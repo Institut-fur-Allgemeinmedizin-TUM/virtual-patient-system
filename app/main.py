@@ -18,7 +18,8 @@ from sqlalchemy.orm import Session as OrmSession
 from app.auth import oidc, auth
 from app.config.config import settings
 from app.db.db import get_db
-from app.llm import formatting, chat
+from app.llm import formatting
+from app.llm import chat as chat_functions
 from app.llm.prompts.evaluation import get_evaluation_prompt
 from app.model.evaluation import EvaluationResponse, Evaluation
 from app.model.llm import CreateSessionResponse, CreateSessionRequest, ChatResponse, ChatRequest
@@ -257,7 +258,7 @@ async def create_session(
         }
     else:
         # Normal TUM user: persist to database
-        chat.ensure_case(db, req.case_id)
+        chat_functions.ensure_case(db, req.case_id)
         
         # Use stored tum_id from session cookie (extracted at auth time)
         # Fallback to sub if tum_id wasn't found
@@ -281,7 +282,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
     if req.session_id in vhb_sessions:
         vhb_session = vhb_sessions[req.session_id]
         case_id = vhb_session["case_id"]
-        persona = chat.load_case_prompt(case_id)
+        persona = chat_functions.load_case_prompt(case_id)
         
         # Build messages from in-memory storage
         messages_to_send = [{"role": "system", "content": persona}]
@@ -291,7 +292,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
         messages_to_send.append({"role": "user", "content": req.message})
         
         # Call OpenAI
-        client = chat.get_openai_client()
+        client = chat_functions.get_openai_client()
         completion = client.chat.completions.create(
             model=settings.openai_model,
             messages=messages_to_send,  # type: ignore[arg-type]
@@ -316,7 +317,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
     msgs = db.query(Message).filter(Message.session_id == req.session_id).order_by(Message.id.asc()).all()
 
     case_id = chat_session.case_id
-    persona = chat.load_case_prompt(case_id)
+    persona = chat_functions.load_case_prompt(case_id)
 
     messages_to_send = [{"role": "system", "content": persona}]
     for m in msgs:
@@ -324,7 +325,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
             messages_to_send.append({"role": m.role, "content": m.content})
     messages_to_send.append({"role": "user", "content": req.message})
 
-    client = chat.get_openai_client()
+    client = chat_functions.get_openai_client()
     completion = client.chat.completions.create(
         model=settings.openai_model,
         messages=messages_to_send,  # type: ignore[arg-type]
@@ -357,7 +358,7 @@ async def transcribe_audio(
         audio_data = await audio.read()
         
         # Get OpenAI client
-        client = chat.get_openai_client()
+        client = chat_functions.get_openai_client()
         
         # Transcribe using Whisper
         transcript = client.audio.transcriptions.create(
@@ -459,7 +460,7 @@ async def get_session_messages(
 async def get_case_details(case_id: str) -> JSONResponse:
     """Get case details including patient persona information."""
     try:
-        case_data = chat.load_case_data(case_id)
+        case_data = chat_functions.load_case_data(case_id)
         persona = case_data.get("persona", {})
         
         return JSONResponse(content={
@@ -580,7 +581,7 @@ async def evaluate_session(
     
     # Call OpenAI to generate evaluation
     try:
-        client = chat.get_openai_client()
+        client = chat_functions.get_openai_client()
         completion = client.chat.completions.create(
             model=settings.openai_model,
             messages=[
