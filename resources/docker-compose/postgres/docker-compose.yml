@@ -1,0 +1,25 @@
+# Example taken from https://hub.docker.com/_/postgres 
+# DO NOT USE THIS IN PRODUCTION WITHOUT PROPER CONFIGURATION, SEE THE LINK ABOVE FOR MORE DETAILS
+services:
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    # Use DATABASE_URL=postgresql+psycopg://postgres@localhost/vpatient as your enviroment variables to connect to the database
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: vpatient
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  postgres_data:

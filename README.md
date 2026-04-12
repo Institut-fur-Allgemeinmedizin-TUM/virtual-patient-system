@@ -84,8 +84,9 @@ The system includes the following medical scenarios:
    ```
 
 4. **Set up database**
+   Ensure your Docker Postgres container is running, then create the database:
    ```bash
-   createdb vpatient
+   createdb -h localhost -U postgres vpatient
    alembic upgrade head
    ```
 
