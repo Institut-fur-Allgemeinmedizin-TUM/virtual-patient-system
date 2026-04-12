@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import String, Text, ForeignKey, DateTime, func, Integer, JSON
 from typing import List, Optional
@@ -42,3 +43,19 @@ class Message(Base):
     tokens_out: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     session: Mapped[Session] = relationship(back_populates="messages")
+
+class SessionSummary(BaseModel):
+    session_id: str
+    case_id: str
+    user_id: Optional[str]
+    started_at: datetime
+    ended_at: Optional[datetime]
+    message_count: int
+    total_tokens_in: Optional[int]
+    total_tokens_out: Optional[int]
+
+
+class ExportResponse(BaseModel):
+    sessions: List[SessionSummary]
+    total_sessions: int
+    date_range: str

@@ -1,29 +1,28 @@
-from fastapi import FastAPI, Depends, HTTPException, Query, Request, File, UploadFile
-from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
-from typing import Dict, List, Optional
-from datetime import datetime, timedelta
-import uuid
-import time
-import httpx
 import json
 import os
+import time
+import uuid
+from datetime import datetime, timedelta
+from typing import Dict, Optional
+
+import httpx
+from fastapi import FastAPI, Depends, HTTPException, Query, Request, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from jose import jwt, JWTError
+from pydantic import BaseModel
+from sqlalchemy import func, desc
+from sqlalchemy.orm import Session as OrmSession
 
 from app.auth import oidc, auth
 from app.config.config import settings
 from app.db.db import get_db
-from sqlalchemy.orm import Session as OrmSession
-from sqlalchemy import func, desc
-
-from app.model.evaluation import EvaluationResponse, Evaluation
-from app.model.models import Case, Session as ChatSession, Message
-from app.llm import formatting
-
-from fastapi.middleware.cors import CORSMiddleware
-from jose import jwt, JWTError
-
+from app.llm import formatting, chat
 from app.llm.prompts.evaluation import get_evaluation_prompt
+from app.model.evaluation import EvaluationResponse, Evaluation
+from app.model.llm import CreateSessionResponse, CreateSessionRequest, ChatResponse, ChatRequest
+from app.model.models import Session as ChatSession, Message, ExportResponse, SessionSummary
 
 # Trigger redeployment with OIDC_AUTH_URL secret now configured
 app = FastAPI(title="Virtual Patient Backend", version="0.1.0")
@@ -238,71 +237,6 @@ async def vhb_login(req: VHBLoginRequest) -> JSONResponse:
     return response
 
 
-class CreateSessionRequest(BaseModel):
-    case_id: str
-
-
-class CreateSessionResponse(BaseModel):
-    session_id: str
-    case_id: str
-
-
-class ChatRequest(BaseModel):
-    session_id: str
-    message: str
-
-
-class ChatResponse(BaseModel):
-    reply: str
-    session_id: str
-
-
-def _load_case_data(case_id: str) -> Dict:
-    """Load case data from JSON file."""
-    case_file = os.path.join(os.path.dirname(__file__), "cases", f"{case_id}.json")
-    if not os.path.exists(case_file):
-        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found")
-    
-    with open(case_file, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-
-def _ensure_case(db: OrmSession, case_id: str) -> Case:
-    case = db.get(Case, case_id)
-    if case is None:
-        # Load case data to get title
-        try:
-            case_data = _load_case_data(case_id)
-            title = case_data.get("title", case_id)
-            language = case_data.get("language", "de")
-        except HTTPException:
-            # Fallback for unknown cases
-            title = case_id
-            language = "de"
-        
-        case = Case(id=case_id, title=title, language=language)
-        db.add(case)
-        db.commit()
-    return case
-
-
-def _load_case_prompt(case_id: str) -> str:
-    """Load case prompt from JSON file."""
-    try:
-        case_data = _load_case_data(case_id)
-        return case_data["persona"]["prompt"]
-    except (HTTPException, KeyError):
-        return "Du bist ein Simulationspatient. Antworte kurz auf Deutsch."
-
-
-def _get_openai_client():
-    from openai import OpenAI
-
-    if not settings.openai_api_key:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
-    return OpenAI(api_key=settings.openai_api_key)
-
-
 @app.post("/api/sessions", response_model=CreateSessionResponse)
 async def create_session(
     req: CreateSessionRequest,
@@ -323,7 +257,7 @@ async def create_session(
         }
     else:
         # Normal TUM user: persist to database
-        _ensure_case(db, req.case_id)
+        chat.ensure_case(db, req.case_id)
         
         # Use stored tum_id from session cookie (extracted at auth time)
         # Fallback to sub if tum_id wasn't found
@@ -347,7 +281,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
     if req.session_id in vhb_sessions:
         vhb_session = vhb_sessions[req.session_id]
         case_id = vhb_session["case_id"]
-        persona = _load_case_prompt(case_id)
+        persona = chat.load_case_prompt(case_id)
         
         # Build messages from in-memory storage
         messages_to_send = [{"role": "system", "content": persona}]
@@ -357,7 +291,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
         messages_to_send.append({"role": "user", "content": req.message})
         
         # Call OpenAI
-        client = _get_openai_client()
+        client = chat.get_openai_client()
         completion = client.chat.completions.create(
             model=settings.openai_model,
             messages=messages_to_send,  # type: ignore[arg-type]
@@ -382,7 +316,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
     msgs = db.query(Message).filter(Message.session_id == req.session_id).order_by(Message.id.asc()).all()
 
     case_id = chat_session.case_id
-    persona = _load_case_prompt(case_id)
+    persona = chat.load_case_prompt(case_id)
 
     messages_to_send = [{"role": "system", "content": persona}]
     for m in msgs:
@@ -390,7 +324,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
             messages_to_send.append({"role": m.role, "content": m.content})
     messages_to_send.append({"role": "user", "content": req.message})
 
-    client = _get_openai_client()
+    client = chat.get_openai_client()
     completion = client.chat.completions.create(
         model=settings.openai_model,
         messages=messages_to_send,  # type: ignore[arg-type]
@@ -423,7 +357,7 @@ async def transcribe_audio(
         audio_data = await audio.read()
         
         # Get OpenAI client
-        client = _get_openai_client()
+        client = chat.get_openai_client()
         
         # Transcribe using Whisper
         transcript = client.audio.transcriptions.create(
@@ -439,24 +373,6 @@ async def transcribe_audio(
 
 
 # Analytics and Export endpoints
-
-class SessionSummary(BaseModel):
-    session_id: str
-    case_id: str
-    user_id: Optional[str]
-    started_at: datetime
-    ended_at: Optional[datetime]
-    message_count: int
-    total_tokens_in: Optional[int]
-    total_tokens_out: Optional[int]
-
-
-class ExportResponse(BaseModel):
-    sessions: List[SessionSummary]
-    total_sessions: int
-    date_range: str
-
-
 @app.get("/api/export", response_model=ExportResponse)
 async def export_sessions(
     case_id: Optional[str] = Query(None, description="Filter by case ID"),
@@ -543,7 +459,7 @@ async def get_session_messages(
 async def get_case_details(case_id: str) -> JSONResponse:
     """Get case details including patient persona information."""
     try:
-        case_data = _load_case_data(case_id)
+        case_data = chat.load_case_data(case_id)
         persona = case_data.get("persona", {})
         
         return JSONResponse(content={
@@ -664,7 +580,7 @@ async def evaluate_session(
     
     # Call OpenAI to generate evaluation
     try:
-        client = _get_openai_client()
+        client = chat.get_openai_client()
         completion = client.chat.completions.create(
             model=settings.openai_model,
             messages=[
