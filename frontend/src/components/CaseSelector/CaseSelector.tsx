@@ -135,6 +135,8 @@ export function CaseSelector({ onCaseSelect, isLoading }: CaseSelectorProps) {
       <Box sx={{ mt: 4, textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary">
           💡 Tipp: Führen Sie eine strukturierte Anamnese durch
+          <br/>
+          ⚠️ Dieser Chat basiert auf einem KI-Assistenten und wird nicht durch medizinisches Fachpersonal moderiert ⚠️
         </Typography>
       </Box>
     </Box>

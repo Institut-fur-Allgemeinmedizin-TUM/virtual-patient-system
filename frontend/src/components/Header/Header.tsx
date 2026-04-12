@@ -76,10 +76,14 @@ export function Header() {
             sx={{ 
               mr: 2, 
               fontSize: 32,
-              color: 'white'
-            }} 
+              color: 'white',
+              cursor: 'pointer'
+            }}
+            onClick={() => navigate("/")}
           />
-          <Box>
+          <Box
+            sx={{cursor: 'pointer'}}
+            onClick={() => navigate("/")}>
             <Typography 
               variant="h5" 
               component="h1"
