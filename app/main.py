@@ -1,24 +1,28 @@
-from fastapi import FastAPI, Depends, HTTPException, Query, Request, File, UploadFile
-from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
-from typing import Dict, List, Optional
-from datetime import datetime, timedelta
-import uuid
-import time
-import httpx
 import json
 import os
+import time
+import uuid
+from datetime import datetime, timedelta
+from typing import Dict, Optional
 
-from .config import settings
-from .db import get_db
-from sqlalchemy.orm import Session as OrmSession
-from sqlalchemy import func, desc
-from .models import Case, Session as ChatSession, Message, Evaluation
-
+import httpx
+from fastapi import FastAPI, Depends, HTTPException, Query, Request, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from jose import jwt, JWTError
-from jose.utils import base64url_decode
+from pydantic import BaseModel
+from sqlalchemy import func, desc
+from sqlalchemy.orm import Session as OrmSession
+
+from app.auth import oidc, auth
+from app.config.config import settings
+from app.db.db import get_db
+from app.llm import formatting, chat
+from app.llm.prompts.evaluation import get_evaluation_prompt
+from app.model.evaluation import EvaluationResponse, Evaluation
+from app.model.llm import CreateSessionResponse, CreateSessionRequest, ChatResponse, ChatRequest
+from app.model.models import Session as ChatSession, Message, ExportResponse, SessionSummary
 
 # Trigger redeployment with OIDC_AUTH_URL secret now configured
 app = FastAPI(title="Virtual Patient Backend", version="0.1.0")
@@ -81,49 +85,6 @@ async def health_db(db: OrmSession = Depends(get_db)) -> dict:
         return {"status": "error", "database": "disconnected", "error": str(e)}
 
 
-# ---------------------
-# OIDC Authentication
-# ---------------------
-
-class OIDCState(BaseModel):
-    state: str
-    nonce: str
-    issued_at: int
-    redirect_to: Optional[str] = None
-
-
-def _sign(data: dict) -> str:
-    return jwt.encode(
-        claims=data,
-        key=settings.app_secret_key,
-        algorithm="HS256",
-        headers={"typ": "JWT"},
-    )
-
-
-def _verify(token: str) -> dict:
-    try:
-        return jwt.decode(token, settings.app_secret_key, algorithms=["HS256"])
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid session")
-
-
-def _set_cookie(response, name: str, value: str, max_age: int = 3600) -> None:
-    # In production (HTTPS), cookies must have secure=True
-    # In development (HTTP), secure=False is needed
-    is_production = settings.environment == "production"
-    
-    response.set_cookie(
-        key=name,
-        value=value,
-        max_age=max_age,
-        httponly=True,
-        secure=is_production,  # True in production (HTTPS), False in dev (HTTP)
-        samesite="lax",
-        path="/",
-    )
-
-
 @app.get("/auth/login")
 async def auth_login(request: Request, redirect_to: Optional[str] = None) -> RedirectResponse:
     if not all([
@@ -135,7 +96,7 @@ async def auth_login(request: Request, redirect_to: Optional[str] = None) -> Red
 
     state = uuid.uuid4().hex
     nonce = uuid.uuid4().hex
-    state_token = _sign({
+    state_token = oidc.sign({
         "state": state,
         "nonce": nonce,
         "issued_at": int(time.time()),
@@ -155,90 +116,8 @@ async def auth_login(request: Request, redirect_to: Optional[str] = None) -> Red
 
     authorize_url = f"{settings.oidc_auth_url}?{urlencode(params)}"
     response = RedirectResponse(authorize_url, status_code=302)
-    _set_cookie(response, "oidc_state", state_token, max_age=600)
+    oidc.set_cookie(response, "oidc_state", state_token, max_age=600)
     return response
-
-
-async def _fetch_jwks() -> dict:
-    if not settings.oidc_jwks_url:
-        raise HTTPException(status_code=500, detail="OIDC_JWKS_URL not configured")
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        res = await client.get(settings.oidc_jwks_url)
-        res.raise_for_status()
-        return res.json()
-
-
-def _extract_tum_id_from_claims(claims: dict) -> Optional[str]:
-    """Extract TUM ID from OIDC claims. Tries multiple methods."""
-    # Method 1: Extract from email (e.g., ge38qap@mytum.de -> ge38qap)
-    email = claims.get("email")
-    if email and "@mytum.de" in email:
-        tum_id_from_email = email.split("@")[0]
-        if tum_id_from_email and len(tum_id_from_email) > 0:
-            return tum_id_from_email
-    
-    # Method 2: Try common OIDC claim fields
-    tum_id = (
-        claims.get("preferred_username") or 
-        claims.get("login") or 
-        claims.get("tumid") or 
-        claims.get("username") or
-        claims.get("user_id") or
-        claims.get("tum_user_id")
-    )
-    if tum_id:
-        return tum_id
-    
-    # Method 3: If email exists but not @mytum.de, extract username part
-    if email and "@" in email:
-        username_part = email.split("@")[0]
-        # Only use if it looks like a TUM ID (starts with letter, 6-8 chars)
-        if len(username_part) >= 6 and len(username_part) <= 8 and username_part[0].isalpha():
-            return username_part
-    
-    # Fallback: return None (will use sub as fallback later)
-    return None
-
-
-def _set_session(response: RedirectResponse, claims: dict) -> None:
-    """Store user claims in session cookie. Extracts TUM ID at auth time."""
-    # Extract TUM ID when we have all the claims
-    tum_id = _extract_tum_id_from_claims(claims)
-    
-    session_claims = {
-        "sub": claims.get("sub"),
-        "email": claims.get("email"),
-        "name": claims.get("name"),
-        "iat": int(time.time()),
-        "exp": int(time.time()) + 60 * 60 * 24,  # 24h
-    }
-    
-    # Only add tum_id if we found one (don't add None)
-    if tum_id:
-        session_claims["tum_id"] = tum_id
-    
-    token = _sign(session_claims)
-    _set_cookie(response, "session", token, max_age=60 * 60 * 24)
-
-
-def get_current_user(request: Request) -> Optional[dict]:
-    token = request.cookies.get("session")
-    if not token:
-        return None
-    try:
-        return _verify(token)
-    except HTTPException:
-        return None
-
-
-def require_user(request: Request) -> dict:
-    if not settings.require_auth:
-        # auth disabled; provide anonymous user
-        return {"sub": "anon", "name": "Anonymous"}
-    user = get_current_user(request)
-    if not user:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    return user
 
 
 @app.get("/auth/callback")
@@ -248,7 +127,7 @@ async def auth_callback(request: Request, code: Optional[str] = None, state: Opt
     state_token = request.cookies.get("oidc_state")
     if not state_token:
         raise HTTPException(status_code=400, detail="Missing state cookie")
-    st = _verify(state_token)
+    st = oidc.verify(state_token)
     if st.get("state") != state:
         raise HTTPException(status_code=400, detail="State mismatch")
 
@@ -276,7 +155,7 @@ async def auth_callback(request: Request, code: Optional[str] = None, state: Opt
     access_token = token_payload.get("access_token")
 
     # Verify id_token using JWKS
-    jwks = await _fetch_jwks()
+    jwks = await auth.fetch_jwks()
     try:
         claims = jwt.decode(
             id_token, 
@@ -297,7 +176,7 @@ async def auth_callback(request: Request, code: Optional[str] = None, state: Opt
     frontend_path = st.get("redirect_to") or "/"
     redirect_to = f"{settings.frontend_url}{frontend_path}"
     response = RedirectResponse(redirect_to, status_code=302)
-    _set_session(response, claims)
+    auth.set_session(response, claims)
     # remove the temporary state cookie
     response.delete_cookie("oidc_state", path="/")
     return response
@@ -306,7 +185,7 @@ async def auth_callback(request: Request, code: Optional[str] = None, state: Opt
 @app.get("/auth/me")
 async def auth_me(request: Request) -> JSONResponse:
     """Get current user information."""
-    user = get_current_user(request)
+    user = auth.get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
@@ -351,76 +230,11 @@ async def vhb_login(req: VHBLoginRequest) -> JSONResponse:
         "iat": int(time.time()),
         "exp": int(time.time()) + 60 * 60 * 24,  # 24h
     }
-    token = _sign(session_claims)
+    token = oidc.sign(session_claims)
     
     response = JSONResponse(content={"ok": True, "token": token})
-    _set_cookie(response, "session", token, max_age=60 * 60 * 24)
+    oidc.set_cookie(response, "session", token, max_age=60 * 60 * 24)
     return response
-
-
-class CreateSessionRequest(BaseModel):
-    case_id: str
-
-
-class CreateSessionResponse(BaseModel):
-    session_id: str
-    case_id: str
-
-
-class ChatRequest(BaseModel):
-    session_id: str
-    message: str
-
-
-class ChatResponse(BaseModel):
-    reply: str
-    session_id: str
-
-
-def _load_case_data(case_id: str) -> Dict:
-    """Load case data from JSON file."""
-    case_file = os.path.join(os.path.dirname(__file__), "cases", f"{case_id}.json")
-    if not os.path.exists(case_file):
-        raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found")
-    
-    with open(case_file, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-
-def _ensure_case(db: OrmSession, case_id: str) -> Case:
-    case = db.get(Case, case_id)
-    if case is None:
-        # Load case data to get title
-        try:
-            case_data = _load_case_data(case_id)
-            title = case_data.get("title", case_id)
-            language = case_data.get("language", "de")
-        except HTTPException:
-            # Fallback for unknown cases
-            title = case_id
-            language = "de"
-        
-        case = Case(id=case_id, title=title, language=language)
-        db.add(case)
-        db.commit()
-    return case
-
-
-def _load_case_prompt(case_id: str) -> str:
-    """Load case prompt from JSON file."""
-    try:
-        case_data = _load_case_data(case_id)
-        return case_data["persona"]["prompt"]
-    except (HTTPException, KeyError):
-        return "Du bist ein Simulationspatient. Antworte kurz auf Deutsch."
-
-
-def _get_openai_client():
-    from openai import OpenAI
-
-    if not settings.openai_api_key:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
-    return OpenAI(api_key=settings.openai_api_key)
 
 
 @app.post("/api/sessions", response_model=CreateSessionResponse)
@@ -429,7 +243,7 @@ async def create_session(
     request: Request,
     db: OrmSession = Depends(get_db)
 ) -> CreateSessionResponse:
-    user = require_user(request)
+    user = auth.require_user(request)
     session_id = str(uuid.uuid4())
     
     # Check if this is a VHB user
@@ -443,7 +257,7 @@ async def create_session(
         }
     else:
         # Normal TUM user: persist to database
-        _ensure_case(db, req.case_id)
+        chat.ensure_case(db, req.case_id)
         
         # Use stored tum_id from session cookie (extracted at auth time)
         # Fallback to sub if tum_id wasn't found
@@ -467,7 +281,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
     if req.session_id in vhb_sessions:
         vhb_session = vhb_sessions[req.session_id]
         case_id = vhb_session["case_id"]
-        persona = _load_case_prompt(case_id)
+        persona = chat.load_case_prompt(case_id)
         
         # Build messages from in-memory storage
         messages_to_send = [{"role": "system", "content": persona}]
@@ -477,7 +291,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
         messages_to_send.append({"role": "user", "content": req.message})
         
         # Call OpenAI
-        client = _get_openai_client()
+        client = chat.get_openai_client()
         completion = client.chat.completions.create(
             model=settings.openai_model,
             messages=messages_to_send,  # type: ignore[arg-type]
@@ -502,7 +316,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
     msgs = db.query(Message).filter(Message.session_id == req.session_id).order_by(Message.id.asc()).all()
 
     case_id = chat_session.case_id
-    persona = _load_case_prompt(case_id)
+    persona = chat.load_case_prompt(case_id)
 
     messages_to_send = [{"role": "system", "content": persona}]
     for m in msgs:
@@ -510,7 +324,7 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
             messages_to_send.append({"role": m.role, "content": m.content})
     messages_to_send.append({"role": "user", "content": req.message})
 
-    client = _get_openai_client()
+    client = chat.get_openai_client()
     completion = client.chat.completions.create(
         model=settings.openai_model,
         messages=messages_to_send,  # type: ignore[arg-type]
@@ -543,7 +357,7 @@ async def transcribe_audio(
         audio_data = await audio.read()
         
         # Get OpenAI client
-        client = _get_openai_client()
+        client = chat.get_openai_client()
         
         # Transcribe using Whisper
         transcript = client.audio.transcriptions.create(
@@ -559,24 +373,6 @@ async def transcribe_audio(
 
 
 # Analytics and Export endpoints
-
-class SessionSummary(BaseModel):
-    session_id: str
-    case_id: str
-    user_id: Optional[str]
-    started_at: datetime
-    ended_at: Optional[datetime]
-    message_count: int
-    total_tokens_in: Optional[int]
-    total_tokens_out: Optional[int]
-
-
-class ExportResponse(BaseModel):
-    sessions: List[SessionSummary]
-    total_sessions: int
-    date_range: str
-
-
 @app.get("/api/export", response_model=ExportResponse)
 async def export_sessions(
     case_id: Optional[str] = Query(None, description="Filter by case ID"),
@@ -663,7 +459,7 @@ async def get_session_messages(
 async def get_case_details(case_id: str) -> JSONResponse:
     """Get case details including patient persona information."""
     try:
-        case_data = _load_case_data(case_id)
+        case_data = chat.load_case_data(case_id)
         persona = case_data.get("persona", {})
         
         return JSONResponse(content={
@@ -719,22 +515,7 @@ async def get_analytics_summary(
         "total_sessions": sum(count for _, count in case_stats)
     })
 
-
-# Evaluation endpoints
-
-class EvaluationCriterion(BaseModel):
-    name: str
-    score: int
-    explanation: str
-
-
-class EvaluationResponse(BaseModel):
-    id: int
-    session_id: str
-    created_at: datetime
-    criteria: List[EvaluationCriterion]
-    improvement_suggestions: List[str]
-
+# Evaluation Endpoints
 
 @app.post("/api/sessions/{session_id}/evaluate", response_model=EvaluationResponse)
 async def evaluate_session(
@@ -743,7 +524,7 @@ async def evaluate_session(
     db: OrmSession = Depends(get_db)
 ) -> EvaluationResponse:
     """Evaluate anamnesis performance for a session."""
-    user = require_user(request)
+    user = auth.require_user(request)
     
     # Check if this is a VHB user - they cannot use evaluation feature
     if user.get("is_vhb_user", False):
@@ -771,7 +552,7 @@ async def evaluate_session(
     
     if existing_evaluation:
         # Return existing evaluation
-        return _format_evaluation_response(existing_evaluation)
+        return formatting.format_evaluation_response(existing_evaluation)
     
     # Get all messages for this session
     messages = db.query(Message).filter(
@@ -795,62 +576,11 @@ async def evaluate_session(
     
     conversation_text = "\n\n".join(conversation)
     
-    # Build evaluation prompt
-    evaluation_prompt = f"""Sie sind ein medizinischer Ausbilder, der die Anamnese-Fähigkeiten eines Arztes bewertet.
-
-Analysieren Sie das folgende Gespräch zwischen einem Arzt (User) und einem Patienten (Assistant):
-
-{conversation_text}
-
-Geben Sie Rückmeldung dazu, wie der Arzt die Anamnese verbessern könnte.
-
-Ihr Feedback soll die folgenden acht Kriterien enthalten:
-
-1. Gesprächsführung: Beurteilen Sie, ob der Arzt das Gespräch geführt hat, um die erforderlichen Informationen zu erhalten.
-
-2. Erkennung relevanter Informationen: Beurteilen Sie, ob der Arzt alle relevanten Informationen erkennt.
-
-3. Zielgerichtete Fragen: Beurteilen Sie, ob der Arzt zielgerichtete Fragen formuliert, um Symptome detailliert zu erfassen und zu spezifizieren.
-
-4. Spezifische Ursachen: Beurteilen Sie, ob die Fragen des Arztes nahelegen, dass spezifische Ursachen oder Umstände zu bestimmten Symptomen führen.
-
-5. Logische Reihenfolge: Beurteilen Sie, ob der Arzt die Fragen in einer logischen Reihenfolge stellt.
-
-6. Rückversicherung: Beurteilen Sie, ob der Arzt den Patienten rückversichert, dass er die Informationen korrekt verstanden hat.
-
-7. Zusammenfassung: Beurteilen Sie, ob der Arzt seine gesammelten Informationen vor dem Gesprächsende zusammengefasst hat.
-
-8. Qualität und Zeit: Beurteilen Sie, ob der Arzt ausreichend hochwertige Informationen in angemessener Zeit erhoben hat.
-
-Weisen Sie jedem der acht Kriterien eine Bewertung nach folgendem Schema zu:
-1 - Erfüllt das Kriterium nicht
-2 - Erfüllt das Kriterium eher nicht
-3 - Erfüllt das Kriterium teilweise
-4 - Erfüllt das Kriterium eher
-5 - Erfüllt das Kriterium vollständig
-
-Erläutern Sie die Bewertung mit zwei Sätzen.
-
-Erstellen Sie drei Verbesserungsvorschläge in Stichpunkten, die auf die Stärkung klinischer Entscheidungsfähigkeiten abzielen.
-
-WICHTIG: Antworten Sie ausschließlich im folgenden JSON-Format (ohne zusätzlichen Text):
-{{
-  "criteria": [
-    {{"name": "Gesprächsführung", "score": 1-5, "explanation": "Zwei Sätze Erklärung"}},
-    {{"name": "Erkennung relevanter Informationen", "score": 1-5, "explanation": "Zwei Sätze Erklärung"}},
-    {{"name": "Zielgerichtete Fragen", "score": 1-5, "explanation": "Zwei Sätze Erklärung"}},
-    {{"name": "Spezifische Ursachen", "score": 1-5, "explanation": "Zwei Sätze Erklärung"}},
-    {{"name": "Logische Reihenfolge", "score": 1-5, "explanation": "Zwei Sätze Erklärung"}},
-    {{"name": "Rückversicherung", "score": 1-5, "explanation": "Zwei Sätze Erklärung"}},
-    {{"name": "Zusammenfassung", "score": 1-5, "explanation": "Zwei Sätze Erklärung"}},
-    {{"name": "Qualität und Zeit", "score": 1-5, "explanation": "Zwei Sätze Erklärung"}}
-  ],
-  "suggestions": ["Vorschlag 1", "Vorschlag 2", "Vorschlag 3"]
-}}"""
+    evaluation_prompt = get_evaluation_prompt(conversation_text)
     
     # Call OpenAI to generate evaluation
     try:
-        client = _get_openai_client()
+        client = chat.get_openai_client()
         completion = client.chat.completions.create(
             model=settings.openai_model,
             messages=[
@@ -914,7 +644,7 @@ WICHTIG: Antworten Sie ausschließlich im folgenden JSON-Format (ohne zusätzlic
         db.commit()
         db.refresh(evaluation)
         
-        return _format_evaluation_response(evaluation)
+        return formatting.format_evaluation_response(evaluation)
         
     except json.JSONDecodeError as e:
         raise HTTPException(
@@ -926,60 +656,6 @@ WICHTIG: Antworten Sie ausschließlich im folgenden JSON-Format (ohne zusätzlic
             status_code=500, 
             detail=f"Evaluation failed: {str(e)}"
         )
-
-
-def _format_evaluation_response(evaluation: Evaluation) -> EvaluationResponse:
-    """Format an Evaluation model instance as an EvaluationResponse."""
-    criteria = [
-        EvaluationCriterion(
-            name="Gesprächsführung",
-            score=evaluation.criterion1_score,
-            explanation=evaluation.criterion1_explanation
-        ),
-        EvaluationCriterion(
-            name="Erkennung relevanter Informationen",
-            score=evaluation.criterion2_score,
-            explanation=evaluation.criterion2_explanation
-        ),
-        EvaluationCriterion(
-            name="Zielgerichtete Fragen",
-            score=evaluation.criterion3_score,
-            explanation=evaluation.criterion3_explanation
-        ),
-        EvaluationCriterion(
-            name="Spezifische Ursachen",
-            score=evaluation.criterion4_score,
-            explanation=evaluation.criterion4_explanation
-        ),
-        EvaluationCriterion(
-            name="Logische Reihenfolge",
-            score=evaluation.criterion5_score,
-            explanation=evaluation.criterion5_explanation
-        ),
-        EvaluationCriterion(
-            name="Rückversicherung",
-            score=evaluation.criterion6_score,
-            explanation=evaluation.criterion6_explanation
-        ),
-        EvaluationCriterion(
-            name="Zusammenfassung",
-            score=evaluation.criterion7_score,
-            explanation=evaluation.criterion7_explanation
-        ),
-        EvaluationCriterion(
-            name="Qualität und Zeit",
-            score=evaluation.criterion8_score,
-            explanation=evaluation.criterion8_explanation
-        ),
-    ]
-    
-    return EvaluationResponse(
-        id=evaluation.id,
-        session_id=evaluation.session_id,
-        created_at=evaluation.created_at,
-        criteria=criteria,
-        improvement_suggestions=evaluation.improvement_suggestions
-    )
 
 
 # Mount static files and serve frontend (production only)
