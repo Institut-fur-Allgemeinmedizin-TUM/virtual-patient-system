@@ -1,4 +1,5 @@
-from app.model.evaluation import EvaluationResponse, EvaluationCriterion, Evaluation
+from app.model.evaluation import EvaluationResponse, EvaluationCriterion
+from app.model.models import Evaluation
 
 
 def format_evaluation_response(evaluation: Evaluation) -> EvaluationResponse:

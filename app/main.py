@@ -21,7 +21,8 @@ from app.db.db import get_db
 from app.llm import formatting
 from app.llm import chat as chat_functions
 from app.llm.prompts.evaluation import get_evaluation_prompt
-from app.model.evaluation import EvaluationResponse, Evaluation
+from app.model.evaluation import EvaluationResponse
+from app.model.models import Evaluation
 from app.model.llm import CreateSessionResponse, CreateSessionRequest, ChatResponse, ChatRequest
 from app.model.models import Session as ChatSession, Message, ExportResponse, SessionSummary
 
