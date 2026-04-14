@@ -92,24 +92,6 @@ export interface HTTPValidationError {
   detail?: ValidationError[];
 }
 
-/** MobileExchangeRequest */
-export interface MobileExchangeRequest {
-  /** Code */
-  code: string;
-}
-
-/** MobileExchangeResponse */
-export interface MobileExchangeResponse {
-  /** Access Token */
-  access_token: string;
-  /** Token Type */
-  token_type: string;
-  /** Expires In */
-  expires_in: number;
-  /** User */
-  user: Record<string, string | null>;
-}
-
 /** SessionSummary */
 export interface SessionSummary {
   /** Session Id */
@@ -139,6 +121,14 @@ export interface VHBLoginRequest {
   password: string;
 }
 
+/** VHBLoginResponse */
+export interface VHBLoginResponse {
+  /** Ok */
+  ok: boolean;
+  /** Token */
+  token: string;
+}
+
 /** ValidationError */
 export interface ValidationError {
   /** Location */
@@ -160,10 +150,8 @@ import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<
-  AxiosRequestConfig,
-  "data" | "params" | "url" | "responseType"
-> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -183,10 +171,8 @@ export type RequestParams = Omit<
   "body" | "method" | "query" | "path"
 >;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<
-  AxiosRequestConfig,
-  "data" | "cancelToken"
-> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -459,26 +445,6 @@ export class Api<
       }),
 
     /**
-     * No description
-     *
-     * @name AuthMobileExchangeAuthMobileExchangePost
-     * @summary Auth Mobile Exchange
-     * @request POST:/auth/mobile/exchange
-     */
-    authMobileExchangeAuthMobileExchangePost: (
-      data: MobileExchangeRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<MobileExchangeResponse, HTTPValidationError>({
-        path: `/auth/mobile/exchange`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        format: "json",
-        ...params,
-      }),
-
-    /**
      * @description Authenticate VHB users with a shared password.
      *
      * @name VhbLoginAuthVhbLoginPost
@@ -489,7 +455,7 @@ export class Api<
       data: VHBLoginRequest,
       params: RequestParams = {},
     ) =>
-      this.request<any, HTTPValidationError>({
+      this.request<VHBLoginResponse, HTTPValidationError>({
         path: `/auth/vhb-login`,
         method: "POST",
         body: data,

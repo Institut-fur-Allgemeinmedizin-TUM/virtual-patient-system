@@ -120,44 +120,29 @@ export const useAuthStore = create<AuthState>((set) => ({
     const res = await apiClient.auth.vhbLoginAuthVhbLoginPost({
       password,
     });
-    if (res.status === 200) {
-    }
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/vhb-login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ password }),
-      });
-
-      if (!response.ok) {
-        const error = await response
-          .json()
-          .catch(() => ({ detail: "Login fehlgeschlagen" }));
-        set({ authError: error.detail || "Login fehlgeschlagen" });
-        return false;
+    if(res.status === 200) {
+      const data = res.data;
+      if (data?.token && typeof data.token === "string") {
+        await saveAccessToken(data.token);
       }
-
-      const data = await response.json();
-      if (data?.access_token && typeof data.access_token === "string") {
-        await saveAccessToken(data.access_token);
-      }
-
-      set({ isAuthenticated: true });
+      set({ isAuthenticated: true , vhbLoading: false});
       return true;
-    } catch {
-      set({ authError: "Verbindungsfehler. Bitte versuchen Sie es erneut." });
-      return false;
-    } finally {
-      set({ vhbLoading: false });
+    } else {
+      
+        set({ authError: res.statusText || "Login fehlgeschlagen", vhbLoading: false });
+        return false;
     }
+    
   },
 
   logout: async () => {
-    await clearAccessToken();
-    set({ isAuthenticated: false, authError: "", authChecked: true });
+    const res = await apiClient.auth.authLogoutAuthLogoutPost({
+      
+    });
+    if(res.status === 200) {
+      await clearAccessToken();
+      set({ isAuthenticated: false, authError: "", authChecked: true });
+    }
+   
   },
 }));
