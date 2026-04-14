@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional
 
 import httpx
-from fastapi import FastAPI, Depends, HTTPException, Query, Request, File, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, Query, Request, Response, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -21,6 +21,7 @@ from app.db.db import get_db
 from app.llm import formatting
 from app.llm import chat as chat_functions
 from app.llm.prompts.evaluation import get_evaluation_prompt
+from app.model.auth import VHBLoginRequest, VHBLoginResponse
 from app.model.evaluation import EvaluationResponse
 from app.model.models import Evaluation
 from app.model.llm import (
@@ -251,12 +252,9 @@ async def auth_logout() -> JSONResponse:
     return response
 
 
-class VHBLoginRequest(BaseModel):
-    password: str
 
-
-@app.post("/auth/vhb-login")
-async def vhb_login(req: VHBLoginRequest) -> JSONResponse:
+@app.post("/auth/vhb-login", response_model=VHBLoginResponse)
+async def vhb_login(req: VHBLoginRequest, response: Response) -> VHBLoginResponse:
     """Authenticate VHB users with a shared password."""
     if not settings.vhb_password:
         raise HTTPException(status_code=503, detail="VHB login not configured")
@@ -275,9 +273,8 @@ async def vhb_login(req: VHBLoginRequest) -> JSONResponse:
     }
     token = oidc.sign(session_claims)
 
-    response = JSONResponse(content={"ok": True, "token": token})
     oidc.set_cookie(response, "session", token, max_age=60 * 60 * 24)
-    return response
+    return VHBLoginResponse(ok=True, token=token)
 
 
 @app.post("/api/sessions", response_model=CreateSessionResponse)
