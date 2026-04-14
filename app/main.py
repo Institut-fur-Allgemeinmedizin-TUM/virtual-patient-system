@@ -653,6 +653,9 @@ async def evaluate_session(
     if chat_session is None:
         raise HTTPException(status_code=404, detail="Session not found")
 
+    tum_id = user.get("tum_id") or user.get("sub")
+    if chat_session.user_id != tum_id:
+        raise HTTPException(status_code=403, detail="Invalid user ID for session")
     # Check if evaluation already exists
     existing_evaluation = (
         db.query(Evaluation).filter(Evaluation.session_id == session_id).first()
