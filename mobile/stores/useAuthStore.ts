@@ -1,15 +1,16 @@
-import { create } from 'zustand';
-import { Platform } from 'react-native';
-import * as ExpoLinking from 'expo-linking';
-import * as WebBrowser from 'expo-web-browser';
+import * as ExpoLinking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
+import { Platform } from "react-native";
+import { create } from "zustand";
 
+import { apiClient } from "@/lib/apiClient";
 import {
   API_BASE_URL,
   clearAccessToken,
   getAccessToken,
   saveAccessToken,
   type MobileExchangeResponse,
-} from '@/lib/auth';
+} from "@/lib/auth";
 
 interface AuthState {
   authError: string;
@@ -25,13 +26,13 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  authError: '',
+  authError: "",
   authChecked: false,
   isAuthenticated: false,
   tumLoading: false,
   vhbLoading: false,
 
-  clearAuthError: () => set({ authError: '' }),
+  clearAuthError: () => set({ authError: "" }),
 
   checkStoredToken: async () => {
     const token = await getAccessToken();
@@ -39,23 +40,31 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   loginWithTum: async () => {
-    set({ authError: '', tumLoading: true });
+    set({ authError: "", tumLoading: true });
 
     try {
-      if (Platform.OS === 'web') {
-        const loginUrl = `${API_BASE_URL}/auth/login?redirect_to=${encodeURIComponent('/')}`;
+      if (Platform.OS === "web") {
+        const loginUrl = `${API_BASE_URL}/auth/login?redirect_to=${encodeURIComponent("/")}`;
         window.location.href = loginUrl;
         return false;
       }
 
-      const redirectUri = ExpoLinking.createURL('/auth/callback', { scheme: 'mobile' });
+      const redirectUri = ExpoLinking.createURL("/auth/callback", {
+        scheme: "mobile",
+      });
       const loginUrl = `${API_BASE_URL}/auth/login?redirect_to=${encodeURIComponent(redirectUri)}`;
 
-      const authResult = await WebBrowser.openAuthSessionAsync(loginUrl, redirectUri);
+      const authResult = await WebBrowser.openAuthSessionAsync(
+        loginUrl,
+        redirectUri,
+      );
 
-      if (authResult.type !== 'success') {
-        if (authResult.type !== 'cancel') {
-          set({ authError: 'Anmeldung wurde abgebrochen. Bitte versuchen Sie es erneut.' });
+      if (authResult.type !== "success") {
+        if (authResult.type !== "cancel") {
+          set({
+            authError:
+              "Anmeldung wurde abgebrochen. Bitte versuchen Sie es erneut.",
+          });
         }
         return false;
       }
@@ -64,22 +73,29 @@ export const useAuthStore = create<AuthState>((set) => ({
       const codeParam = parsedUrl.queryParams?.code;
       const code = Array.isArray(codeParam) ? codeParam[0] : codeParam;
 
-      if (!code || typeof code !== 'string') {
-        set({ authError: 'Ungueltige Anmeldung. Bitte versuchen Sie es erneut.' });
+      if (!code || typeof code !== "string") {
+        set({
+          authError: "Ungueltige Anmeldung. Bitte versuchen Sie es erneut.",
+        });
         return false;
       }
 
-      const exchangeResponse = await fetch(`${API_BASE_URL}/auth/mobile/exchange`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const exchangeResponse = await fetch(
+        `${API_BASE_URL}/auth/mobile/exchange`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ code }),
         },
-        body: JSON.stringify({ code }),
-      });
+      );
 
       if (!exchangeResponse.ok) {
-        const error = await exchangeResponse.json().catch(() => ({ detail: 'Anmeldung fehlgeschlagen' }));
-        set({ authError: error.detail || 'Anmeldung fehlgeschlagen' });
+        const error = await exchangeResponse
+          .json()
+          .catch(() => ({ detail: "Anmeldung fehlgeschlagen" }));
+        set({ authError: error.detail || "Anmeldung fehlgeschlagen" });
         return false;
       }
 
@@ -88,7 +104,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isAuthenticated: true });
       return true;
     } catch {
-      set({ authError: 'Anmeldung konnte nicht gestartet werden. Bitte versuchen Sie es erneut.' });
+      set({
+        authError:
+          "Anmeldung konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
+      });
       return false;
     } finally {
       set({ tumLoading: false });
@@ -96,33 +115,41 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   loginWithVhb: async (password: string) => {
-    set({ authError: '', vhbLoading: true });
+    set({ authError: "", vhbLoading: true });
+
+    const res = await apiClient.auth.vhbLoginAuthVhbLoginPost({
+      password,
+    });
+    if (res.status === 200) {
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/auth/vhb-login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ password }),
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'Login fehlgeschlagen' }));
-        set({ authError: error.detail || 'Login fehlgeschlagen' });
+        const error = await response
+          .json()
+          .catch(() => ({ detail: "Login fehlgeschlagen" }));
+        set({ authError: error.detail || "Login fehlgeschlagen" });
         return false;
       }
 
       const data = await response.json();
-      if (data?.access_token && typeof data.access_token === 'string') {
+      if (data?.access_token && typeof data.access_token === "string") {
         await saveAccessToken(data.access_token);
       }
 
       set({ isAuthenticated: true });
       return true;
     } catch {
-      set({ authError: 'Verbindungsfehler. Bitte versuchen Sie es erneut.' });
+      set({ authError: "Verbindungsfehler. Bitte versuchen Sie es erneut." });
       return false;
     } finally {
       set({ vhbLoading: false });
@@ -131,6 +158,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     await clearAccessToken();
-    set({ isAuthenticated: false, authError: '', authChecked: true });
+    set({ isAuthenticated: false, authError: "", authChecked: true });
   },
 }));
