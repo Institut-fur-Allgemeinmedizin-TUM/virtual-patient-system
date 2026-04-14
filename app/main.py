@@ -315,9 +315,16 @@ async def create_session(
 
 
 @app.post("/api/chat", response_model=ChatResponse)
-async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatResponse:
+async def chat(req: ChatRequest, request: Request, db: OrmSession = Depends(get_db)) -> ChatResponse:
+    user = auth.require_user(request)
+
     # Check if this is a VHB session (in-memory)
     if req.session_id in vhb_sessions:
+        if not user.get("is_vhb_user", False):
+            raise HTTPException(
+                status_code=403,
+                detail="Non VHB user tried to access VHB session"
+            )
         vhb_session = vhb_sessions[req.session_id]
         case_id = vhb_session["case_id"]
         persona = chat_functions.load_case_prompt(case_id)
@@ -350,6 +357,10 @@ async def chat(req: ChatRequest, db: OrmSession = Depends(get_db)) -> ChatRespon
     chat_session = db.get(ChatSession, req.session_id)
     if chat_session is None:
         raise HTTPException(status_code=404, detail="Session not found")
+
+    tum_id = user.get("tum_id") or user.get("sub")
+    if chat_session.user_id != tum_id:
+        raise HTTPException(status_code=403, detail="Invalid user id")
 
     # Fetch messages ordered
     msgs = (
