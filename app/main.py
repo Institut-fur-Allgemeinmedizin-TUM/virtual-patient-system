@@ -53,7 +53,7 @@ app = FastAPI(title="Virtual Patient Backend", version="0.1.0")
 # Add CORS middleware
 # In production, the frontend is served from the same origin
 # In development, allow localhost:3000
-cors_origins = ["http://localhost:3000"]
+cors_origins = ["http://localhost:3000", "http://localhost:8082", "http://localhost:8081"]
 if settings.environment == "production" or settings.environment == "beta":
     # Allow same-origin requests in production
     cors_origins = ["*"]  # Or specify your Cloud Run URL
