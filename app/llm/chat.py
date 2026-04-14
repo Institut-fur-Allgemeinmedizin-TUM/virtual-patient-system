@@ -12,7 +12,7 @@ from app.model.models import Case
 
 def load_case_data(case_id: str) -> Dict:
     """Load case data from JSON file."""
-    case_file = os.path.join(os.path.dirname(__file__), "cases", f"{case_id}.json")
+    case_file = os.path.join(os.path.dirname(__file__), "..", "cases", f"{case_id}.json")
     if not os.path.exists(case_file):
         raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found")
 
