@@ -5,10 +5,10 @@ from jose import jwt, JWTError
 
 from app.config.config import settings
 
-
 # ---------------------
 # OIDC Authentication
 # ---------------------
+
 
 class OIDCState(BaseModel):
     state: str
@@ -60,12 +60,12 @@ def extract_tum_id_from_claims(claims: dict) -> Optional[str]:
 
     # Method 2: Try common OIDC claim fields
     tum_id = (
-            claims.get("preferred_username") or
-            claims.get("login") or
-            claims.get("tumid") or
-            claims.get("username") or
-            claims.get("user_id") or
-            claims.get("tum_user_id")
+        claims.get("preferred_username")
+        or claims.get("login")
+        or claims.get("tumid")
+        or claims.get("username")
+        or claims.get("user_id")
+        or claims.get("tum_user_id")
     )
     if tum_id:
         return tum_id
@@ -74,7 +74,11 @@ def extract_tum_id_from_claims(claims: dict) -> Optional[str]:
     if email and "@" in email:
         username_part = email.split("@")[0]
         # Only use if it looks like a TUM ID (starts with letter, 6-8 chars)
-        if len(username_part) >= 6 and len(username_part) <= 8 and username_part[0].isalpha():
+        if (
+            len(username_part) >= 6
+            and len(username_part) <= 8
+            and username_part[0].isalpha()
+        ):
             return username_part
 
     # Fallback: return None (will use sub as fallback later)

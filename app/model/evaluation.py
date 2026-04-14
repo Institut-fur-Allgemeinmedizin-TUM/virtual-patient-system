@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.model.models import Base, Session
 
+
 class EvaluationCriterion(BaseModel):
     name: str
     score: int

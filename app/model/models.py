@@ -23,12 +23,20 @@ class Session(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True)
     case_id: Mapped[str] = mapped_column(ForeignKey("cases.id"), nullable=False)
     user_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    ended_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    ended_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     case: Mapped[Case] = relationship()
-    messages: Mapped[List["Message"]] = relationship(back_populates="session", cascade="all, delete-orphan")
-    evaluation: Mapped[Optional["Evaluation"]] = relationship(back_populates="session", uselist=False, cascade="all, delete-orphan")
+    messages: Mapped[List["Message"]] = relationship(
+        back_populates="session", cascade="all, delete-orphan"
+    )
+    evaluation: Mapped[Optional["Evaluation"]] = relationship(
+        back_populates="session", uselist=False, cascade="all, delete-orphan"
+    )
 
 
 class Message(Base):
@@ -38,7 +46,9 @@ class Message(Base):
     session_id: Mapped[str] = mapped_column(ForeignKey("sessions.id"), nullable=False)
     role: Mapped[str] = mapped_column(String, nullable=False)  # user|assistant|system
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     tokens_in: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     tokens_out: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
@@ -49,8 +59,12 @@ class Evaluation(Base):
     __tablename__ = "evaluations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    session_id: Mapped[str] = mapped_column(ForeignKey("sessions.id"), nullable=False, unique=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("sessions.id"), nullable=False, unique=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
     # Criterion 1: Gesprächsführung
     criterion1_score: Mapped[int] = mapped_column(Integer, nullable=False)
