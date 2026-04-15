@@ -315,15 +315,16 @@ async def create_session(
 
 
 @app.post("/api/chat", response_model=ChatResponse)
-async def chat(req: ChatRequest, request: Request, db: OrmSession = Depends(get_db)) -> ChatResponse:
+async def chat(
+    req: ChatRequest, request: Request, db: OrmSession = Depends(get_db)
+) -> ChatResponse:
     user = auth.require_user(request)
 
     # Check if this is a VHB session (in-memory)
     if req.session_id in vhb_sessions:
         if not user.get("is_vhb_user", False):
             raise HTTPException(
-                status_code=403,
-                detail="Non VHB user tried to access VHB session"
+                status_code=403, detail="Non VHB user tried to access VHB session"
             )
         vhb_session = vhb_sessions[req.session_id]
         case_id = vhb_session["case_id"]
