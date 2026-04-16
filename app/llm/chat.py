@@ -10,7 +10,7 @@ from app.config.config import settings
 from app.model.models import Case
 
 
-def load_case_data(case_id: str) -> Dict:
+def _load_case_data_from_disk(case_id: str) -> Dict:
     """Load case data from JSON file."""
     case_file = os.path.join(
         os.path.dirname(__file__), "..", "cases", f"{case_id}.json"
@@ -20,6 +20,33 @@ def load_case_data(case_id: str) -> Dict:
 
     with open(case_file, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def _load_all_cases_from_disk() -> Dict[str, Dict]:
+    cases_dir = os.path.join(os.path.dirname(__file__), "..", "cases")
+    cases = {}
+    for filename in os.listdir(cases_dir):
+        if filename.endswith(".json"):
+            case_id = filename[:-5]  # Remove .json extension
+            try:
+                cases[case_id] = _load_case_data_from_disk(case_id)
+            except HTTPException:
+                continue  # Skip files that can't be loaded
+    return cases
+
+
+ALL_CASES: Dict[str, Dict] = _load_all_cases_from_disk()
+
+
+def load_case_data(case_id: str) -> Dict:
+    """Load case data from JSON file."""
+    if case_id in ALL_CASES:
+        return ALL_CASES[case_id]
+
+
+def load_all_cases() -> Dict[str, Dict]:
+    """Return all case data from the in-memory cache."""
+    return ALL_CASES
 
 
 def ensure_case(db: OrmSession, case_id: str) -> Case:

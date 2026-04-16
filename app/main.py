@@ -22,6 +22,7 @@ from app.llm import formatting
 from app.llm import chat as chat_functions
 from app.llm.prompts.evaluation import get_evaluation_prompt
 from app.model.auth import VHBLoginRequest, VHBLoginResponse
+from app.model.cases import GetCasesResponse
 from app.model.evaluation import EvaluationResponse
 from app.model.models import Evaluation
 from app.model.llm import (
@@ -539,6 +540,30 @@ async def get_case_details(case_id: str) -> JSONResponse:
                 "patient_occupation": persona.get("occupation", ""),
             }
         )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load case: {str(e)}")
+
+
+@app.get("/api/cases", response_model=GetCasesResponse)
+async def get_cases() -> GetCasesResponse:
+    """Get case details including patient persona information."""
+    try:
+        cases_data = chat_functions.load_all_cases()
+        cases_list = []
+        for case_id, case_data in cases_data.items():
+            persona = case_data.get("persona", {})
+            casesJson = {
+                "id": case_data.get("id", case_id),
+                "title": case_data.get("title", ""),
+                "language": case_data.get("language", "de"),
+                "patient_name": persona.get("name", ""),
+                "patient_age": persona.get("age", ""),
+                "patient_occupation": persona.get("occupation", ""),
+            }
+            cases_list.append(casesJson)
+        return GetCasesResponse(cases=cases_list)
     except HTTPException:
         raise
     except Exception as e:
