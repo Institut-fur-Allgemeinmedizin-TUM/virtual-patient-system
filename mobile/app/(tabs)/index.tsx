@@ -9,11 +9,9 @@ import { Link } from 'expo-router';
 import { Button } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
 
- 
-
 export default function HomeScreen() {
-   const logout = async () => {
-      await useAuthStore.getState().logout();
+  const logout = async () => {
+    await useAuthStore.getState().logout();
   };
   return (
     <ParallaxScrollView
@@ -23,20 +21,15 @@ export default function HomeScreen() {
           source={require('@/assets/images/partial-react-logo.png')}
           style={styles.reactLogo}
         />
-      }>
+      }
+    >
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
       </ThemedView>
-      <Button
-                  onPress={logout}
-                  mode="contained"
-                
-                  icon="lock"
-                 
-                >
-                  Logout
-          </Button>
+      <Button onPress={logout} mode="contained" icon="lock">
+        Logout
+      </Button>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>

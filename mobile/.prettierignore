@@ -4,3 +4,4 @@ ios
 dist
 build
 coverage
+api.ts

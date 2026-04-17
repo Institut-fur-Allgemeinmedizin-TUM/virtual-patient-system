@@ -93,7 +93,10 @@ export default function LoginScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.gradient}
         >
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          >
             <Card style={styles.card}>
               <Card.Content>
                 <View style={styles.iconContainer}>
@@ -124,11 +127,21 @@ export default function LoginScreen() {
                   Mit TUM-Kennung anmelden
                 </Button>
 
-                <Text variant="labelSmall" style={{ textAlign: 'center', marginBottom: 16, marginTop: 8 }}>
+                <Text
+                  variant="labelSmall"
+                  style={{ textAlign: 'center', marginBottom: 16, marginTop: 8 }}
+                >
                   Sie werden zur sicheren Anmeldeseite der TU München weitergeleitet.
                 </Text>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 16, gap: 12 }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginVertical: 16,
+                    gap: 12,
+                  }}
+                >
                   <Divider style={{ flex: 1 }} />
                   <Text variant="labelSmall">oder</Text>
                   <Divider style={{ flex: 1 }} />
