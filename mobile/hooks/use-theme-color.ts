@@ -4,18 +4,24 @@
  */
 
 import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from 'react-native-paper';
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
 ) {
-  const theme = useColorScheme() ?? 'light';
+  const paperTheme = useTheme();
+  const theme = paperTheme.dark ? 'dark' : 'light';
   const colorFromProps = props[theme];
 
   if (colorFromProps) {
     return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
   }
+
+  const paperColor = paperTheme.colors[colorName as keyof typeof paperTheme.colors];
+  if (typeof paperColor === 'string') {
+    return paperColor;
+  }
+
+  return Colors[theme][colorName];
 }

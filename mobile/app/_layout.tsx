@@ -1,9 +1,17 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { PaperProvider } from 'react-native-paper';
 
+import { AppHeader } from '@/components/app-header';
+import {
+  navigationDarkTheme,
+  navigationLightTheme,
+  paperDarkTheme,
+  paperLightTheme,
+} from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAuthStore } from '@/stores/useAuthStore';
 
@@ -32,15 +40,17 @@ export default function RootLayout() {
     }
 
     const inTabsGroup = segments[0] === '(tabs)';
+    const inCaseOverviewGroup = segments[0] === '(caseOverview)';
     const inLoginScreen = segments[0] === 'login';
+    const inProtectedRoute = inTabsGroup || inCaseOverviewGroup;
 
-    if (!isAuthenticated && inTabsGroup) {
+    if (!isAuthenticated) {
       router.replace('/login');
       return;
     }
 
     if (isAuthenticated && inLoginScreen) {
-      router.replace('/(tabs)');
+      router.replace('/(caseOverview)');
     }
   }, [authChecked, isAuthenticated, router, segments]);
 
@@ -49,13 +59,23 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <PaperProvider theme={colorScheme === 'dark' ? paperDarkTheme : paperLightTheme}>
+      <ThemeProvider value={colorScheme === 'dark' ? navigationDarkTheme : navigationLightTheme}>
+        <Stack
+          screenOptions={{
+            header: () => <AppHeader />,
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: 'transparent' },
+            headerTitle: '',
+          }}
+        >
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ title: '' }} />
+          <Stack.Screen name="(caseOverview)" options={{ title: '' }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal', title: '' }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </PaperProvider>
   );
 }

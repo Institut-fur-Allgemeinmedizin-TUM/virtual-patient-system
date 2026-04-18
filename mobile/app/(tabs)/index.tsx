@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { Platform, StyleSheet } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
@@ -10,12 +11,16 @@ import { Button } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export default function HomeScreen() {
+  const theme = useTheme();
   const logout = async () => {
     await useAuthStore.getState().logout();
   };
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{
+        light: theme.colors.primaryContainer,
+        dark: theme.colors.surfaceVariant,
+      }}
       headerImage={
         <Image
           source={require('@/assets/images/partial-react-logo.png')}
