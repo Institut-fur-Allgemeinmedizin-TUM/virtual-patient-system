@@ -25,6 +25,21 @@ interface AuthState {
   logout: () => Promise<void>;
 }
 
+function readApiErrorMessage(error: unknown, fallback: string) {
+  if (typeof error !== 'object' || error === null) {
+    return fallback;
+  }
+
+  const response = (error as { response?: { data?: { detail?: string } } }).response;
+  const detail = response?.data?.detail;
+
+  if (typeof detail === 'string' && detail.length > 0) {
+    return detail;
+  }
+
+  return fallback;
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   authError: '',
   authChecked: false,
@@ -109,25 +124,37 @@ export const useAuthStore = create<AuthState>((set) => ({
   loginWithVhb: async (password: string) => {
     set({ authError: '', vhbLoading: true });
 
-    const res = await apiClient.auth.vhbLoginAuthVhbLoginPost({
-      password,
-    });
-    if (res.status === 200) {
-      const data = res.data;
-      if (data?.token && typeof data.token === 'string') {
-        await saveAccessToken(data.token);
+    try {
+      const res = await apiClient.auth.vhbLoginAuthVhbLoginPost({
+        password,
+      });
+
+      if (res.status === 200) {
+        const data = res.data;
+        if (data?.token && typeof data.token === 'string') {
+          await saveAccessToken(data.token);
+        }
+        set({ isAuthenticated: true, vhbLoading: false });
+        return true;
       }
-      set({ isAuthenticated: true, vhbLoading: false });
-      return true;
-    } else {
+
       set({ authError: res.statusText || 'Login fehlgeschlagen', vhbLoading: false });
+      return false;
+    } catch (error) {
+      set({
+        authError: readApiErrorMessage(error, 'Login fehlgeschlagen'),
+        vhbLoading: false,
+      });
       return false;
     }
   },
 
   logout: async () => {
-    const res = await apiClient.auth.authLogoutAuthLogoutPost({});
-    if (res.status === 200) {
+    try {
+      await apiClient.auth.authLogoutAuthLogoutPost({});
+    } catch {
+      // Ignore backend logout errors (e.g., expired token) and clear local session anyway.
+    } finally {
       await clearAccessToken();
       set({ isAuthenticated: false, authError: '', authChecked: true });
     }
