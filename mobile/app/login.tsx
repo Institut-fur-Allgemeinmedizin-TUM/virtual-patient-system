@@ -70,7 +70,7 @@ export default function LoginScreen() {
       setVhbDialogOpen(false);
       setVhbPassword('');
       clearAuthError();
-      router.replace('/(tabs)');
+      router.replace('/');
     }
   };
 
