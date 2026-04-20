@@ -6,7 +6,16 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional
 
 import httpx
-from fastapi import FastAPI, Depends, HTTPException, Query, Request, Response, File, UploadFile
+from fastapi import (
+    FastAPI,
+    Depends,
+    HTTPException,
+    Query,
+    Request,
+    Response,
+    File,
+    UploadFile,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -251,7 +260,6 @@ async def auth_logout() -> JSONResponse:
     response = JSONResponse(content={"ok": True})
     response.delete_cookie("session", path="/")
     return response
-
 
 
 @app.post("/auth/vhb-login", response_model=VHBLoginResponse)
@@ -656,7 +664,7 @@ async def evaluate_session(
 
     tum_id = user.get("tum_id") or user.get("sub")
     if chat_session.user_id != tum_id:
-        raise HTTPException(status_code=403, detail="Invalid user ID for session")
+        raise HTTPException(status_code=403, detail="Invalid user id")
     # Check if evaluation already exists
     existing_evaluation = (
         db.query(Evaluation).filter(Evaluation.session_id == session_id).first()
