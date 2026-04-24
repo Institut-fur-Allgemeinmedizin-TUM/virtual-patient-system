@@ -12,15 +12,16 @@ import {
   paperDarkTheme,
   paperLightTheme,
 } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useThemeStore } from '@/stores/useThemeStore';
 
 export const unstable_settings = {
   initialRouteName: 'login',
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const colorScheme = useThemeStore();
   const router = useRouter();
   const segments = useSegments();
 
@@ -59,8 +60,8 @@ export default function RootLayout() {
   }
 
   return (
-    <PaperProvider theme={colorScheme === 'dark' ? paperDarkTheme : paperLightTheme}>
-      <ThemeProvider value={colorScheme === 'dark' ? navigationDarkTheme : navigationLightTheme}>
+    <PaperProvider theme={colorScheme.getResolvedTheme() === 'dark' ? paperDarkTheme : paperLightTheme}>
+      <ThemeProvider value={colorScheme.getResolvedTheme() === 'dark' ? navigationDarkTheme : navigationLightTheme}>
         <Stack
           screenOptions={{
             header: () => <AppHeader />,

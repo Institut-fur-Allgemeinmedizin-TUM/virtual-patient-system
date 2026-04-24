@@ -19,6 +19,22 @@ export interface BodyTranscribeAudioApiTranscribePost {
   audio: File;
 }
 
+/** CaseItemModel */
+export interface CaseItemModel {
+  /** Id */
+  id: string;
+  /** Title */
+  title: string;
+  /** Language */
+  language: string;
+  /** Patient Name */
+  patient_name: string;
+  /** Patient Age */
+  patient_age: number;
+  /** Patient Occupation */
+  patient_occupation: string;
+}
+
 /** ChatRequest */
 export interface ChatRequest {
   /** Session Id */
@@ -84,6 +100,12 @@ export interface ExportResponse {
   total_sessions: number;
   /** Date Range */
   date_range: string;
+}
+
+/** GetCasesResponse */
+export interface GetCasesResponse {
+  /** Cases */
+  cases: CaseItemModel[];
 }
 
 /** HTTPValidationError */
@@ -584,6 +606,21 @@ export class Api<
     ) =>
       this.request<any, HTTPValidationError>({
         path: `/api/cases/${caseId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get case details including patient persona information.
+     *
+     * @name GetCasesApiCasesGet
+     * @summary Get Cases
+     * @request GET:/api/cases
+     */
+    getCasesApiCasesGet: (params: RequestParams = {}) =>
+      this.request<GetCasesResponse, any>({
+        path: `/api/cases`,
         method: "GET",
         format: "json",
         ...params,

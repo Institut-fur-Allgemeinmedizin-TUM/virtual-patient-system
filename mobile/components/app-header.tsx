@@ -3,14 +3,18 @@ import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appbar, Divider, Drawer, Modal, Portal, Surface } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useThemeStore } from '@/stores/useThemeStore';
 
 export function AppHeader() {
   const { width } = useWindowDimensions();
-  const isCompact = width < 720;
   const sidebarWidth = Math.min(Math.max(width * 0.78, 260), 340);
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
+  const themeMode = useThemeStore((state) => state.mode);
   const logout = async () => {
     await useAuthStore.getState().logout();
+  };
+  const switchTheme = () => {
+    useThemeStore.getState().toggleMode();
   };
 
   return (
@@ -22,13 +26,14 @@ export function AppHeader() {
           accessibilityLabel="App logo"
         />
         <Appbar.Content title="TUM Virtual Patient System" />
-        {!isCompact ? (
-          <Appbar.Action
-            icon="robot-outline"
-            onPress={() => {}}
-            accessibilityLabel="Powered by AI"
-          />
-        ) : null}
+
+
+        <Appbar.Action
+          icon={themeMode === 'dark' ? 'moon-waning-crescent' : themeMode === 'system' ? 'laptop' : 'weather-sunny'}
+          onPress={switchTheme}
+          accessibilityLabel="Toggle theme"
+        />
+
         <Appbar.Action
           icon="account-circle-outline"
           onPress={() => {
