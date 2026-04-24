@@ -1,9 +1,11 @@
 import json
 import os
+from random import Random
 import time
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, Optional
+from urllib.parse import urlparse
 
 import httpx
 from fastapi import (
@@ -52,15 +54,22 @@ app = FastAPI(title="Virtual Patient Backend", version="0.1.0")
 
 # Add CORS middleware
 # In production, the frontend is served from the same origin
-# In development, allow localhost:3000
-cors_origins = ["http://localhost:3000", "http://localhost:8082", "http://localhost:8081"]
-if settings.environment == "production" or settings.environment == "beta":
+# In development, allow localhost and local-network origins so mobile devices can reach the backend
+cors_origins = [
+    "http://localhost:3000",
+    "http://localhost:8082",
+    "http://localhost:8081",
+]
+cors_origin_regex = r"^http://((localhost|127\.0\.0\.1)|((10|192\.168)\.\d+\.\d+)|(172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+))(:\d+)?$"
+if settings.environment == "production":
     # Allow same-origin requests in production
     cors_origins = ["*"]  # Or specify your Cloud Run URL
+    cors_origin_regex = None
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
+    allow_origin_regex=cors_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -226,7 +235,11 @@ async def auth_callback(
 
     # Redirect back to frontend after successful authentication
     frontend_path = st.get("redirect_to") or "/"
-    redirect_to = f"{settings.frontend_url}{frontend_path}"
+    parsed_redirect = urlparse(frontend_path)
+    if parsed_redirect.scheme and parsed_redirect.netloc:
+        redirect_to = frontend_path
+    else:
+        redirect_to = f"{settings.frontend_url}{frontend_path}"
     response = RedirectResponse(redirect_to, status_code=302)
     auth.set_session(response, claims)
     # remove the temporary state cookie
@@ -344,17 +357,21 @@ async def chat(
             if m["role"] in ("user", "assistant"):
                 messages_to_send.append({"role": m["role"], "content": m["content"]})
         messages_to_send.append({"role": "user", "content": req.message})
+        if os.environ.get("SIMULATE_AI") == "true":
+            # Simulate AI response for testing without OpenAI calls
+            time.sleep(1)
+            reply = f"Simulated response to: {req.message}"
+        else:
+            # Call OpenAI
+            client = chat_functions.get_openai_client()
+            completion = client.chat.completions.create(
+                model=settings.openai_model,
+                messages=messages_to_send,  # type: ignore[arg-type]
+                temperature=0.6,
+                max_tokens=300,
+            )
 
-        # Call OpenAI
-        client = chat_functions.get_openai_client()
-        completion = client.chat.completions.create(
-            model=settings.openai_model,
-            messages=messages_to_send,  # type: ignore[arg-type]
-            temperature=0.6,
-            max_tokens=300,
-        )
-
-        reply = completion.choices[0].message.content or ""
+            reply = completion.choices[0].message.content or ""
 
         # Store messages in memory only (no DB persistence)
         vhb_session["messages"].append({"role": "user", "content": req.message})
@@ -387,21 +404,27 @@ async def chat(
         if m.role in ("user", "assistant"):
             messages_to_send.append({"role": m.role, "content": m.content})
     messages_to_send.append({"role": "user", "content": req.message})
+    if os.environ.get("SIMULATE_AI") == "true":
+        # Simulate AI response for testing without OpenAI calls
+        time.sleep(1)
+        reply = f"Simulated response to: {req.message}"
+        tokens_in = 1
+        tokens_out = 2
+    else:
+        client = chat_functions.get_openai_client()
+        completion = client.chat.completions.create(
+            model=settings.openai_model,
+            messages=messages_to_send,  # type: ignore[arg-type]
+            temperature=0.6,
+            max_tokens=300,
+        )
 
-    client = chat_functions.get_openai_client()
-    completion = client.chat.completions.create(
-        model=settings.openai_model,
-        messages=messages_to_send,  # type: ignore[arg-type]
-        temperature=0.6,
-        max_tokens=300,
-    )
+        reply = completion.choices[0].message.content or ""
 
-    reply = completion.choices[0].message.content or ""
-
-    # Extract token usage
-    usage = completion.usage
-    tokens_in = usage.prompt_tokens if usage else None
-    tokens_out = usage.completion_tokens if usage else None
+        # Extract token usage
+        usage = completion.usage
+        tokens_in = usage.prompt_tokens if usage else None
+        tokens_out = usage.completion_tokens if usage else None
 
     # Persist turn with token usage
     db.add(
@@ -671,6 +694,8 @@ async def evaluate_session(
     )
 
     if existing_evaluation:
+        if os.environ.get("SIMULATE_AI") == "true":
+            time.sleep(4)
         # Return existing evaluation
         return formatting.format_evaluation_response(existing_evaluation)
 
@@ -701,41 +726,58 @@ async def evaluate_session(
 
     evaluation_prompt = get_evaluation_prompt(conversation_text)
 
-    # Call OpenAI to generate evaluation
+    # Call OpenAI to generate evaluation (or simulate in test mode)
     try:
-        client = chat_functions.get_openai_client()
-        completion = client.chat.completions.create(
-            model=settings.openai_model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "Sie sind ein medizinischer Ausbilder. Antworten Sie ausschließlich im angeforderten JSON-Format.",
-                },
-                {"role": "user", "content": evaluation_prompt},
-            ],
-            temperature=0.7,
-            max_tokens=2000,
-        )
+        if os.environ.get("SIMULATE_AI") == "true":
+            time.sleep(8)
+            evaluation_data = {
+                "criteria": [
+                    {
+                        "score": Random().randint(1, 5),
+                        "explanation": "Simulierte Bewertung: Gute Struktur, mit Potenzial zur Vertiefung.",
+                    }
+                    for _ in range(8)
+                ],
+                "suggestions": [
+                    "Stellen Sie mehr offene Fragen.",
+                    "Fassen Sie Zwischenergebnisse zusammen.",
+                    "Prüfen Sie Red Flags systematisch.",
+                ],
+            }
+        else:
+            client = chat_functions.get_openai_client()
+            completion = client.chat.completions.create(
+                model=settings.openai_model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "Sie sind ein medizinischer Ausbilder. Antworten Sie ausschließlich im angeforderten JSON-Format.",
+                    },
+                    {"role": "user", "content": evaluation_prompt},
+                ],
+                temperature=0.7,
+                max_tokens=2000,
+            )
 
-        response_text = completion.choices[0].message.content or ""
+            response_text = completion.choices[0].message.content or ""
 
-        # Parse JSON response
-        try:
-            evaluation_data = json.loads(response_text)
-        except json.JSONDecodeError:
-            # Try to extract JSON from markdown code blocks if present
-            if "```json" in response_text:
-                json_start = response_text.find("```json") + 7
-                json_end = response_text.find("```", json_start)
-                response_text = response_text[json_start:json_end].strip()
+            # Parse JSON response
+            try:
                 evaluation_data = json.loads(response_text)
-            elif "```" in response_text:
-                json_start = response_text.find("```") + 3
-                json_end = response_text.find("```", json_start)
-                response_text = response_text[json_start:json_end].strip()
-                evaluation_data = json.loads(response_text)
-            else:
-                raise
+            except json.JSONDecodeError:
+                # Try to extract JSON from markdown code blocks if present
+                if "```json" in response_text:
+                    json_start = response_text.find("```json") + 7
+                    json_end = response_text.find("```", json_start)
+                    response_text = response_text[json_start:json_end].strip()
+                    evaluation_data = json.loads(response_text)
+                elif "```" in response_text:
+                    json_start = response_text.find("```") + 3
+                    json_end = response_text.find("```", json_start)
+                    response_text = response_text[json_start:json_end].strip()
+                    evaluation_data = json.loads(response_text)
+                else:
+                    raise
 
         # Validate structure
         if "criteria" not in evaluation_data or "suggestions" not in evaluation_data:

@@ -60,8 +60,14 @@ export default function RootLayout() {
   }
 
   return (
-    <PaperProvider theme={colorScheme.getResolvedTheme() === 'dark' ? paperDarkTheme : paperLightTheme}>
-      <ThemeProvider value={colorScheme.getResolvedTheme() === 'dark' ? navigationDarkTheme : navigationLightTheme}>
+    <PaperProvider
+      theme={colorScheme.getResolvedTheme() === 'dark' ? paperDarkTheme : paperLightTheme}
+    >
+      <ThemeProvider
+        value={
+          colorScheme.getResolvedTheme() === 'dark' ? navigationDarkTheme : navigationLightTheme
+        }
+      >
         <Stack
           screenOptions={{
             header: () => <AppHeader />,

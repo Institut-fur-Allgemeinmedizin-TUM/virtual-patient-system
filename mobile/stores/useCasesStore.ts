@@ -19,23 +19,32 @@ export const useCasesStore = create<CasesState>((set, get) => ({
   error: false,
 
   loadAndGetCases: () => {
-    if(get().loaded) {
-        return get().cases;
+    if (get().loaded) {
+      return get().cases;
     } else {
-        apiClient.api.getCasesApiCasesGet().then((cases) => {
-            const mappedCases = cases.data.cases.map((c) => {
-              const caseModel = new Case({id: c.id, patientName: c.patient_name});
-              caseModel.id = c.id;
-              caseModel.patientName = c.patient_name;
-              
-              return caseModel;
+      apiClient.api
+        .getCasesApiCasesGet()
+        .then((cases) => {
+          const mappedCases = cases.data.cases.map((c) => {
+            const caseModel = new Case({
+              id: c.id,
+              patientName: c.patient_name,
+              title: c.title,
+              patientAge: c.patient_age,
+              patientOccupation: c.patient_occupation,
             });
-            set({ cases: mappedCases, loaded: true, error: false });
-        }).catch((error) => {
-            console.error('Failed to load cases:', error);
-            set({ error: true, loaded: false });
+            caseModel.id = c.id;
+            caseModel.patientName = c.patient_name;
+
+            return caseModel;
+          });
+          set({ cases: mappedCases, loaded: true, error: false });
+        })
+        .catch((error) => {
+          console.error('Failed to load cases:', error);
+          set({ error: true, loaded: false });
         });
     }
     return [];
-  }
+  },
 }));

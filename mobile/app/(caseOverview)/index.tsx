@@ -14,7 +14,8 @@ const caseImages: Record<string, number> = {
   'thomas_friedrich.png': require('@/assets/images/patients/thomas_friedrich.png'),
 };
 
-const getCaseImage = (imageName: string) => caseImages[imageName] ?? require('@/assets/images/react-logo.png');
+const getCaseImage = (imageName: string) =>
+  caseImages[imageName] ?? require('@/assets/images/react-logo.png');
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -43,10 +44,14 @@ export default function HomeScreen() {
       numColumns={columns}
       keyExtractor={(item) => item.id}
       columnWrapperStyle={columns > 1 ? styles.columnWrapper : undefined}
-      
-      
       renderItem={({ item }) => (
-        <View style={[styles.cardShell, { width: cardWidth }, columns === 1 ? styles.fullWidthCard : null]}>
+        <View
+          style={[
+            styles.cardShell,
+            { width: cardWidth },
+            columns === 1 ? styles.fullWidthCard : null,
+          ]}
+        >
           <Card mode="elevated" style={styles.card}>
             <Image
               source={getCaseImage(item.imageName)}
@@ -54,14 +59,11 @@ export default function HomeScreen() {
               contentFit="contain"
             />
             <Card.Content>
-              <Text variant="labelLarge" style={{ color: theme.colors.primary }}>
-                Case {item.id} {item.patientName} {item.imageName}
+              <Text variant="titleLarge" style={styles.cardTitle}>
+                {item.title}
               </Text>
-              <Text variant="titleMedium" style={styles.cardTitle}>
-                Placeholder title
-              </Text>
-              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                Placeholder text describing the case content and next action.
+              <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
+                {item.patientName}, {item.patientAge} Jahre, {item.patientOccupation}
               </Text>
             </Card.Content>
           </Card>
@@ -109,6 +111,8 @@ const styles = StyleSheet.create({
   cardTitle: {
     marginTop: 6,
     marginBottom: 8,
+    fontWeight: '700',
+    fontSize: 22,
   },
   emptyCard: {
     marginTop: 4,

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appbar, Divider, Drawer, Modal, Portal, Surface } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useThemeStore } from '@/stores/useThemeStore';
@@ -18,7 +17,7 @@ export function AppHeader() {
   };
 
   return (
-    <SafeAreaView edges={['top']}>
+    <>
       <Appbar.Header elevated>
         <Appbar.Action
           icon="hospital-box-outline"
@@ -27,9 +26,14 @@ export function AppHeader() {
         />
         <Appbar.Content title="TUM Virtual Patient System" />
 
-
         <Appbar.Action
-          icon={themeMode === 'dark' ? 'moon-waning-crescent' : themeMode === 'system' ? 'laptop' : 'weather-sunny'}
+          icon={
+            themeMode === 'dark'
+              ? 'moon-waning-crescent'
+              : themeMode === 'system'
+                ? 'laptop'
+                : 'weather-sunny'
+          }
           onPress={switchTheme}
           accessibilityLabel="Toggle theme"
         />
@@ -84,7 +88,7 @@ export function AppHeader() {
           </View>
         </Modal>
       </Portal>
-    </SafeAreaView>
+    </>
   );
 }
 
