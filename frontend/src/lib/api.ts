@@ -2,7 +2,7 @@ import { Evaluation } from '@/types';
 
 // In production (Cloud Run), frontend and backend are served from same origin
 // In development, use localhost:8000
-const getApiBaseUrl = () => {
+export const getApiBaseUrl = () => {
   // If VITE_API_URL is set, use it
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
@@ -167,6 +167,14 @@ export class ApiClient {
     if (!response.ok) {
       throw new Error(`Failed to logout: ${response.statusText}`);
     }
+  }
+
+  getLiveWebSocketUrl(sessionId: string): string {
+    const wsBaseUrl = this.baseUrl.startsWith('https://')
+      ? this.baseUrl.replace('https://', 'wss://')
+      : this.baseUrl.replace('http://', 'ws://');
+
+    return `${wsBaseUrl}/api/live/${encodeURIComponent(sessionId)}/ws`;
   }
 }
 

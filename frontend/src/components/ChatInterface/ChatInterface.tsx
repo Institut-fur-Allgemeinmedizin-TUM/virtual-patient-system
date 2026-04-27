@@ -164,6 +164,38 @@ export function ChatInterface({ sessionId, caseId, onReset }: ChatInterfaceProps
     navigate('/');
   };
 
+  const handleLiveTranscript = (role: 'user' | 'assistant', content: string) => {
+    const normalizedContent = content.trim();
+    if (!normalizedContent) {
+      return;
+    }
+
+    const transcriptMessage: Message = {
+      id: `live-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+      role,
+      content: normalizedContent,
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages(prev => {
+      if (role === 'assistant' && prev.length > 0) {
+        const lastMessage = prev[prev.length - 1];
+        if (lastMessage.role === 'assistant') {
+          const separator = lastMessage.content.endsWith(' ') ? '' : ' ';
+          const mergedMessage: Message = {
+            ...lastMessage,
+            content: `${lastMessage.content}${separator}${normalizedContent}`,
+            timestamp: transcriptMessage.timestamp,
+          };
+
+          return [...prev.slice(0, -1), mergedMessage];
+        }
+      }
+
+      return [...prev, transcriptMessage];
+    });
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <SessionInfo 
@@ -327,7 +359,12 @@ export function ChatInterface({ sessionId, caseId, onReset }: ChatInterfaceProps
         <div ref={messagesEndRef} />
       </Box>
       
-      <ChatInput onSendMessage={sendMessage} disabled={isLoading} />
+      <ChatInput
+        sessionId={sessionId}
+        onSendMessage={sendMessage}
+        onLiveTranscript={handleLiveTranscript}
+        disabled={isLoading}
+      />
 
       {/* Evaluation Dialog */}
       <EvaluationDialog
