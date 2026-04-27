@@ -4,6 +4,7 @@ from typing import Optional
 import httpx
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from app.auth import oidc
 from app.config.config import settings
@@ -68,6 +69,15 @@ def get_current_user(request: Request) -> Optional[dict]:
     except HTTPException:
         return None
 
+def get_current_user_websocket(websocket: WebSocket):
+    token = websocket.cookies.get("session")
+    if not token:
+        return None
+    try:
+        return oidc.verify(token)
+    except HTTPException:
+        return None
+
 
 def require_user(request: Request) -> dict:
     if not settings.require_auth:
@@ -76,4 +86,12 @@ def require_user(request: Request) -> dict:
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
+    return user
+
+def require_user_websocket(websocket: WebSocket):
+    if not settings.require_auth:
+        return {"sub": "anon", "name": "Anonymous"}
+    user = get_current_user_websocket(websocket)
+    if not user:
+        raise WebSocketDisconnect(reason="Not authenticated")
     return user

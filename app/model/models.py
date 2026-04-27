@@ -38,6 +38,8 @@ class Session(Base):
         back_populates="session", uselist=False, cascade="all, delete-orphan"
     )
 
+    live_api_handle: Mapped[str] = mapped_column(String, nullable=True)
+
 
 class Message(Base):
     __tablename__ = "messages"
