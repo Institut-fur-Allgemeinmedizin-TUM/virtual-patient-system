@@ -1,3 +1,5 @@
+import asyncio
+import base64
 import json
 import os
 import re
@@ -5,7 +7,9 @@ from random import Random
 import time
 import uuid
 from datetime import datetime, timedelta
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional
+
+import google.genai.types
 from urllib.parse import urlparse
 from urllib.parse import urlencode
 import httpx
@@ -18,6 +22,8 @@ from fastapi import (
     Response,
     File,
     UploadFile,
+    WebSocket,
+    WebSocketDisconnect,
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
@@ -179,11 +185,11 @@ async def auth_login(
         "state": state,
         "nonce": nonce,
     }
-    
+
     # Build authorize URL
     authorize_url = f"{settings.oidc_auth_url}?{urlencode(params)}"
     response = RedirectResponse(authorize_url, status_code=302)
-    
+
     # Check if the request is coming from localhost (e.g., your adb reverse setup)
     is_localhost = request.url.hostname in ["localhost", "127.0.0.1"]
 
@@ -196,7 +202,7 @@ async def auth_login(
         samesite="lax",             # MUST be 'lax' to survive the redirect back from TUM
         secure=not is_localhost     # False for local HTTP, True for production HTTPS
     )
-    
+
     return response
 
 
@@ -263,17 +269,17 @@ async def auth_callback(
 
     # Redirect back to frontend after successful authentication
     frontend_path = st.get("redirect_to") or "/"
-    # Check if the redirect URL is a mobile app deep link 
+    # Check if the redirect URL is a mobile app deep link
     # (Checking for custom scheme, Expo's development scheme, and the actual mobile app scheme)
     is_mobile = frontend_path.startswith("virtualpatient://") or frontend_path.startswith("myapp://") or frontend_path.startswith("exp://")
 
     if is_mobile:
-        mobile_session_token = auth.create_mobile_session_token(claims) 
-        
+        mobile_session_token = auth.create_mobile_session_token(claims)
+
         # Safely append the token (checking if the URL already has query parameters)
         separator = "&" if "?" in frontend_path else "?"
         redirect_to = f"{frontend_path}{separator}token={mobile_session_token}"
-        
+
         response = RedirectResponse(redirect_to, status_code=302)
     else:
         # Standard web flow handling
@@ -484,6 +490,196 @@ async def chat(
     db.commit()
 
     return ChatResponse(reply=reply, session_id=req.session_id)
+
+
+# Gemini Live API
+@app.websocket("/api/live/{session_id}/ws")
+async def live_websocket(
+    websocket: WebSocket, session_id: str, db: OrmSession = Depends(get_db)
+):
+    user = auth.require_user_websocket(websocket)
+    relay_tasks: List[asyncio.Task] = []
+
+    if session_id in vhb_sessions:
+        if not user.get("is_vhb_user", False):
+            raise WebSocketDisconnect(reason="VHB session expired")
+        raise WebSocketDisconnect(reason="Feature not available for VHB students")
+
+    if not settings.gemini_api_key:
+        await websocket.accept()
+        await websocket.send_json({"error": "Gemini Live is not configured on backend"})
+        await websocket.close(code=1011)
+        return
+
+    try:
+        from google import genai
+    except ImportError:
+        await websocket.accept()
+        await websocket.send_json({"error": "genai not available"})
+        await websocket.close(code=1011)
+        return
+
+    model_name = settings.gemini_live_model
+
+    chat_session = db.get(ChatSession, session_id)
+    if chat_session is None:
+        raise WebSocketDisconnect(reason="Session not found")
+
+    tum_id = user.get("tum_id") or user.get("sub")
+    if chat_session.user_id != tum_id:
+        raise WebSocketDisconnect(reason="Invalid user id")
+
+    case_id = chat_session.case_id
+    system_prompt = chat_functions.load_case_prompt(case_id)
+
+    await websocket.accept()
+    session_metadata = {"latest_handle": None}
+
+    try:
+        client = genai.Client(api_key=settings.gemini_api_key)
+        live_config: google.genai.types.LiveConnectConfigDict = {
+            "response_modalities": ["AUDIO"],
+            "system_instruction": system_prompt,
+        }
+
+        async with client.aio.live.connect(model=model_name, config=live_config) as live_session:
+
+            async def browser_to_gemini() -> None:
+                while True:
+                    incoming = await websocket.receive()
+                    if incoming.get("type") == "websocket.disconnect":
+                        break
+
+                    text_data = incoming.get("text")
+                    bytes_data = incoming.get("bytes")
+
+                    if bytes_data is not None:
+                        await live_session.send_realtime_input(
+                            audio={"data": bytes_data, "mime_type": "audio/pcm"}
+                        )
+
+                    if text_data is not None:
+                        try:
+                            parsed = json.loads(text_data)
+                        except json.JSONDecodeError:
+                            parsed = {"type": "text", "text": text_data}
+
+                        event_type = parsed.get("type") if isinstance(parsed, dict) else None
+
+                        if event_type == "audio":
+                            encoded_audio = parsed.get("data")
+                            if not encoded_audio:
+                                continue
+                            audio_bytes = base64.b64decode(encoded_audio)
+                            await live_session.send_realtime_input(
+                                audio={"data": audio_bytes, "mime_type": "audio/pcm"}
+                            )
+                        elif event_type == "text":
+                            text_value = parsed.get("text")
+                            if text_value:
+                                await live_session.send_client_content(
+                                    turns=[
+                                        {
+                                            "role": "user",
+                                            "parts": [{"text": text_value}],
+                                        }
+                                    ],
+                                    turn_complete=True,
+                                )
+                        elif event_type == "end_turn":
+                            await live_session.send_client_content(
+                                turns=[], turn_complete=True
+                            )
+
+            async def gemini_to_browser() -> None:
+                while True:
+                    rec = live_session.receive()
+                    async for response in rec:
+                        if response.session_resumption_update:
+                            update = response.session_resumption_update
+                            if update.resumable and update.new_handle:
+                                session_handle = update.new_handle
+                                print(f"Received session handle: {session_handle}")
+                                session_metadata["latest_handle"] = session_handle
+
+                        server_content = getattr(response, "server_content", None)
+                        if not server_content:
+                            continue
+
+                        model_turn = getattr(server_content, "model_turn", None)
+                        if model_turn and getattr(model_turn, "parts", None):
+                            for part in model_turn.parts:
+                                part_text = getattr(part, "text", None)
+                                if part_text:
+                                    payload = {"type": "model_text", "text": part_text}
+                                    await websocket.send_json(payload)
+
+                                inline_data = getattr(part, "inline_data", None)
+                                data = (
+                                    getattr(inline_data, "data", None)
+                                    if inline_data
+                                    else None
+                                )
+                                if isinstance(data, (bytes, bytearray)):
+                                    payload = {
+                                        "type": "model_audio",
+                                        "mime_type": getattr(
+                                            inline_data, "mime_type", "audio/pcm"
+                                        ),
+                                        "data": base64.b64encode(data).decode("ascii"),
+                                    }
+                                    await websocket.send_json(payload)
+
+            relay_tasks = [
+                asyncio.create_task(browser_to_gemini()),
+                asyncio.create_task(gemini_to_browser()),
+            ]
+
+            print("Waiting for tasks to stop")
+            done, pending = await asyncio.wait(
+                relay_tasks,
+                return_when=asyncio.FIRST_COMPLETED,
+            )
+
+            for task in pending:
+                task.cancel()
+
+            if pending:
+                await asyncio.gather(*pending, return_exceptions=True)
+
+            for task in done:
+                exc = task.exception()
+                if exc and not isinstance(exc, asyncio.CancelledError):
+                    print(f"Live relay task failed: {type(exc).__name__}: {exc}")
+                    raise exc
+
+            print("Tasks stopped")
+
+
+    except WebSocketDisconnect as e:
+        await websocket.close(code=1011, reason=e.reason)
+    except Exception as e:
+        print(f"Live websocket failed: {type(e).__name__}: {e}")
+        try:
+            await websocket.close(code=1011)
+        except Exception:
+            pass
+    finally:
+        for task in relay_tasks:
+            if not task.done():
+                task.cancel()
+
+        if relay_tasks:
+            await asyncio.gather(*relay_tasks, return_exceptions=True)
+
+        final_handle = session_metadata.get("latest_handle")
+        if final_handle:
+            try:
+                chat_session.live_api_handle = final_handle
+                db.commit()
+            except Exception as e:
+                db.rollback()
+                print(f"Failed to save handle to database: {e}")
 
 
 @app.post("/api/transcribe")
@@ -861,12 +1057,12 @@ async def evaluate_session(
 
 
 @app.get("/api/sessions/summary", response_model=SessionsSummaryResponse)
-async def get_last_session_summary( request: Request, 
+async def get_last_session_summary( request: Request,
      db: OrmSession = Depends(get_db)
 ) -> SessionsSummaryResponse:
     """Get a summary of the last sessions the user did per case."""
 
-  
+
     user = auth.require_user(request)
     session_id = str(uuid.uuid4())
 
@@ -903,10 +1099,10 @@ async def get_last_session_summary( request: Request,
                 ) / 8.0,
             )
             session_summary.sessions[session.case_id] = summary
-    
+
     return session_summary
-    
-    
+
+
 
 # Mount static files and serve the mobile web frontend (production only)
 if settings.environment == "production" or settings.environment == "beta":

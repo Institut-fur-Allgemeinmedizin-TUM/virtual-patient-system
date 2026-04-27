@@ -11,6 +11,10 @@ class Settings:
         self.port: int = int(os.getenv("PORT", "8000"))
         self.openai_api_key: Optional[str] = os.getenv("OPENAI_API_KEY")
         self.openai_model: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        self.gemini_api_key: Optional[str] = os.getenv("GEMINI_API_KEY")
+        self.gemini_live_model: str = os.getenv(
+            "GEMINI_LIVE_MODEL", "gemini-2.0-flash-live-001"
+        )
         # OIDC (TUM) configuration
         self.oidc_issuer: Optional[str] = os.getenv("OIDC_ISSUER")
         self.oidc_client_id: Optional[str] = os.getenv("OIDC_CLIENT_ID")
