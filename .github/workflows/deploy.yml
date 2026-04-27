@@ -9,12 +9,16 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: europe-west1
-  SERVICE_NAME: virtual-patient-system-eu
+  SERVICE_NAME_PROD: virtual-patient-system-eu
+  SERVICE_NAME_BETA: virtual-patient-system-eu-beta
+  IMAGE_NAME: virtual-patient-system-eu
   ARTIFACT_REGISTRY: europe-west3-docker.pkg.dev
 
 jobs:
-  deploy:
+  deploy-prod:
+    if: startsWith(github.ref_name, 'v') && !contains(github.ref_name, '-')
     runs-on: ubuntu-latest
+    environment: PRODUCTION
     
     steps:
       - name: Checkout code
@@ -34,33 +38,86 @@ jobs:
       
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.SERVICE_NAME }}:${{ github.sha }} .
-          docker tag ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.SERVICE_NAME }}:${{ github.sha }} ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.SERVICE_NAME }}:latest
+          docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:${{ github.ref_name }} .
+          docker tag ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:${{ github.ref_name }} ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:latest
       
       - name: Push Docker image to Artifact Registry
         run: |
-          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.SERVICE_NAME }}:${{ github.sha }}
-          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.SERVICE_NAME }}:latest
+          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:latest
       
       - name: Deploy to Cloud Run
         env:
-          IMAGE: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          IMAGE: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
           CLOUD_SQL: ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} --image="${IMAGE}" --region="${{ env.REGION }}" --platform=managed --allow-unauthenticated --add-cloudsql-instances="${CLOUD_SQL}" --memory=1Gi --cpu=1 --timeout=300 --max-instances=10 --min-instances=0
+          gcloud run deploy ${{ env.SERVICE_NAME_PROD }} --image="${IMAGE}" --region="${{ env.REGION }}" --platform=managed --allow-unauthenticated --add-cloudsql-instances="${CLOUD_SQL}" --memory=1Gi --cpu=1 --timeout=300 --max-instances=10 --min-instances=0
       
       - name: Set environment variables
         env:
           CLOUD_SQL: ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
         run: |
-          gcloud run services update ${{ env.SERVICE_NAME }} \
+          gcloud run services update ${{ env.SERVICE_NAME_PROD }} \
             --region=${{ env.REGION }} \
             --add-cloudsql-instances="${CLOUD_SQL}" \
             --update-env-vars="ENVIRONMENT=production,CLOUD_SQL_CONNECTION_NAME=${{ secrets.CLOUD_SQL_CONNECTION_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }},OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},OPENAI_MODEL=gpt-4o-mini,APP_SECRET_KEY=${{ secrets.APP_SECRET_KEY }},REQUIRE_AUTH=false,OIDC_ISSUER=${{ secrets.OIDC_ISSUER }},OIDC_CLIENT_ID=${{ secrets.OIDC_CLIENT_ID }},OIDC_CLIENT_SECRET=${{ secrets.OIDC_CLIENT_SECRET }},OIDC_AUTH_URL=${{ secrets.OIDC_AUTH_URL }},OIDC_TOKEN_URL=${{ secrets.OIDC_TOKEN_URL }},OIDC_JWKS_URL=${{ secrets.OIDC_JWKS_URL }},OIDC_REDIRECT_URI=${{ secrets.OIDC_REDIRECT_URI }},FRONTEND_URL=${{ secrets.FRONTEND_URL }},VHB_PASSWORD=${{ secrets.VHB_PASSWORD }}"
       
-      - name: Output service URL
+      - name: Output production service URL
         run: |
-          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} --region=${{ env.REGION }} --format='value(status.url)')
-          echo "Service deployed to: $SERVICE_URL"
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME_PROD }} --region=${{ env.REGION }} --format='value(status.url)')
+          echo "Production service deployed to: $SERVICE_URL"
+          echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_ENV
+
+  deploy-beta:
+    if: startsWith(github.ref_name, 'v') && contains(github.ref_name, '-beta.')
+    runs-on: ubuntu-latest
+    environment: BETA
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}
+      
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:${{ github.ref_name }} .
+          docker tag ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:${{ github.ref_name }} ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:beta-latest
+      
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:beta-latest
+      
+      - name: Deploy to Cloud Run
+        env:
+          IMAGE: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/virtual-patient/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          CLOUD_SQL: ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME_BETA }} --image="${IMAGE}" --region="${{ env.REGION }}" --platform=managed --allow-unauthenticated --add-cloudsql-instances="${CLOUD_SQL}" --memory=1Gi --cpu=1 --timeout=300 --max-instances=10 --min-instances=0
+      
+      - name: Set environment variables
+        env:
+          CLOUD_SQL: ${{ secrets.CLOUD_SQL_CONNECTION_NAME }}
+        run: |
+          gcloud run services update ${{ env.SERVICE_NAME_BETA }} \
+            --region=${{ env.REGION }} \
+            --add-cloudsql-instances="${CLOUD_SQL}" \
+            --update-env-vars="ENVIRONMENT=beta,CLOUD_SQL_CONNECTION_NAME=${{ secrets.CLOUD_SQL_CONNECTION_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }},OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }},OPENAI_MODEL=gpt-4o-mini,APP_SECRET_KEY=${{ secrets.APP_SECRET_KEY }},REQUIRE_AUTH=false,OIDC_ISSUER=${{ secrets.OIDC_ISSUER }},OIDC_CLIENT_ID=${{ secrets.OIDC_CLIENT_ID }},OIDC_CLIENT_SECRET=${{ secrets.OIDC_CLIENT_SECRET }},OIDC_AUTH_URL=${{ secrets.OIDC_AUTH_URL }},OIDC_TOKEN_URL=${{ secrets.OIDC_TOKEN_URL }},OIDC_JWKS_URL=${{ secrets.OIDC_JWKS_URL }},OIDC_REDIRECT_URI=${{ secrets.OIDC_REDIRECT_URI }},FRONTEND_URL=${{ secrets.FRONTEND_URL }},VHB_PASSWORD=${{ secrets.VHB_PASSWORD }}"
+      
+      - name: Output beta service URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME_BETA }} --region=${{ env.REGION }} --format='value(status.url)')
+          echo "Beta service deployed to: $SERVICE_URL"
           echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_ENV
 
