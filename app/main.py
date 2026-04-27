@@ -54,7 +54,7 @@ app = FastAPI(title="Virtual Patient Backend", version="0.1.0")
 # In production, the frontend is served from the same origin
 # In development, allow localhost:3000
 cors_origins = ["http://localhost:3000"]
-if settings.environment == "production":
+if settings.environment == "production" or settings.environment == "beta":
     # Allow same-origin requests in production
     cors_origins = ["*"]  # Or specify your Cloud Run URL
 
@@ -783,7 +783,7 @@ async def evaluate_session(
 
 
 # Mount static files and serve frontend (production only)
-if settings.environment == "production":
+if settings.environment == "production" or settings.environment == "beta":
     frontend_dist = os.path.join(
         os.path.dirname(os.path.dirname(__file__)), "frontend", "dist"
     )
