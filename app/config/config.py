@@ -39,7 +39,7 @@ class Settings:
             return db_url
 
         # In production with Cloud SQL, construct Unix socket connection
-        if self.environment == "production":
+        if self.environment == "production" or self.environment == "beta":
             instance_connection_name = os.getenv("CLOUD_SQL_CONNECTION_NAME")
             db_user = os.getenv("DB_USER", "postgres")
             db_password = os.getenv("DB_PASSWORD", "")

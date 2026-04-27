@@ -36,7 +36,7 @@ def verify(token: str) -> dict:
 def set_cookie(response, name: str, value: str, max_age: int = 3600) -> None:
     # In production (HTTPS), cookies must have secure=True
     # In development (HTTP), secure=False is needed
-    is_production = settings.environment == "production"
+    is_production = settings.environment == "production" or settings.environment == "beta"
 
     response.set_cookie(
         key=name,
