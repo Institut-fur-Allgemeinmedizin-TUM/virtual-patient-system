@@ -21,7 +21,7 @@ jobs:
     environment: PRODUCTION
     
     steps:
-      - name: Checkout code
+      - name: Checkout code for prod
         uses: actions/checkout@v4
       
       - name: Authenticate to Google Cloud
@@ -74,7 +74,7 @@ jobs:
     environment: BETA
     
     steps:
-      - name: Checkout code
+      - name: Checkout code for beta
         uses: actions/checkout@v4
       
       - name: Authenticate to Google Cloud
