@@ -29,7 +29,7 @@ db_url = os.getenv("DATABASE_URL")
 # If not set, check if we're in production with Cloud SQL (Cloud Run)
 if not db_url:
     environment = os.getenv("ENVIRONMENT", "development")
-    if environment == "production":
+    if environment == "production" or environment == "beta":
         instance_connection_name = os.getenv("CLOUD_SQL_CONNECTION_NAME")
         db_user = os.getenv("DB_USER", "postgres")
         db_password = os.getenv("DB_PASSWORD", "")
