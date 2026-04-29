@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Appbar, Divider, Drawer, Modal, Portal, Surface } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useThemeStore } from '@/stores/useThemeStore';
+import { router } from 'expo-router';
 
 export function AppHeader() {
   const { width } = useWindowDimensions();
@@ -21,7 +22,9 @@ export function AppHeader() {
       <Appbar.Header elevated>
         <Appbar.Action
           icon="hospital-box-outline"
-          onPress={() => {}}
+          onPress={() => {
+            router.push('/');
+          }}
           accessibilityLabel="App logo"
         />
         <Appbar.Content title="TUM Virtual Patient System" />

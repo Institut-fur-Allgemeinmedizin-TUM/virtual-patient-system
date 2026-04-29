@@ -1,28 +1,18 @@
 import { useEffect } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { FlatList, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { Card, Text, useTheme } from 'react-native-paper';
+import { Button, Card, Text, useTheme } from 'react-native-paper';
 import { useCasesStore } from '@/stores/useCasesStore';
-
-const caseImages: Record<string, number> = {
-  'emin_yilmaz.png': require('@/assets/images/patients/emin_yilmaz.png'),
-  'johann_huber.png': require('@/assets/images/patients/johann_huber.png'),
-  'karin_seidel.png': require('@/assets/images/patients/karin_seidel.png'),
-  'michael_bauer.png': require('@/assets/images/patients/michael_bauer.png'),
-  'peter_lenz.png': require('@/assets/images/patients/peter_lenz.png'),
-  'sandra_mueller.png': require('@/assets/images/patients/sandra_mueller.png'),
-  'thomas_friedrich.png': require('@/assets/images/patients/thomas_friedrich.png'),
-};
-
-const getCaseImage = (imageName: string) =>
-  caseImages[imageName] ?? require('@/assets/images/react-logo.png');
+import { useSessionStore } from '@/stores/useSessionStore';
+import { router } from 'expo-router';
+import { getCaseImage } from '@/lib/cases/case';
 
 export default function HomeScreen() {
   const theme = useTheme();
   const { width } = useWindowDimensions();
   const cases = useCasesStore((state) => state.cases);
-  const loaded = useCasesStore((state) => state.loaded);
   const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
+  const startCase = useSessionStore((state) => state.startSession);
 
   useEffect(() => {
     loadAndGetCases();
@@ -52,13 +42,23 @@ export default function HomeScreen() {
             columns === 1 ? styles.fullWidthCard : null,
           ]}
         >
-          <Card mode="elevated" style={styles.card}>
+          <Card
+            mode="elevated"
+            style={styles.card}
+            onPress={async () => {
+              const sessionId = await startCase(item.id, item);
+              if (sessionId) {
+                //Navigate to session screen with sessionId
+                router.push(`/session/${sessionId}`);
+              }
+            }}
+          >
             <Image
               source={getCaseImage(item.imageName)}
               style={styles.cardImage}
-              contentFit="contain"
+              contentFit="cover"
             />
-            <Card.Content>
+            <Card.Content style={styles.contentPadding}>
               <Text variant="titleLarge" style={styles.cardTitle}>
                 {item.title}
               </Text>
@@ -66,6 +66,24 @@ export default function HomeScreen() {
                 {item.patientName}, {item.patientAge} Jahre, {item.patientOccupation}
               </Text>
             </Card.Content>
+            <Card.Actions style={styles.fullWidthActions}>
+              <Button
+                mode="contained"
+                onPress={async () => {
+                  const sessionId = await startCase(item.id, item);
+                  if (sessionId) {
+                    //Navigate to session screen with sessionId
+                    router.push(`/session/${sessionId}`);
+                  }
+                }}
+                icon="play"
+                style={styles.fullWidthButton}
+                contentStyle={styles.buttonHeight}
+                labelStyle={styles.buttonLabel}
+              >
+                Fall starten
+              </Button>
+            </Card.Actions>
           </Card>
         </View>
       )}
@@ -105,7 +123,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: '100%',
-    aspectRatio: 1,
+    aspectRatio: 1.1,
     backgroundColor: '#E8E8E8',
   },
   cardTitle: {
@@ -119,5 +137,27 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     paddingVertical: 24,
+  },
+  contentPadding: {
+    paddingBottom: 16,
+  },
+  fullWidthActions: {
+    paddingHorizontal: 0,
+    paddingBottom: 0,
+    paddingTop: 0,
+    marginHorizontal: 0,
+  },
+  fullWidthButton: {
+    width: '100%',
+    borderRadius: 0,
+    margin: 0,
+  },
+  buttonHeight: {
+    height: 52,
+    flexDirection: 'row-reverse',
+  },
+  buttonLabel: {
+    fontSize: 18,
+    fontWeight: '600',
   },
 });

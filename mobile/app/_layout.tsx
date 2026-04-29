@@ -40,10 +40,7 @@ export default function RootLayout() {
       return;
     }
 
-    const inTabsGroup = segments[0] === '(tabs)';
-    const inCaseOverviewGroup = segments[0] === '(caseOverview)';
     const inLoginScreen = segments[0] === 'login';
-    const inProtectedRoute = inTabsGroup || inCaseOverviewGroup;
 
     if (!isAuthenticated) {
       router.replace('/login');
@@ -79,6 +76,7 @@ export default function RootLayout() {
           <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ title: '' }} />
           <Stack.Screen name="(caseOverview)" options={{ title: '' }} />
+          <Stack.Screen name="session/[sessionId]" options={{ title: 'Session' }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: '' }} />
         </Stack>
         <StatusBar style="auto" />
