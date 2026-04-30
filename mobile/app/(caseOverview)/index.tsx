@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { FlatList, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { Button, Card, Text, useTheme } from 'react-native-paper';
+import { Button, Text, Avatar, useTheme, Surface, TouchableRipple } from 'react-native-paper';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { router } from 'expo-router';
@@ -19,12 +19,20 @@ export default function HomeScreen() {
   }, [loadAndGetCases]);
 
   const horizontalPadding = 16;
-  const columnGap = 12;
+  const columnGap = 16;
   const columns = width >= 1100 ? 4 : width >= 780 ? 3 : width >= 520 ? 2 : 1;
   const cardWidth =
     columns === 1
       ? width - horizontalPadding * 2
       : (width - horizontalPadding * 2 - columnGap * (columns - 1)) / columns;
+
+  const getDifficultyStyle = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Leicht': return { bg: '#e8f7ef', text: '#0b7f5a' };
+      case 'Schwer': return { bg: '#fcebea', text: '#d93025' };
+      default: return { bg: '#fef3e5', text: '#d67e00' };
+    }
+  };
 
   return (
     <FlatList
@@ -34,130 +42,163 @@ export default function HomeScreen() {
       numColumns={columns}
       keyExtractor={(item) => item.id}
       columnWrapperStyle={columns > 1 ? styles.columnWrapper : undefined}
-      renderItem={({ item }) => (
-        <View
-          style={[
-            styles.cardShell,
-            { width: cardWidth },
-            columns === 1 ? styles.fullWidthCard : null,
-          ]}
-        >
-          <Card
-            mode="elevated"
-            style={styles.card}
-            onPress={async () => {
-              const sessionId = await startCase(item.id, item);
-              if (sessionId) {
-                //Navigate to session screen with sessionId
-                router.push(`/session/${sessionId}`);
-              }
-            }}
+      renderItem={({ item, index }) => {
+        const mockDifficulty = index % 3 === 0 ? 'Leicht' : index % 3 === 1 ? 'Mittel' : 'Schwer';
+        const mockIsCompleted = index % 2 === 0; 
+        const mockScore = 4.2; 
+        const diffStyle = getDifficultyStyle(mockDifficulty);
+
+        return (
+          <View
+            style={[
+              styles.cardShell,
+              { width: cardWidth },
+              columns === 1 ? styles.fullWidthCard : null,
+            ]}
           >
-            <Image
-              source={getCaseImage(item.imageName)}
-              style={styles.cardImage}
-              contentFit="cover"
-            />
-            <Card.Content style={styles.contentPadding}>
-              <Text variant="titleLarge" style={styles.cardTitle}>
-                {item.title}
-              </Text>
-              <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
-                {item.patientName}, {item.patientAge} Jahre, {item.patientOccupation}
-              </Text>
-            </Card.Content>
-            <Card.Actions style={styles.fullWidthActions}>
-              <Button
-                mode="contained"
+            <Surface
+              elevation={2}
+              style={[styles.card, { backgroundColor: theme.colors.surface }]}
+            >
+              <TouchableRipple
+                style={{ flex: 1 }} 
                 onPress={async () => {
                   const sessionId = await startCase(item.id, item);
-                  if (sessionId) {
-                    //Navigate to session screen with sessionId
-                    router.push(`/session/${sessionId}`);
-                  }
+                  if (sessionId) router.push(`/session/${sessionId}`);
                 }}
-                icon="play"
-                style={styles.fullWidthButton}
-                contentStyle={styles.buttonHeight}
-                labelStyle={styles.buttonLabel}
               >
-                Fall starten
-              </Button>
-            </Card.Actions>
-          </Card>
-        </View>
-      )}
+                <View style={styles.cardInnerFlex}>
+                  
+                  {/* --- TOP HALF (Image) --- */}
+                  <View style={styles.imageContainer}>
+                    <Image
+                      source={getCaseImage(item.imageName)}
+                      style={styles.cardImage}
+                      contentFit="cover"
+                    />
+                    <View style={[styles.difficultyBadge, { backgroundColor: diffStyle.bg }]}>
+                      <Text style={{ color: diffStyle.text, fontSize: 12, fontWeight: '700' }}>
+                        {mockDifficulty}
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  {/* --- MIDDLE HALF (Text) --- */}
+                  <View style={styles.textContainer}>
+                    <Text variant="titleLarge" style={styles.cardTitle} numberOfLines={2}>
+                      {item.title}
+                    </Text>
+                    <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
+                      {item.patientName}, {item.patientAge} Jahre
+                    </Text>
+                    <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                      {item.patientOccupation}
+                    </Text>
+                  </View>
+
+                  {/* --- BOTTOM HALF (Status + Action Buttons) --- */}
+                  <View>
+                    {mockIsCompleted && (
+                      <View style={[styles.statusRow, { borderTopColor: theme.colors.outlineVariant }]}>
+                        <Avatar.Icon size={20} icon="check-circle" color="#2ecc71" style={{ backgroundColor: 'transparent', margin: 0 }} />
+                        <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginLeft: 6, fontWeight: '600' }}>
+                          Absolviert • Letzter Score: {mockScore}/5
+                        </Text>
+                      </View>
+                    )}
+                    
+                    {/* UI/UX FIX: Split buttons for completed cases, single button for new cases */}
+                    {mockIsCompleted ? (
+                      <View style={styles.buttonRow}>
+                        <Button
+                          mode="contained-tonal"
+                          onPress={() => {
+                            // TODO: Add logic to open the last session evaluation
+                            console.log('Open previous result for:', item.id);
+                          }}
+                          icon="chart-box-outline"
+                          style={styles.halfWidthButton}
+                          contentStyle={styles.buttonHeight}
+                          labelStyle={styles.splitButtonLabel}
+                        >
+                          Ergebnis
+                        </Button>
+                        <Button
+                          mode="contained"
+                          onPress={async () => {
+                            const sessionId = await startCase(item.id, item);
+                            if (sessionId) router.push(`/session/${sessionId}`);
+                          }}
+                          icon="refresh"
+                          style={styles.halfWidthButton}
+                          contentStyle={styles.buttonHeight}
+                          labelStyle={styles.splitButtonLabel}
+                        >
+                          Wiederholen
+                        </Button>
+                      </View>
+                    ) : (
+                      <Button
+                        mode="contained"
+                        onPress={async () => {
+                          const sessionId = await startCase(item.id, item);
+                          if (sessionId) router.push(`/session/${sessionId}`);
+                        }}
+                        icon="play"
+                        style={styles.fullWidthButton}
+                        contentStyle={styles.buttonHeight}
+                        labelStyle={styles.fullButtonLabel}
+                      >
+                        Fall starten
+                      </Button>
+                    )}
+                  </View>
+
+                </View>
+              </TouchableRipple>
+            </Surface>
+          </View>
+        );
+      }}
     />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    gap: 16,
+  container: { padding: 16, gap: 16 },
+  columnWrapper: { gap: 16, alignItems: 'stretch' },
+  cardShell: { display: 'flex' },
+  fullWidthCard: { flexBasis: '100%' },
+  card: { flex: 1, overflow: 'hidden', borderRadius: 16 },
+  cardInnerFlex: { flex: 1, display: 'flex', flexDirection: 'column' },
+  imageContainer: { position: 'relative' },
+  cardImage: { width: '100%', aspectRatio: 1.5, backgroundColor: '#E8E8E8' },
+  difficultyBadge: {
+    position: 'absolute', top: 12, right: 12, paddingHorizontal: 10, paddingVertical: 4,
+    borderRadius: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15, shadowRadius: 4, elevation: 3, 
   },
-  header: {
-    gap: 8,
-    marginBottom: 4,
+  textContainer: { flex: 1, padding: 16, paddingBottom: 24 },
+  cardTitle: { fontWeight: '700', fontSize: 20, lineHeight: 26 },
+  statusRow: {
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, 
+    paddingVertical: 12, borderTopWidth: 1, 
   },
-  title: {
-    fontWeight: '700',
-  },
-  chip: {
-    alignSelf: 'flex-start',
-    marginTop: 4,
-  },
-  columnWrapper: {
-    gap: 12,
-  },
-  cardShell: {
-    flexGrow: 0,
-    minWidth: 0,
-  },
-  fullWidthCard: {
-    flexBasis: '100%',
-  },
-  card: {
-    height: '100%',
-    overflow: 'hidden',
-  },
-  cardImage: {
+  buttonRow: {
+    flexDirection: 'row', // Places the two buttons side-by-side
     width: '100%',
-    aspectRatio: 1.1,
-    backgroundColor: '#E8E8E8',
   },
-  cardTitle: {
-    marginTop: 6,
-    marginBottom: 8,
-    fontWeight: '700',
-    fontSize: 22,
-  },
-  emptyCard: {
-    marginTop: 4,
-  },
-  loadingContainer: {
-    paddingVertical: 24,
-  },
-  contentPadding: {
-    paddingBottom: 16,
-  },
-  fullWidthActions: {
-    paddingHorizontal: 0,
-    paddingBottom: 0,
-    paddingTop: 0,
-    marginHorizontal: 0,
-  },
-  fullWidthButton: {
-    width: '100%',
+  halfWidthButton: {
+    flex: 1, // Ensures both buttons take exactly 50% of the row
     borderRadius: 0,
     margin: 0,
   },
-  buttonHeight: {
-    height: 52,
-    flexDirection: 'row-reverse',
-  },
-  buttonLabel: {
-    fontSize: 18,
-    fontWeight: '600',
+  fullWidthButton: { width: '100%', borderRadius: 0, margin: 0 },
+  buttonHeight: { height: 48, flexDirection: 'row-reverse' },
+  fullButtonLabel: { fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
+  splitButtonLabel: { 
+    fontSize: 14, // Slightly smaller to ensure German words don't clip on small phones
+    fontWeight: '700', 
+    letterSpacing: 0.2 
   },
 });
