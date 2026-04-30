@@ -48,10 +48,19 @@ export default function SessionScreen() {
 
   const profile = useMemo(() => getSessionProfile(sessionId), [sessionId]);
   const session = useSessionStore((state) => state);
+  session.sessionId = sessionId; // Ensure session ID is set in store for API calls
+  const loadSession = useSessionStore((state) => state.loadSession);
+
   const isBotTyping = session.waitingForBotresponse ?? false;
 
   const [draft, setDraft] = useState('');
   const messageScrollRef = useRef<ScrollView>(null);
+  
+  useEffect(() => {
+    if (!session.loaded) {
+      void loadSession();
+    }
+  }, [loadSession, session.loaded]);
 
   useEffect(() => {
     messageScrollRef.current?.scrollToEnd({ animated: true });
@@ -78,6 +87,25 @@ export default function SessionScreen() {
       sendMessage();
     }
   };
+
+  const evaluate = () => {
+    if(session.chatHistory!.length >= 10) {
+      session.evaluate();
+    }
+  }
+
+  if (!session.loaded) {
+    return (
+      <SafeAreaView
+        style={[styles.safeArea, { backgroundColor: theme.colors.background }]}
+        edges={['bottom']}
+      >
+        <View style={[styles.page, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size="large" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -117,6 +145,9 @@ export default function SessionScreen() {
                   {session.case?.patientOccupation}
                 </Text>
               </View>
+              <Button icon="chart-box-outline" style={styles.evaluateButton} compact={true} mode="outlined" onPress={() => evaluate()}>
+                Evaluate
+            </Button>
             </View>
 
             <View style={styles.chatBody}>
@@ -298,6 +329,10 @@ const styles = StyleSheet.create({
   chatHeaderTitle: {
     marginLeft: 16,
     justifyContent: 'center',
+    flex: 1,
+  },
+  evaluateButton: {
+    marginLeft: 'auto',
   },
   chatBody: {
     flex: 1, // Forces scroll view container to take all available middle space
