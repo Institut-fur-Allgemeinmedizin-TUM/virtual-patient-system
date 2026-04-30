@@ -18,6 +18,7 @@ interface SessionState {
   chatHistory?: ChatMessage[];
   waitingForBotresponse?: boolean;
   evaluationResponse: EvaluationResponse | undefined; 
+  waitingForEvaluationResponse: boolean;
   startSession: (caseId: string, caseData: Case) => Promise<string | undefined>;
   loadSession: () => Promise<void>;
   chat: (msg: string) => void;
@@ -31,6 +32,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   chatHistory: [],
   waitingForBotresponse: false,
   evaluationResponse: undefined,
+  waitingForEvaluationResponse: false,
 
   startSession: async (caseId: string, caseData: Case) => {
     const resp = await apiClient.api.createSessionApiSessionsPost({ case_id: caseId });
@@ -107,14 +109,26 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     
   },
   evaluate: () => {
+    set((state) => ({
+            waitingForEvaluationResponse: true,
+          }));
     apiClient.api.evaluateSessionApiSessionsSessionIdEvaluatePost(get().sessionId!).then((resp) => {
       if (resp.status !== 200) {
         console.error('Evaluation failed');
+        set((state) => ({
+            waitingForEvaluationResponse: false,
+          }));
       } else {
-        console.log('Evaluation result:', resp.data);
+        set((state) => ({
+            waitingForEvaluationResponse: false,
+            evaluationResponse: resp.data,
+          }));
       }
     }).catch((error) => {
       console.error('Evaluation error:', error);
+      set((state) => ({
+            waitingForEvaluationResponse: false,
+          }));
     });
   }
 }));

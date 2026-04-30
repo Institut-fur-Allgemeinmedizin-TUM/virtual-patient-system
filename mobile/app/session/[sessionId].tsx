@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Avatar, Button, IconButton, Surface, Text, TextInput, useTheme } from 'react-native-paper';
+import EvaluationModal from '../components/EvaluationModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { getCaseImage } from '@/lib/cases/case';
@@ -87,9 +88,9 @@ export default function SessionScreen() {
       sendMessage();
     }
   };
-
+  const canEvaluate = session.chatHistory && session.chatHistory.length >= 10 && !session.waitingForEvaluationResponse && !isBotTyping;
   const evaluate = () => {
-    if(session.chatHistory!.length >= 10) {
+    if(canEvaluate) {
       session.evaluate();
     }
   }
@@ -145,7 +146,14 @@ export default function SessionScreen() {
                   {session.case?.patientOccupation}
                 </Text>
               </View>
-              <Button icon="chart-box-outline" style={styles.evaluateButton} compact={true} mode="outlined" onPress={() => evaluate()}>
+              <Button icon="chart-box-outline" 
+                      style={styles.evaluateButton} 
+                      compact={true} 
+                      mode="outlined" 
+                      onPress={() => evaluate()}
+                      disabled={!canEvaluate}
+                      loading={session.waitingForEvaluationResponse}
+              >
                 Evaluate
             </Button>
             </View>
@@ -295,6 +303,7 @@ export default function SessionScreen() {
           </Surface>
         </View>
       </KeyboardAvoidingView>
+        <EvaluationModal />
     </SafeAreaView>
   );
 }
