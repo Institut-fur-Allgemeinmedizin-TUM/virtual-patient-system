@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 from urllib.parse import urlparse
-
+from urllib.parse import urlencode
 import httpx
 from fastapi import (
     FastAPI,
@@ -163,12 +163,24 @@ async def auth_login(
         "state": state,
         "nonce": nonce,
     }
+    
     # Build authorize URL
-    from urllib.parse import urlencode
-
     authorize_url = f"{settings.oidc_auth_url}?{urlencode(params)}"
     response = RedirectResponse(authorize_url, status_code=302)
-    oidc.set_cookie(response, "oidc_state", state_token, max_age=600)
+    
+    # Check if the request is coming from localhost (e.g., your adb reverse setup)
+    is_localhost = request.url.hostname in ["localhost", "127.0.0.1"]
+
+    # Explicitly set the cookie with the correct flags for mobile browsers
+    response.set_cookie(
+        key="oidc_state",
+        value=state_token,
+        max_age=600,
+        httponly=True,
+        samesite="lax",             # MUST be 'lax' to survive the redirect back from TUM
+        secure=not is_localhost     # False for local HTTP, True for production HTTPS
+    )
+    
     return response
 
 
@@ -235,14 +247,24 @@ async def auth_callback(
 
     # Redirect back to frontend after successful authentication
     frontend_path = st.get("redirect_to") or "/"
-    parsed_redirect = urlparse(frontend_path)
-    if parsed_redirect.scheme and parsed_redirect.netloc:
-        redirect_to = frontend_path
+    # Check if the redirect URL is a mobile app deep link 
+    # (Checking for custom scheme, Expo's development scheme, and the actual mobile app scheme)
+    is_mobile = frontend_path.startswith("virtualpatient://") or frontend_path.startswith("myapp://") or frontend_path.startswith("exp://")
+
+    if is_mobile:
+        mobile_session_token = auth.create_mobile_session_token(claims) 
+        
+        # Safely append the token (checking if the URL already has query parameters)
+        separator = "&" if "?" in frontend_path else "?"
+        redirect_to = f"{frontend_path}{separator}token={mobile_session_token}"
+        
+        response = RedirectResponse(redirect_to, status_code=302)
     else:
-        redirect_to = f"{settings.frontend_url}{frontend_path}"
-    response = RedirectResponse(redirect_to, status_code=302)
-    auth.set_session(response, claims)
-    # remove the temporary state cookie
+        # Standard web flow handling
+        redirect_to = frontend_path if frontend_path.startswith("http") else f"{settings.frontend_url}{frontend_path}"
+        response = RedirectResponse(redirect_to, status_code=302)
+        auth.set_session(response, claims)
+
     response.delete_cookie("oidc_state", path="/")
     return response
 

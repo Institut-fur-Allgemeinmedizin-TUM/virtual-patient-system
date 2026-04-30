@@ -10,7 +10,7 @@ export const getApiBaseUrl = () => {
   }
 
   if (Platform.OS === 'android') {
-    return 'http://192.168.178.21:8000';
+    return 'http://localhost:8000';
   }
 
   return 'http://localhost:8000';

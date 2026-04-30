@@ -60,7 +60,7 @@ export default function LoginScreen() {
   const handleTumLogin = async () => {
     const success = await loginWithTum();
     if (success) {
-      router.replace('/(tabs)');
+      router.replace('/');
     }
   };
 

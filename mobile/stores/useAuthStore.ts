@@ -51,24 +51,49 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   checkStoredToken: async () => {
     const token = await getAccessToken();
-    set({ isAuthenticated: Boolean(token), authChecked: true });
+
+    if (token) {
+      set({ isAuthenticated: true, authChecked: true });
+      return;
+    }
+
+    if (Platform.OS === 'web') {
+      try {
+        const res = await apiClient.auth.authMeAuthMeGet({});
+        if (res.status === 200) {
+          set({ isAuthenticated: true, authChecked: true });
+          return;
+        }
+      } catch {
+        // No active web session; fall through to unauthenticated state.
+      }
+    }
+
+    set({ isAuthenticated: false, authChecked: true });
   },
 
   loginWithTum: async () => {
     set({ authError: '', tumLoading: true });
 
     try {
+      // 1. Web Flow: Standard cookie-based redirection
       if (Platform.OS === 'web') {
         const loginUrl = `${API_BASE_URL}/auth/login?redirect_to=${encodeURIComponent('/')}`;
         window.location.href = loginUrl;
-        return false;
+        return false; 
       }
 
-      const redirectUri = ExpoLinking.createURL('/auth/callback', {
-        scheme: 'mobile',
-      });
+      // 2. Mobile Flow: Generate the deep link
+      const redirectUri = ExpoLinking.createURL('callback');
+      console.log('🔗 Deep Link redirectUri:', redirectUri);
+      
+      // Tell the backend exactly where to send the user after logging in
       const loginUrl = `${API_BASE_URL}/auth/login?redirect_to=${encodeURIComponent(redirectUri)}`;
+      console.log('🔗 Login URL:', loginUrl);
 
+      // 3. Open the secure browser
+      // The user logs into TUM, the backend processes the code/state, 
+      // and redirects back to `redirectUri?token=XYZ`
       const authResult = await WebBrowser.openAuthSessionAsync(loginUrl, redirectUri);
 
       if (authResult.type !== 'success') {
@@ -80,38 +105,30 @@ export const useAuthStore = create<AuthState>((set) => ({
         return false;
       }
 
+      // 4. Extract the token passed by your backend
+      console.log('🔗 Auth Result URL:', authResult.url);
       const parsedUrl = ExpoLinking.parse(authResult.url);
-      const codeParam = parsedUrl.queryParams?.code;
-      const code = Array.isArray(codeParam) ? codeParam[0] : codeParam;
+      console.log('🔗 Parsed URL:', parsedUrl);
+      const tokenParam = parsedUrl.queryParams?.token;
+      console.log('🔗 Token Param:', tokenParam);
+      
+      // Handle edge case where parsing returns an array
+      const token = Array.isArray(tokenParam) ? tokenParam[0] : tokenParam;
 
-      if (!code || typeof code !== 'string') {
+      if (!token || typeof token !== 'string') {
         set({
-          authError: 'Ungueltige Anmeldung. Bitte versuchen Sie es erneut.',
+          authError: 'Ungültige Anmeldung. Session-Token fehlt.',
         });
         return false;
       }
 
-      const exchangeResponse = await fetch(`${API_BASE_URL}/auth/mobile/exchange`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code }),
-      });
 
-      if (!exchangeResponse.ok) {
-        const error = await exchangeResponse
-          .json()
-          .catch(() => ({ detail: 'Anmeldung fehlgeschlagen' }));
-        set({ authError: error.detail || 'Anmeldung fehlgeschlagen' });
-        return false;
-      }
-
-      const data: MobileExchangeResponse = await exchangeResponse.json();
-      await saveAccessToken(data.access_token);
+      await saveAccessToken(token);
       set({ isAuthenticated: true });
       return true;
-    } catch {
+
+    } catch (error) {
+      console.error('Login error:', error);
       set({
         authError: 'Anmeldung konnte nicht gestartet werden. Bitte versuchen Sie es erneut.',
       });

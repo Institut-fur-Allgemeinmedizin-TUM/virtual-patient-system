@@ -17,7 +17,7 @@ async def fetch_jwks() -> dict:
         res.raise_for_status()
         return res.json()
 
-
+# TODO combine with create_mobile_session_token
 def set_session(response: RedirectResponse, claims: dict) -> None:
     """Store user claims in session cookie. Extracts TUM ID at auth time."""
     # Extract TUM ID when we have all the claims
@@ -37,6 +37,26 @@ def set_session(response: RedirectResponse, claims: dict) -> None:
 
     token = oidc.sign(session_claims)
     oidc.set_cookie(response, "session", token, max_age=60 * 60 * 24)
+
+
+def create_mobile_session_token(claims: dict) -> str:
+    """Create a session token for mobile clients. Extracts TUM ID at auth time."""
+    # Extract TUM ID when we have all the claims
+    tum_id = oidc.extract_tum_id_from_claims(claims)
+
+    session_claims = {
+        "sub": claims.get("sub"),
+        "email": claims.get("email"),
+        "name": claims.get("name"),
+        "iat": int(time.time()),
+        "exp": int(time.time()) + 60 * 60 * 24,  # 24h
+    }
+
+    # Only add tum_id if we found one (don't add None)
+    if tum_id:
+        session_claims["tum_id"] = tum_id
+
+    return oidc.sign(session_claims)
 
 
 def get_current_user(request: Request) -> Optional[dict]:
