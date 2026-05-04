@@ -1,17 +1,18 @@
-# Stage 1: Build frontend
-FROM node:18-alpine AS frontend-builder
 
-WORKDIR /app/frontend
+# Stage 1: Build mobile web frontend
+FROM node:20-alpine AS frontend-builder
 
-# Copy frontend package files
-COPY frontend/package*.json ./
+WORKDIR /app/mobile
+
+# Copy mobile package files
+COPY mobile/package*.json ./
 RUN npm ci
 
-# Copy frontend source
-COPY frontend/ ./
+# Copy mobile source
+COPY mobile/ ./
 
-# Build frontend
-RUN npm run build
+# Build web frontend
+RUN npx expo export --platform web
 
 # Stage 2: Production image
 FROM python:3.9-slim
@@ -37,8 +38,9 @@ COPY start.sh ./
 # Make startup script executable
 RUN chmod +x start.sh
 
-# Copy frontend build from previous stage
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+
+# Copy mobile web build from previous stage
+COPY --from=frontend-builder /app/mobile/dist ./mobile/dist
 
 # Expose port (Cloud Run will set PORT env var)
 EXPOSE 8080

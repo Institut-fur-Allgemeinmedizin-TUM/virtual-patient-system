@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from random import Random
 import time
 import uuid
@@ -78,6 +79,20 @@ app.add_middleware(
 # In-memory storage for VHB sessions (not persisted to database)
 # Structure: {session_id: {"case_id": str, "messages": [{"role": str, "content": str}]}}
 vhb_sessions: Dict[str, Dict] = {}
+
+
+def _read_mobile_index_html(frontend_dist: str) -> str:
+    index_path = os.path.join(frontend_dist, "index.html")
+    with open(index_path, encoding="utf-8") as index_file:
+        html = index_file.read()
+
+    # Add a query string so browsers don't reuse a stale cached bundle URL.
+    html = re.sub(
+        r'src="(/_expo/static/js/web/[^"]+)"',
+        r'src="\1?v=mobile-web-1"',
+        html,
+    )
+    return html
 
 
 @app.get("/health")
@@ -846,13 +861,20 @@ async def evaluate_session(
         raise HTTPException(status_code=500, detail=f"Evaluation failed: {str(e)}")
 
 
-# Mount static files and serve frontend (production only)
+# Mount static files and serve the mobile web frontend (production only)
 if settings.environment == "production" or settings.environment == "beta":
     frontend_dist = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "frontend", "dist"
+        os.path.dirname(os.path.dirname(__file__)), "mobile", "dist"
     )
 
     if os.path.exists(frontend_dist):
+        # Serve Expo runtime assets and route manifest
+        app.mount(
+            "/_expo",
+            StaticFiles(directory=os.path.join(frontend_dist, "_expo")),
+            name="expo",
+        )
+
         # Serve static assets (JS, CSS, images)
         app.mount(
             "/assets",
@@ -893,4 +915,8 @@ if settings.environment == "production" or settings.environment == "beta":
             ):
                 raise HTTPException(status_code=404, detail="Not found")
 
-            return FileResponse(os.path.join(frontend_dist, "index.html"))
+            return Response(
+                content=_read_mobile_index_html(frontend_dist),
+                media_type="text/html",
+                headers={"Cache-Control": "no-store"},
+            )
