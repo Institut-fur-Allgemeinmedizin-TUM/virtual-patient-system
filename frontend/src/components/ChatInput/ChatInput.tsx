@@ -265,6 +265,18 @@ export function ChatInput({ sessionId, onSendMessage, onLiveTranscript, disabled
       const spokenText = finalTranscript.trim();
       if (spokenText) {
         onLiveTranscript?.('user', spokenText);
+
+        // Also forward live transcript text to the backend over the live websocket
+        const liveSocket = liveSocketRef.current;
+        if (liveSocket && liveSocket.readyState === WebSocket.OPEN) {
+          try {
+            liveSocket.send(
+              JSON.stringify({ type: 'text', text: spokenText })
+            );
+          } catch (err) {
+            // ignore send errors
+          }
+        }
       }
     };
 
@@ -310,36 +322,49 @@ export function ChatInput({ sessionId, onSendMessage, onLiveTranscript, disabled
       const ws = new WebSocket(apiClient.getLiveWebSocketUrl(sessionId));
 
       ws.onopen = () => {
+        console.log('WebSocket connected to:', apiClient.getLiveWebSocketUrl(sessionId));
         setIsLiveActive(true);
         setIsLiveConnecting(false);
         startSpeechRecognition();
       };
 
       ws.onmessage = (event) => {
+        console.log('WebSocket message received:', event.data);
         try {
           const payload = JSON.parse(String(event.data)) as LiveServerMessage;
+          console.log('Parsed payload:', payload);
 
           if (payload.type === 'model_text' && payload.text) {
+            console.log('Received model_text:', payload.text);
             onLiveTranscript?.('assistant', payload.text);
           }
 
+          if (payload.type === 'user_text' && payload.text) {
+            console.log('Received user_text:', payload.text);
+            onLiveTranscript?.('user', payload.text);
+          }
+
           if (payload.type === 'model_audio' && payload.data) {
+            console.log('Received model_audio, playing chunk:', payload.data.substring(0, 50));
             void playPcm16Chunk(payload.data);
           }
 
           if (payload.error) {
+            console.log('Received error:', payload.error);
             setLiveError(payload.detail || payload.error);
           }
-        } catch {
-          // Ignore malformed websocket events
+        } catch (err) {
+          console.error('Error parsing websocket message:', err);
         }
       };
 
       ws.onerror = () => {
+        console.error('WebSocket error occurred');
         setLiveError('Live-Verbindung fehlgeschlagen. Bitte versuchen Sie es erneut.');
       };
 
       ws.onclose = () => {
+        console.log('WebSocket closed');
         void cleanupLiveResources();
       };
 
@@ -385,10 +410,25 @@ export function ChatInput({ sessionId, onSendMessage, onLiveTranscript, disabled
   }, []);
 
   const handleSubmit = () => {
-    if (message.trim() && !disabled) {
-      onSendMessage(message);
+    const trimmed = message.trim();
+    if (!trimmed || disabled) return;
+
+    // If live session is active, send text over the live websocket instead of REST /api/chat
+    const liveSocket = liveSocketRef.current;
+    if (liveSocket && liveSocket.readyState === WebSocket.OPEN) {
+      try {
+        liveSocket.send(JSON.stringify({ type: 'text', text: trimmed }));
+        onLiveTranscript?.('user', trimmed);
+      } catch (err) {
+        console.error('Failed to send live text message:', err);
+      }
       setMessage('');
+      return;
     }
+
+    // Fallback: use regular REST send via parent handler
+    onSendMessage(message);
+    setMessage('');
   };
 
   const handleKeyPress = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -441,6 +481,22 @@ export function ChatInput({ sessionId, onSendMessage, onLiveTranscript, disabled
             
             // Set transcribed text in input field
             setMessage(transcribedText);
+
+            // If live is active, forward transcribed text immediately via live websocket
+            const liveSocket = liveSocketRef.current;
+            if (liveSocket && liveSocket.readyState === WebSocket.OPEN) {
+              try {
+                liveSocket.send(JSON.stringify({ type: 'text', text: transcribedText }));
+                onLiveTranscript?.('user', transcribedText);
+                setMessage('');
+              } catch (err) {
+                console.error('Failed to send live transcription:', err);
+                // Keep the transcribed text in the field if send fails
+              }
+            } else {
+              // Live not active, just set the message field
+              setMessage(transcribedText);
+            }
           } catch (error) {
             console.error('Transcription error:', error);
             setRecordingError('Transkription fehlgeschlagen. Bitte versuchen Sie es erneut.');

@@ -540,6 +540,8 @@ async def live_websocket(
         live_config: google.genai.types.LiveConnectConfigDict = {
             "response_modalities": ["AUDIO"],
             "system_instruction": system_prompt,
+            "output_audio_transcription": {},
+            "input_audio_transcription": {},
         }
 
         async with client.aio.live.connect(model=model_name, config=live_config) as live_session:
@@ -629,6 +631,19 @@ async def live_websocket(
                                         "data": base64.b64encode(data).decode("ascii"),
                                     }
                                     await websocket.send_json(payload)
+                        output_transcription = getattr(server_content, "output_transcription", None)
+                        if output_transcription:
+                            text = getattr(output_transcription, "text", None)
+                            payload = {"type": "model_text", "text": text}
+                            await websocket.send_json(payload)
+                            print(f"Transcription: {text}")
+
+                        input_transcription = getattr(server_content, "input_transcription", None)
+                        if input_transcription:
+                            text = getattr(input_transcription, "text", None)
+                            payload = {"type": "user_text", "text": text}
+                            await websocket.send_json(payload)
+                            print(f"Transcription: {text}")
 
             relay_tasks = [
                 asyncio.create_task(browser_to_gemini()),
