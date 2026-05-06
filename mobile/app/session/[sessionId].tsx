@@ -303,7 +303,7 @@ export default function SessionScreen() {
               style={styles.footerHint}
               labelStyle={{ textAlign: 'left' }}
             >
-              Im Moment werden nur simulierte Antworten angezeigt.
+              Antworten sind KI generiert!
             </Button>
           </Surface>
         </View>
