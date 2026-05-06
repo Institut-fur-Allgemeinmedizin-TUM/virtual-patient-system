@@ -114,6 +114,42 @@ export interface HTTPValidationError {
   detail?: ValidationError[];
 }
 
+/** SessionMessageItem */
+export interface SessionMessageItem {
+  /** Id */
+  id: number;
+  /** Role */
+  role: string;
+  /** Content */
+  content: string;
+  /**
+   * Created At
+   * @format date-time
+   */
+  created_at: string;
+  /** Tokens In */
+  tokens_in: number | null;
+  /** Tokens Out */
+  tokens_out: number | null;
+}
+
+/** SessionMessagesResponse */
+export interface SessionMessagesResponse {
+  /** Session Id */
+  session_id: string;
+  /** Case Id */
+  case_id: string;
+  /**
+   * Started At
+   * @format date-time
+   */
+  started_at: string;
+  /** Ended At */
+  ended_at: string | null;
+  /** Messages */
+  messages: SessionMessageItem[];
+}
+
 /** SessionSummary */
 export interface SessionSummary {
   /** Session Id */
@@ -135,6 +171,20 @@ export interface SessionSummary {
   total_tokens_in: number | null;
   /** Total Tokens Out */
   total_tokens_out: number | null;
+}
+
+/** SessionSummaryData */
+export interface SessionSummaryData {
+  /** Sessionid */
+  sessionId: string;
+  /** Score */
+  score: number;
+}
+
+/** SessionsSummaryResponse */
+export interface SessionsSummaryResponse {
+  /** Sessions */
+  sessions: Record<string, SessionSummaryData>;
 }
 
 /** VHBLoginRequest */
@@ -586,7 +636,7 @@ export class Api<
       sessionId: string,
       params: RequestParams = {},
     ) =>
-      this.request<any, HTTPValidationError>({
+      this.request<SessionMessagesResponse, HTTPValidationError>({
         path: `/api/sessions/${sessionId}/messages`,
         method: "GET",
         format: "json",
@@ -666,6 +716,21 @@ export class Api<
       this.request<EvaluationResponse, HTTPValidationError>({
         path: `/api/sessions/${sessionId}/evaluate`,
         method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get a summary of the last sessions the user did per case.
+     *
+     * @name GetLastSessionSummaryApiSessionsSummaryGet
+     * @summary Get Last Session Summary
+     * @request GET:/api/sessions/summary
+     */
+    getLastSessionSummaryApiSessionsSummaryGet: (params: RequestParams = {}) =>
+      this.request<SessionsSummaryResponse, any>({
+        path: `/api/sessions/summary`,
+        method: "GET",
         format: "json",
         ...params,
       }),

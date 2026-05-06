@@ -119,3 +119,27 @@ class ExportResponse(BaseModel):
     sessions: List[SessionSummary]
     total_sessions: int
     date_range: str
+
+
+class SessionMessageItem(BaseModel):
+    id: int
+    role: str
+    content: str
+    created_at: datetime
+    tokens_in: Optional[int]
+    tokens_out: Optional[int]
+
+
+class SessionMessagesResponse(BaseModel):
+    session_id: str
+    case_id: str
+    started_at: datetime
+    ended_at: Optional[datetime]
+    messages: List[SessionMessageItem]
+class SessionSummaryData(BaseModel):
+    sessionId: str
+    score: float
+    
+class SessionsSummaryResponse(BaseModel):
+    # Key: case_id -> Value: SessionSummaryData object
+    sessions: dict[str, SessionSummaryData]

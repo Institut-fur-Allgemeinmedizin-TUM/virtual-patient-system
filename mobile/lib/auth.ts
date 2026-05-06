@@ -4,19 +4,28 @@ import * as SecureStore from 'expo-secure-store';
 const AUTH_TOKEN_KEY = 'auth_access_token';
 
 export const getApiBaseUrl = () => {
-  const envUrl = process.env.EXPO_PUBLIC_API_URL;
+  // Development: Check for explicit BACKEND_URL environment variable
+  // Set before running: export EXPO_PUBLIC_BACKEND_URL=http://localhost:8000
+  const envUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
   if (envUrl) {
+    console.log(`Using BACKEND_URL from env: ${envUrl}`);
     return envUrl;
   }
-
-  if (Platform.OS === 'android') {
-    return 'http://localhost:8000';
+  
+  // Production/Docker: Frontend and backend on same origin
+  // This works because app.main.py serves both on the same port
+  if (typeof window !== 'undefined') {
+    console.log(`Using origin: ${window.location.origin}`);
+    return window.location.origin;
   }
-
-  return 'http://localhost:8000';
+  
+  // Fallback for SSR/build time
+  return 'http://localhost:8080';
 };
 
-export const API_BASE_URL = getApiBaseUrl();
+// Don't call getApiBaseUrl() at module load time - defer to runtime
+// Import this function and call it where needed
+export const API_BASE_URL = typeof window !== 'undefined' ? getApiBaseUrl() : 'http://localhost:8080';
 
 export interface MobileExchangeResponse {
   access_token: string;

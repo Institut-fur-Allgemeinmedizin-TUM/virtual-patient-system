@@ -80,19 +80,19 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (Platform.OS === 'web') {
         const loginUrl = `${API_BASE_URL}/auth/login?redirect_to=${encodeURIComponent('/')}`;
         window.location.href = loginUrl;
-        return false; 
+        return false;
       }
 
       // 2. Mobile Flow: Generate the deep link
       const redirectUri = ExpoLinking.createURL('callback');
       console.log('🔗 Deep Link redirectUri:', redirectUri);
-      
+
       // Tell the backend exactly where to send the user after logging in
       const loginUrl = `${API_BASE_URL}/auth/login?redirect_to=${encodeURIComponent(redirectUri)}`;
       console.log('🔗 Login URL:', loginUrl);
 
       // 3. Open the secure browser
-      // The user logs into TUM, the backend processes the code/state, 
+      // The user logs into TUM, the backend processes the code/state,
       // and redirects back to `redirectUri?token=XYZ`
       const authResult = await WebBrowser.openAuthSessionAsync(loginUrl, redirectUri);
 
@@ -111,7 +111,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       console.log('🔗 Parsed URL:', parsedUrl);
       const tokenParam = parsedUrl.queryParams?.token;
       console.log('🔗 Token Param:', tokenParam);
-      
+
       // Handle edge case where parsing returns an array
       const token = Array.isArray(tokenParam) ? tokenParam[0] : tokenParam;
 
@@ -122,11 +122,9 @@ export const useAuthStore = create<AuthState>((set) => ({
         return false;
       }
 
-
       await saveAccessToken(token);
       set({ isAuthenticated: true });
       return true;
-
     } catch (error) {
       console.error('Login error:', error);
       set({

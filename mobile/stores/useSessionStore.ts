@@ -1,6 +1,3 @@
-import * as ExpoLinking from 'expo-linking';
-import * as WebBrowser from 'expo-web-browser';
-import { Platform } from 'react-native';
 import { create } from 'zustand';
 import { Case } from '@/lib/cases/case';
 import { apiClient } from '@/lib/apiClient';
@@ -17,12 +14,13 @@ interface SessionState {
   case?: Case;
   chatHistory?: ChatMessage[];
   waitingForBotresponse?: boolean;
-  evaluationResponse: EvaluationResponse | undefined; 
+  evaluationResponse: EvaluationResponse | undefined;
   waitingForEvaluationResponse: boolean;
   startSession: (caseId: string, caseData: Case) => Promise<string | undefined>;
   loadSession: () => Promise<void>;
   chat: (msg: string) => void;
   evaluate: () => void;
+  resetEvaluation: () => void;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -101,34 +99,38 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       })
       .catch((error) => {
         set((state) => ({
-            chatHistory: [...(state.chatHistory || []), { role: 'bot', text: 'error'}],
-            waitingForBotresponse: false,
-          }));
+          chatHistory: [...(state.chatHistory || []), { role: 'bot', text: 'error' }],
+          waitingForBotresponse: false,
+        }));
       });
-
-    
   },
   evaluate: () => {
     set((state) => ({
-            waitingForEvaluationResponse: true,
-          }));
-    apiClient.api.evaluateSessionApiSessionsSessionIdEvaluatePost(get().sessionId!).then((resp) => {
-      if (resp.status !== 200) {
-        console.error('Evaluation failed');
-        set((state) => ({
+      waitingForEvaluationResponse: true,
+    }));
+    apiClient.api
+      .evaluateSessionApiSessionsSessionIdEvaluatePost(get().sessionId!)
+      .then((resp) => {
+        if (resp.status !== 200) {
+          console.error('Evaluation failed');
+          set((state) => ({
             waitingForEvaluationResponse: false,
           }));
-      } else {
-        set((state) => ({
+        } else {
+          set((state) => ({
             waitingForEvaluationResponse: false,
             evaluationResponse: resp.data,
           }));
-      }
-    }).catch((error) => {
-      console.error('Evaluation error:', error);
-      set((state) => ({
-            waitingForEvaluationResponse: false,
-          }));
-    });
-  }
+        }
+      })
+      .catch((error) => {
+        console.error('Evaluation error:', error);
+        set((state) => ({
+          waitingForEvaluationResponse: false,
+        }));
+      });
+  },
+  resetEvaluation: () => {
+    set({ evaluationResponse: undefined, waitingForEvaluationResponse: false });
+  },
 }));

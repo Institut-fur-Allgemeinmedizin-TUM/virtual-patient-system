@@ -56,7 +56,7 @@ export default function SessionScreen() {
 
   const [draft, setDraft] = useState('');
   const messageScrollRef = useRef<ScrollView>(null);
-  
+
   useEffect(() => {
     if (!session.loaded) {
       void loadSession();
@@ -88,12 +88,16 @@ export default function SessionScreen() {
       sendMessage();
     }
   };
-  const canEvaluate = session.chatHistory && session.chatHistory.length >= 10 && !session.waitingForEvaluationResponse && !isBotTyping;
+  const canEvaluate =
+    session.chatHistory &&
+    session.chatHistory.length >= 10 &&
+    !session.waitingForEvaluationResponse &&
+    !isBotTyping;
   const evaluate = () => {
-    if(canEvaluate) {
+    if (canEvaluate) {
       session.evaluate();
     }
-  }
+  };
 
   if (!session.loaded) {
     return (
@@ -146,16 +150,17 @@ export default function SessionScreen() {
                   {session.case?.patientOccupation}
                 </Text>
               </View>
-              <Button icon="chart-box-outline" 
-                      style={styles.evaluateButton} 
-                      compact={true} 
-                      mode="outlined" 
-                      onPress={() => evaluate()}
-                      disabled={!canEvaluate}
-                      loading={session.waitingForEvaluationResponse}
+              <Button
+                icon="chart-box-outline"
+                style={styles.evaluateButton}
+                compact={true}
+                mode="outlined"
+                onPress={() => evaluate()}
+                disabled={!canEvaluate}
+                loading={session.waitingForEvaluationResponse}
               >
                 Evaluate
-            </Button>
+              </Button>
             </View>
 
             <View style={styles.chatBody}>
@@ -303,7 +308,7 @@ export default function SessionScreen() {
           </Surface>
         </View>
       </KeyboardAvoidingView>
-        <EvaluationModal />
+      <EvaluationModal />
     </SafeAreaView>
   );
 }

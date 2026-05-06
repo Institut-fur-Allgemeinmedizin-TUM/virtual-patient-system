@@ -36,7 +36,7 @@ from app.llm.prompts.evaluation import get_evaluation_prompt
 from app.model.auth import VHBLoginRequest, VHBLoginResponse
 from app.model.cases import GetCasesResponse
 from app.model.evaluation import EvaluationResponse
-from app.model.models import Evaluation
+from app.model.models import Evaluation, SessionSummaryData, SessionsSummaryResponse
 from app.model.llm import (
     CreateSessionResponse,
     CreateSessionRequest,
@@ -48,6 +48,7 @@ from app.model.models import (
     Message,
     ExportResponse,
     SessionSummary,
+    SessionMessagesResponse,
 )
 
 # Trigger redeployment with OIDC_AUTH_URL secret now configured
@@ -565,10 +566,10 @@ async def export_sessions(
     )
 
 
-@app.get("/api/sessions/{session_id}/messages")
+@app.get("/api/sessions/{session_id}/messages", response_model=SessionMessagesResponse)
 async def get_session_messages(
     session_id: str, db: OrmSession = Depends(get_db)
-) -> JSONResponse:
+) -> SessionMessagesResponse:
     """Get all messages for a specific session."""
 
     session = db.get(ChatSession, session_id)
@@ -582,24 +583,22 @@ async def get_session_messages(
         .all()
     )
 
-    return JSONResponse(
-        content={
-            "session_id": session_id,
-            "case_id": session.case_id,
-            "started_at": session.started_at.isoformat(),
-            "ended_at": session.ended_at.isoformat() if session.ended_at else None,
-            "messages": [
-                {
-                    "id": msg.id,
-                    "role": msg.role,
-                    "content": msg.content,
-                    "created_at": msg.created_at.isoformat(),
-                    "tokens_in": msg.tokens_in,
-                    "tokens_out": msg.tokens_out,
-                }
-                for msg in messages
-            ],
-        }
+    return SessionMessagesResponse(
+        session_id=session_id,
+        case_id=session.case_id,
+        started_at=session.started_at,
+        ended_at=session.ended_at,
+        messages=[
+            {
+                "id": msg.id,
+                "role": msg.role,
+                "content": msg.content,
+                "created_at": msg.created_at,
+                "tokens_in": msg.tokens_in,
+                "tokens_out": msg.tokens_out,
+            }
+            for msg in messages
+        ],
     )
 
 
@@ -860,6 +859,54 @@ async def evaluate_session(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Evaluation failed: {str(e)}")
 
+
+@app.get("/api/sessions/summary", response_model=SessionsSummaryResponse)
+async def get_last_session_summary( request: Request, 
+     db: OrmSession = Depends(get_db)
+) -> SessionsSummaryResponse:
+    """Get a summary of the last sessions the user did per case."""
+
+  
+    user = auth.require_user(request)
+    session_id = str(uuid.uuid4())
+
+    # Check if this is a VHB user
+    is_vhb = user.get("is_vhb_user", False)
+    if is_vhb:
+        raise HTTPException(
+            status_code=403, detail="Session summary not available for VHB users"
+        )
+    tum_id = user.get("tum_id") or user.get("sub")
+    last_sessions = (
+        db.query(ChatSession)
+        .filter(ChatSession.user_id == tum_id)
+        .filter(ChatSession.evaluation != None)
+        .distinct(ChatSession.case_id)
+        .order_by(ChatSession.case_id, desc(ChatSession.started_at))
+        .all()
+    )
+    session_summary = SessionsSummaryResponse(sessions={})
+    for session in last_sessions:
+        evaluation = db.query(Evaluation).filter(Evaluation.session_id == session.id).first()
+        if evaluation:
+            summary = SessionSummaryData(
+                sessionId=session.id,
+                score=(
+                    evaluation.criterion1_score
+                    + evaluation.criterion2_score
+                    + evaluation.criterion3_score
+                    + evaluation.criterion4_score
+                    + evaluation.criterion5_score
+                    + evaluation.criterion6_score
+                    + evaluation.criterion7_score
+                    + evaluation.criterion8_score
+                ) / 8.0,
+            )
+            session_summary.sessions[session.case_id] = summary
+    
+    return session_summary
+    
+    
 
 # Mount static files and serve the mobile web frontend (production only)
 if settings.environment == "production" or settings.environment == "beta":

@@ -1,6 +1,17 @@
 import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { Portal, Modal, Surface, Text, ActivityIndicator, Button, List, Divider, Avatar, useTheme } from 'react-native-paper';
+import {
+  Portal,
+  Modal,
+  Surface,
+  Text,
+  ActivityIndicator,
+  Button,
+  List,
+  Divider,
+  Avatar,
+  useTheme,
+} from 'react-native-paper';
 import { useSessionStore } from '@/stores/useSessionStore';
 
 export default function EvaluationModal() {
@@ -9,12 +20,12 @@ export default function EvaluationModal() {
 
   const evaluation = useSessionStore((s) => s.evaluationResponse);
   const loading = useSessionStore((s) => s.waitingForEvaluationResponse);
+  const resetEvaluation = useSessionStore((s) => s.resetEvaluation);
 
   const visible = Boolean(loading || evaluation);
 
   const close = () => {
-    // @ts-ignore setState is available on the zustand store
-    useSessionStore.setState({ evaluationResponse: undefined });
+    resetEvaluation();
   };
 
   const containerStyle = useMemo(() => {
@@ -24,7 +35,7 @@ export default function EvaluationModal() {
       {
         width: isMobile ? width : Math.min(820, width - 48),
         maxHeight: Math.min(height - 80, 800),
-        backgroundColor: theme.colors.surface, 
+        backgroundColor: theme.colors.surface,
       },
     ];
   }, [width, height, theme.colors.surface]);
@@ -39,7 +50,7 @@ export default function EvaluationModal() {
     if (!evaluation || !evaluation.criteria.length) return 0;
     const total = evaluation.criteria.reduce((s, c) => s + c.score, 0);
     return total / evaluation.criteria.length;
-  }
+  };
 
   if (!visible) return null;
 
@@ -47,18 +58,22 @@ export default function EvaluationModal() {
     <Portal>
       <Modal visible={visible} onDismiss={close} contentContainerStyle={styles.modalBackdrop}>
         <Surface style={containerStyle} elevation={2}>
-          
           {/* HEADER */}
           <View style={styles.header}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Avatar.Icon 
-                size={40} 
-                icon="chart-bar" 
-                style={{ backgroundColor: theme.colors.primary }} 
-                color={theme.colors.onPrimary} 
+              <Avatar.Icon
+                size={40}
+                icon="chart-bar"
+                style={{ backgroundColor: theme.colors.primary }}
+                color={theme.colors.onPrimary}
               />
               <View style={{ marginLeft: 16 }}>
-                <Text variant="titleLarge" style={[styles.headerTitle, { color: theme.colors.primary }]}>Anamnese-Evaluation</Text>
+                <Text
+                  variant="titleLarge"
+                  style={[styles.headerTitle, { color: theme.colors.primary }]}
+                >
+                  Anamnese-Evaluation
+                </Text>
                 <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
                   Detailliertes Feedback zu Ihrer Gesprächsführung
                 </Text>
@@ -71,62 +86,122 @@ export default function EvaluationModal() {
           {loading ? (
             <View style={styles.loadingWrap}>
               <ActivityIndicator size="large" color={theme.colors.primary} />
-              <Text style={{ marginTop: 12, color: theme.colors.onSurface }}>Evaluation läuft …</Text>
+              <Text style={{ marginTop: 12, color: theme.colors.onSurface }}>
+                Evaluation läuft …
+              </Text>
             </View>
           ) : evaluation ? (
             <>
               <ScrollView contentContainerStyle={styles.content}>
-                
                 {/* OVERALL SCORE CARD */}
-                <Surface style={[styles.card, { backgroundColor: theme.colors.elevation.level1, borderColor: theme.colors.outlineVariant }]} elevation={0}>
+                <Surface
+                  style={[
+                    styles.card,
+                    {
+                      backgroundColor: theme.colors.elevation.level1,
+                      borderColor: theme.colors.outlineVariant,
+                    },
+                  ]}
+                  elevation={0}
+                >
                   <View style={styles.overallRow}>
                     {/* FIXED: Text color forced to onSurface so it's visible */}
-                    <Text variant="titleMedium" style={{ fontWeight: 'bold', color: theme.colors.onSurface }}>Gesamtbewertung</Text>
-                    <View style={[styles.mainBadge, { backgroundColor: getScoreColor(calculateOverall()) }]}>
-                      <Avatar.Icon size={18} icon="check-circle" color="white" style={{ backgroundColor: 'transparent' }} />
+                    <Text
+                      variant="titleMedium"
+                      style={{ fontWeight: 'bold', color: theme.colors.onSurface }}
+                    >
+                      Gesamtbewertung
+                    </Text>
+                    <View
+                      style={[
+                        styles.mainBadge,
+                        { backgroundColor: getScoreColor(calculateOverall()) },
+                      ]}
+                    >
+                      <Avatar.Icon
+                        size={18}
+                        icon="check-circle"
+                        color="white"
+                        style={{ backgroundColor: 'transparent' }}
+                      />
                       <Text style={styles.mainBadgeText}>
                         {calculateOverall().toFixed(1)} / 5.0
                       </Text>
                     </View>
                   </View>
-                  
-                  <View style={[styles.progressBarBackground, { backgroundColor: theme.colors.surfaceVariant }]}>
-                    <View style={[
-                        styles.progressBarFill, 
-                        { width: `${(calculateOverall() / 5) * 100}%`, backgroundColor: getScoreColor(calculateOverall()) }
-                      ]} 
+
+                  <View
+                    style={[
+                      styles.progressBarBackground,
+                      { backgroundColor: theme.colors.surfaceVariant },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.progressBarFill,
+                        {
+                          width: `${(calculateOverall() / 5) * 100}%`,
+                          backgroundColor: getScoreColor(calculateOverall()),
+                        },
+                      ]}
                     />
                   </View>
                 </Surface>
 
-                <Text variant="titleLarge" style={[styles.sectionTitle, { color: theme.colors.primary }]}>
+                <Text
+                  variant="titleLarge"
+                  style={[styles.sectionTitle, { color: theme.colors.primary }]}
+                >
                   Bewertungskriterien
                 </Text>
 
                 {/* CRITERIA ACCORDIONS */}
                 {evaluation.criteria.map((c, idx) => (
-                  <Surface 
-                    key={idx} 
+                  <Surface
+                    key={idx}
                     // FIXED: Dynamic background and borders
-                    style={[styles.accordionCard, { backgroundColor: theme.colors.elevation.level1, borderColor: theme.colors.outlineVariant }]} 
+                    style={[
+                      styles.accordionCard,
+                      {
+                        backgroundColor: theme.colors.elevation.level1,
+                        borderColor: theme.colors.outlineVariant,
+                      },
+                    ]}
                     elevation={0}
                   >
                     <List.Accordion
                       title={c.name || `Kriterium ${idx + 1}`}
-                      titleStyle={[styles.accordionTitle, { color: theme.colors.primary }]} 
+                      titleStyle={[styles.accordionTitle, { color: theme.colors.primary }]}
                       style={styles.accordionBase}
                       right={(props) => (
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <View style={[styles.smallBadge, { backgroundColor: getScoreColor(c.score) }]}>
-                            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>{c.score}/5</Text>
+                          <View
+                            style={[styles.smallBadge, { backgroundColor: getScoreColor(c.score) }]}
+                          >
+                            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+                              {c.score}/5
+                            </Text>
                           </View>
-                          <List.Icon {...props} icon={props.isExpanded ? "chevron-up" : "chevron-down"} color={theme.colors.onSurfaceVariant} />
+                          <List.Icon
+                            {...props}
+                            icon={props.isExpanded ? 'chevron-up' : 'chevron-down'}
+                            color={theme.colors.onSurfaceVariant}
+                          />
                         </View>
                       )}
                     >
-                      <View style={[styles.expandedContent, { borderTopColor: theme.colors.outlineVariant }]}>
-                        <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 4 }}>
-                          Bewertung: {c.score >= 4 ? 'Gut' : c.score >= 3 ? 'Teilweise' : 'Eher nicht'}
+                      <View
+                        style={[
+                          styles.expandedContent,
+                          { borderTopColor: theme.colors.outlineVariant },
+                        ]}
+                      >
+                        <Text
+                          variant="labelMedium"
+                          style={{ color: theme.colors.onSurfaceVariant, marginBottom: 4 }}
+                        >
+                          Bewertung:{' '}
+                          {c.score >= 4 ? 'Gut' : c.score >= 3 ? 'Teilweise' : 'Eher nicht'}
                         </Text>
                         <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>
                           {c.explanation}
@@ -137,49 +212,71 @@ export default function EvaluationModal() {
                 ))}
 
                 {/* IMPROVEMENT SUGGESTIONS CARD */}
-                <Surface 
+                <Surface
                   style={[
-                    styles.card, 
-                    { 
-                      marginTop: 16, 
-                      backgroundColor: theme.colors.primaryContainer, 
-                      borderColor: theme.colors.primary, 
-                      borderWidth: 1.5, 
-                    }
-                  ]} 
+                    styles.card,
+                    {
+                      marginTop: 16,
+                      backgroundColor: theme.colors.primaryContainer,
+                      borderColor: theme.colors.primary,
+                      borderWidth: 1.5,
+                    },
+                  ]}
                   elevation={0}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Avatar.Icon 
-                      size={32} 
-                      icon="lightbulb-on" 
-                      style={{ backgroundColor: theme.colors.primary }} 
-                      color={theme.colors.onPrimary} 
+                    <Avatar.Icon
+                      size={32}
+                      icon="lightbulb-on"
+                      style={{ backgroundColor: theme.colors.primary }}
+                      color={theme.colors.onPrimary}
                     />
-                    <Text variant="titleMedium" style={{ marginLeft: 12, fontWeight: 'bold', color: theme.colors.onPrimaryContainer }}>
+                    <Text
+                      variant="titleMedium"
+                      style={{
+                        marginLeft: 12,
+                        fontWeight: 'bold',
+                        color: theme.colors.onPrimaryContainer,
+                      }}
+                    >
                       Verbesserungsvorschläge
                     </Text>
                   </View>
-                  
+
                   {evaluation.improvement_suggestions.map((sug, i) => (
-                    <View key={i} style={{ flexDirection: 'row', marginBottom: 10, paddingRight: 12 }}>
-                      <Text style={{ color: theme.colors.primary, marginRight: 10, fontSize: 18, lineHeight: 22 }}>•</Text>
-                      <Text variant="bodyMedium" style={{ color: theme.colors.onPrimaryContainer, flex: 1, lineHeight: 22 }}>
+                    <View
+                      key={i}
+                      style={{ flexDirection: 'row', marginBottom: 10, paddingRight: 12 }}
+                    >
+                      <Text
+                        style={{
+                          color: theme.colors.primary,
+                          marginRight: 10,
+                          fontSize: 18,
+                          lineHeight: 22,
+                        }}
+                      >
+                        •
+                      </Text>
+                      <Text
+                        variant="bodyMedium"
+                        style={{ color: theme.colors.onPrimaryContainer, flex: 1, lineHeight: 22 }}
+                      >
                         {sug}
                       </Text>
                     </View>
                   ))}
                 </Surface>
-                
+
                 <View style={{ height: 24 }} />
               </ScrollView>
 
               {/* STICKY BOTTOM BUTTON */}
               <View style={[styles.footer, { borderTopColor: theme.colors.outlineVariant }]}>
-                <Button 
-                  mode="contained" 
-                  onPress={close} 
-                  style={{ borderRadius: 4 }} 
+                <Button
+                  mode="contained"
+                  onPress={close}
+                  style={{ borderRadius: 4 }}
                   contentStyle={{ paddingVertical: 8 }}
                 >
                   ZURÜCK ZUR FALLAUSWAHL
@@ -240,8 +337,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   mainBadgeText: {
-    color: '#FFFFFF', 
-    fontWeight: 'bold', 
+    color: '#FFFFFF',
+    fontWeight: 'bold',
     marginLeft: 6,
   },
   progressBarBackground: {
@@ -263,10 +360,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 8,
-    overflow: 'hidden', 
+    overflow: 'hidden',
   },
   accordionBase: {
-    backgroundColor: 'transparent', 
+    backgroundColor: 'transparent',
     paddingVertical: 4,
   },
   accordionTitle: {

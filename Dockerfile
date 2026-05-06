@@ -11,7 +11,7 @@ RUN npm ci
 # Copy mobile source
 COPY mobile/ ./
 
-# Build web frontend
+# Build web frontend (use default BACKEND_URL or set from host)
 RUN npx expo export --platform web
 
 # Stage 2: Production image
