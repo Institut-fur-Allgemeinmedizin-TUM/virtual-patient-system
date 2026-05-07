@@ -28,9 +28,10 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
+from google.genai.types import ProactivityConfig, HistoryConfigDict
 from jose import jwt, JWTError
 from pydantic import BaseModel
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, select
 from sqlalchemy.orm import Session as OrmSession
 
 from app.auth import oidc, auth
@@ -536,15 +537,43 @@ async def live_websocket(
     session_metadata = {"latest_handle": None}
 
     try:
+        previous_messages_query = select(Message).filter_by(session_id=chat_session.id).order_by(
+            Message.created_at.asc())
+        previous_messages = db.execute(previous_messages_query).scalars().all()
+
+        history = []
+        message: Message
+        for message in previous_messages:
+            if message.role == 'system':
+                continue
+            role = message.role
+            if role == "assistant":
+                role = "model"
+            history.append(
+                google.genai.types.Content(role=role, parts=[google.genai.types.Part(text=message.content)]))
+
         client = genai.Client(api_key=settings.gemini_api_key)
         live_config: google.genai.types.LiveConnectConfigDict = {
             "response_modalities": ["AUDIO"],
             "system_instruction": system_prompt,
             "output_audio_transcription": {},
             "input_audio_transcription": {},
+            # Nest proactive_audio inside the 'proactivity' key
+            #"proactivity": {
+            #    "proactive_audio": True,
+            #}
         }
+        history_config : HistoryConfigDict = {
+            "initial_history_in_client_content": True
+        }
+        if len(history) > 0:
+                live_config["history_config"] = history_config
+
 
         async with client.aio.live.connect(model=model_name, config=live_config) as live_session:
+            if len(history) > 0:
+                await live_session.send_client_content(turns=history, turn_complete=True)
+                print("Sent client history")
 
             async def browser_to_gemini() -> None:
                 while True:
@@ -588,12 +617,21 @@ async def live_websocket(
                                     ],
                                     turn_complete=True,
                                 )
+                                db.add(
+                                    Message(
+                                        session_id=session_id,
+                                        role="user",
+                                        content=text_value,
+                                    )
+                                )
+                                db.commit()
                         elif event_type == "end_turn":
                             await live_session.send_client_content(
                                 turns=[], turn_complete=True
                             )
 
             async def gemini_to_browser() -> None:
+                current_model_transcript = ""
                 while True:
                     rec = live_session.receive()
                     async for response in rec:
@@ -634,16 +672,41 @@ async def live_websocket(
                         output_transcription = getattr(server_content, "output_transcription", None)
                         if output_transcription:
                             text = getattr(output_transcription, "text", None)
-                            payload = {"type": "model_text", "text": text}
-                            await websocket.send_json(payload)
-                            print(f"Transcription: {text}")
+                            if text:
+                                current_model_transcript += text
+                                payload = {"type": "model_text", "text": text}
+                                await websocket.send_json(payload)
+                                print(f"Transcription: {text}")
 
                         input_transcription = getattr(server_content, "input_transcription", None)
                         if input_transcription:
-                            text = getattr(input_transcription, "text", None)
-                            payload = {"type": "user_text", "text": text}
-                            await websocket.send_json(payload)
-                            print(f"Transcription: {text}")
+                            text : str | None = getattr(input_transcription, "text", None)
+                            if text is not None:
+                                db.add(
+                                    Message(
+                                        session_id=session_id,
+                                        role="user",
+                                        content=text,
+                                        audio_transcript=True
+                                    )
+                                )
+                                db.commit()
+                                payload = {"type": "user_text", "text": text}
+                                await websocket.send_json(payload)
+                                print(f"Transcription: {text}")
+
+                        if getattr(server_content, "turn_complete", False):
+                            if current_model_transcript.strip():
+                                db.add(
+                                    Message(
+                                        session_id=session_id,
+                                        role="assistant",
+                                        content=current_model_transcript,
+                                        audio_transcript=True
+                                    )
+                                )
+                                db.commit()
+                                current_model_transcript = ""
 
             relay_tasks = [
                 asyncio.create_task(browser_to_gemini()),

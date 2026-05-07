@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import String, Text, ForeignKey, DateTime, func, Integer, JSON
+from sqlalchemy import String, Text, ForeignKey, DateTime, func, Integer, JSON, Boolean
 from typing import List, Optional
 from datetime import datetime
 
@@ -53,6 +53,8 @@ class Message(Base):
     )
     tokens_in: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     tokens_out: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    audio_transcript: Mapped[Optional[bool]] = mapped_column(Boolean, default=False, nullable=False)
 
     session: Mapped[Session] = relationship(back_populates="messages")
 
