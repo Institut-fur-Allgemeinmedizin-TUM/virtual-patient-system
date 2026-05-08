@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { Appbar, Divider, Drawer, Modal, Portal, Surface } from 'react-native-paper';
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Appbar, Divider, Drawer, Modal, Portal, Surface, useTheme } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { router } from 'expo-router';
 
 export function AppHeader() {
   const { width } = useWindowDimensions();
+  const { colors } = useTheme();
   const sidebarWidth = Math.min(Math.max(width * 0.78, 260), 340);
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
+  const tumId = useAuthStore((state) => state.user?.tum_id);
   const themeMode = useThemeStore((state) => state.mode);
   const logout = async () => {
     await useAuthStore.getState().logout();
@@ -77,6 +79,24 @@ export function AppHeader() {
 
               <Divider />
 
+              {tumId ? (
+                <View style={styles.profileIdentityRow}>
+                  <Text
+                    style={[
+                      styles.profileTumId,
+                      {
+                        color: colors.onSurfaceVariant,
+                        textDecorationColor: colors.onSurfaceVariant,
+                      },
+                    ]}
+                  >
+                    TUM ID: {tumId}
+                  </Text>
+                </View>
+              ) : null}
+
+              <Divider />
+
               <Drawer.Section>
                 <Drawer.Item
                   icon="logout"
@@ -110,5 +130,12 @@ const styles = StyleSheet.create({
   },
   sidebarPanel: {
     height: '100%',
+  },
+  profileIdentityRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  profileTumId: {
+    fontSize: 12
   },
 });

@@ -9,8 +9,14 @@ import {
   clearAccessToken,
   getAccessToken,
   saveAccessToken,
-  type MobileExchangeResponse,
 } from '@/lib/auth';
+
+interface User {
+  sub?: string;
+  tum_id?: string;
+  email?: string;
+  name?: string;
+}
 
 interface AuthState {
   authError: string;
@@ -18,6 +24,7 @@ interface AuthState {
   isAuthenticated: boolean;
   tumLoading: boolean;
   vhbLoading: boolean;
+  user?: User;
   clearAuthError: () => void;
   checkStoredToken: () => Promise<void>;
   loginWithTum: () => Promise<boolean>;
@@ -53,15 +60,26 @@ export const useAuthStore = create<AuthState>((set) => ({
     const token = await getAccessToken();
 
     if (token) {
-      set({ isAuthenticated: true, authChecked: true });
-      return;
+      try {
+        const res = await apiClient.auth.authMeAuthMeGet();
+        if (res.status === 200) {
+          set({ isAuthenticated: true, authChecked: true, user: res.data });
+          return;
+        }
+      } catch {
+        await clearAccessToken();
+        if (Platform.OS !== 'web') {
+          set({ isAuthenticated: false, authChecked: true });
+          return;
+        }
+      }
     }
 
     if (Platform.OS === 'web') {
       try {
-        const res = await apiClient.auth.authMeAuthMeGet({});
+        const res = await apiClient.auth.authMeAuthMeGet({ secure: false });
         if (res.status === 200) {
-          set({ isAuthenticated: true, authChecked: true });
+          set({ isAuthenticated: true, authChecked: true, user: res.data });
           return;
         }
       } catch {
