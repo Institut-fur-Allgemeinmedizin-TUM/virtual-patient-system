@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Appbar, Divider, Drawer, Modal, Portal, Surface, useTheme } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';

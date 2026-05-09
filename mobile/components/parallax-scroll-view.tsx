@@ -10,6 +10,7 @@ import Animated, {
 import { ThemedView } from '@/components/themed-view';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTheme } from 'react-native-paper';
+import React from 'react';
 
 const HEADER_HEIGHT = 250;
 

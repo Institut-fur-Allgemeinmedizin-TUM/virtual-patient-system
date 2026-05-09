@@ -9,6 +9,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 import { Button } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
+import React from 'react';
 
 export default function HomeScreen() {
   const theme = useTheme();

@@ -7,6 +7,7 @@ import { useSessionStore } from '@/stores/useSessionStore';
 import { router } from 'expo-router';
 import { getCaseImage } from '@/lib/cases/case';
 import EvaluationModal from '../components/EvaluationModal';
+import React from 'react';
 
 export default function HomeScreen() {
   const theme = useTheme();

@@ -14,6 +14,7 @@ import EvaluationModal from '../components/EvaluationModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { getCaseImage } from '@/lib/cases/case';
+import React from 'react';
 
 type SessionProfile = {
   title: string;
