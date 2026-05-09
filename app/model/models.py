@@ -39,6 +39,7 @@ class Session(Base):
     )
 
     live_api_handle: Mapped[str] = mapped_column(String, nullable=True)
+    live_time_remaining: Mapped[int] = mapped_column(Integer, nullable=False, default=600)
 
 
 class Message(Base):

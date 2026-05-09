@@ -498,6 +498,7 @@ async def chat(
 async def live_websocket(
     websocket: WebSocket, session_id: str, db: OrmSession = Depends(get_db)
 ):
+    session_start_time = datetime.now()
     user = auth.require_user_websocket(websocket)
     relay_tasks: List[asyncio.Task] = []
 
@@ -525,6 +526,12 @@ async def live_websocket(
     chat_session = db.get(ChatSession, session_id)
     if chat_session is None:
         raise WebSocketDisconnect(reason="Session not found")
+
+    if chat_session.live_time_remaining <= 0:
+        await websocket.accept()
+        await websocket.send_json({"error": "no live time remaining"})
+        await websocket.close(code=1011)
+        return
 
     tum_id = user.get("tum_id") or user.get("sub")
     if chat_session.user_id != tum_id:
@@ -577,6 +584,14 @@ async def live_websocket(
 
             async def browser_to_gemini() -> None:
                 while True:
+                    session_end_time_during_session = datetime.now()
+                    time_used = session_end_time_during_session - session_start_time
+                    if time_used.total_seconds() >= chat_session.live_time_remaining:
+                        await websocket.send_json({"error": "no live time remaining"})
+                        await websocket.close()
+                        break
+
+
                     incoming = await websocket.receive()
                     if incoming.get("type") == "websocket.disconnect":
                         break
@@ -733,6 +748,10 @@ async def live_websocket(
 
             print("Tasks stopped")
 
+            session_end_time = datetime.now()
+            time_used = session_end_time - session_start_time
+            chat_session.live_time_remaining = chat_session.live_time_remaining - int(time_used.total_seconds())
+            db.add(chat_session)
 
     except WebSocketDisconnect as e:
         await websocket.close(code=1011, reason=e.reason)
