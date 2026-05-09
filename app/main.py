@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import json
+import logging
 import os
 import re
 from random import Random
@@ -88,6 +89,7 @@ app.add_middleware(
 # Structure: {session_id: {"case_id": str, "messages": [{"role": str, "content": str}]}}
 vhb_sessions: Dict[str, Dict] = {}
 
+logger = logging.getLogger("uvicorn.info")
 
 def _read_mobile_index_html(frontend_dist: str) -> str:
     index_path = os.path.join(frontend_dist, "index.html")
@@ -592,6 +594,7 @@ async def live_websocket(
             "system_instruction": system_prompt,
             "output_audio_transcription": {},
             "input_audio_transcription": {},
+            # Let this in the code for later use (newer models support this feature)
             # Nest proactive_audio inside the 'proactivity' key
             # "proactivity": {
             #    "proactive_audio": True,
@@ -608,7 +611,6 @@ async def live_websocket(
                 await live_session.send_client_content(
                     turns=history, turn_complete=True
                 )
-                print("Sent client history")
 
             async def browser_to_gemini() -> None:
                 while True:
@@ -683,7 +685,6 @@ async def live_websocket(
                             update = response.session_resumption_update
                             if update.resumable and update.new_handle:
                                 session_handle = update.new_handle
-                                print(f"Received session handle: {session_handle}")
                                 session_metadata["latest_handle"] = session_handle
 
                         server_content = getattr(response, "server_content", None)
@@ -722,7 +723,6 @@ async def live_websocket(
                                 current_model_transcript += text
                                 payload = {"type": "model_text", "text": text}
                                 await websocket.send_json(payload)
-                                print(f"Transcription: {text}")
 
                         input_transcription = getattr(
                             server_content, "input_transcription", None
@@ -743,7 +743,6 @@ async def live_websocket(
                                 db.commit()
                                 payload = {"type": "user_text", "text": text}
                                 await websocket.send_json(payload)
-                                print(f"Transcription: {text}")
 
                         if getattr(server_content, "turn_complete", False):
                             if current_model_transcript.strip():
@@ -763,7 +762,6 @@ async def live_websocket(
                 asyncio.create_task(gemini_to_browser()),
             ]
 
-            print("Waiting for tasks to stop")
             done, pending = await asyncio.wait(
                 relay_tasks,
                 return_when=asyncio.FIRST_COMPLETED,
@@ -778,10 +776,8 @@ async def live_websocket(
             for task in done:
                 exc = task.exception()
                 if exc and not isinstance(exc, asyncio.CancelledError):
-                    print(f"Live relay task failed: {type(exc).__name__}: {exc}")
+                    logger.error(f"Live relay task failed: {type(exc).__name__}: {exc}")
                     raise exc
-
-            print("Tasks stopped")
 
             session_end_time = datetime.now()
             time_used = session_end_time - session_start_time
@@ -793,7 +789,7 @@ async def live_websocket(
     except WebSocketDisconnect as e:
         await websocket.close(code=1011, reason=e.reason)
     except Exception as e:
-        print(f"Live websocket failed: {type(e).__name__}: {e}")
+        logger.error(f"Live websocket failed: {type(e).__name__}: {e}")
         try:
             await websocket.close(code=1011)
         except Exception:
@@ -813,7 +809,7 @@ async def live_websocket(
                 db.commit()
             except Exception as e:
                 db.rollback()
-                print(f"Failed to save handle to database: {e}")
+                logger.error(f"Failed to save handle to database: {e}")
 
 
 @app.post("/api/transcribe")
