@@ -1,6 +1,5 @@
 import time
 import uuid
-from datetime import time
 from typing import Optional
 from urllib.parse import urlencode
 
@@ -8,18 +7,18 @@ import httpx
 from fastapi import (
     HTTPException,
     Request,
-    Response,
+    Response, APIRouter,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
 from jose import jwt, JWTError
 
-from app.api.api import app
 from app.auth import oidc, auth
 from app.config.config import settings
 from app.model.auth import VHBLoginRequest, VHBLoginResponse
 
+authRouter = APIRouter()
 
-@app.get("/auth/login")
+@authRouter.get("/auth/login")
 async def auth_login(
     request: Request, redirect_to: Optional[str] = None
 ) -> RedirectResponse:
@@ -72,7 +71,7 @@ async def auth_login(
     return response
 
 
-@app.get("/auth/callback")
+@authRouter.get("/auth/callback")
 async def auth_callback(
     request: Request, code: Optional[str] = None, state: Optional[str] = None
 ) -> RedirectResponse:
@@ -165,7 +164,7 @@ async def auth_callback(
     return response
 
 
-@app.get("/auth/me")
+@authRouter.get("/auth/me")
 async def auth_me(request: Request) -> JSONResponse:
     """Get current user information."""
     user = auth.get_current_user(request)
@@ -186,14 +185,14 @@ async def auth_me(request: Request) -> JSONResponse:
     )
 
 
-@app.post("/auth/logout")
+@authRouter.post("/auth/logout")
 async def auth_logout() -> JSONResponse:
     response = JSONResponse(content={"ok": True})
     response.delete_cookie("session", path="/")
     return response
 
 
-@app.post("/auth/vhb-login", response_model=VHBLoginResponse)
+@authRouter.post("/auth/vhb-login", response_model=VHBLoginResponse)
 async def vhb_login(req: VHBLoginRequest, response: Response) -> VHBLoginResponse:
     """Authenticate VHB users with a shared password."""
     if not settings.vhb_password:

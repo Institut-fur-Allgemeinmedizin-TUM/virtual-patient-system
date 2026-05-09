@@ -15,13 +15,13 @@ from fastapi import (
     HTTPException,
     Request,
     WebSocket,
-    WebSocketDisconnect,
+    WebSocketDisconnect, APIRouter,
 )
 from google.genai.types import HistoryConfigDict
 from sqlalchemy import select, desc
 from sqlalchemy.orm import Session as OrmSession
 
-from app.api.api import app, vhb_sessions, logger
+from app.api.memory import vhb_sessions, logger
 from app.auth import auth
 from app.config.config import settings
 from app.db.db import get_db
@@ -49,8 +49,9 @@ from app.model.models import (
     SessionsSummaryResponse,
 )
 
+sessionRouter = APIRouter()
 
-@app.post("/api/sessions", response_model=CreateSessionResponse)
+@sessionRouter.post("/api/sessions", response_model=CreateSessionResponse)
 async def create_session(
     req: CreateSessionRequest, request: Request, db: OrmSession = Depends(get_db)
 ) -> CreateSessionResponse:
@@ -86,7 +87,7 @@ async def create_session(
     return CreateSessionResponse(session_id=session_id, case_id=req.case_id)
 
 
-@app.post("/api/chat", response_model=ChatResponse)
+@sessionRouter.post("/api/chat", response_model=ChatResponse)
 async def chat(
     req: ChatRequest, request: Request, db: OrmSession = Depends(get_db)
 ) -> ChatResponse:
@@ -219,7 +220,7 @@ def check_user_remaining_time_total(db: OrmSession, user_id: str) -> bool:
 
 
 # Gemini Live API
-@app.websocket("/api/live/{session_id}/ws")
+@sessionRouter.websocket("/api/live/{session_id}/ws")
 async def live_websocket(
     websocket: WebSocket, session_id: str, db: OrmSession = Depends(get_db)
 ):
@@ -447,6 +448,7 @@ async def live_websocket(
                                 db.commit()
                                 payload = {"type": "user_text", "text": text}
                                 await websocket.send_json(payload)
+                                print(f"Sent to website: {payload}")
 
                         if getattr(server_content, "turn_complete", False):
                             if current_model_transcript.strip():
@@ -515,7 +517,7 @@ async def live_websocket(
                 db.rollback()
                 logger.error(f"Failed to save handle to database: {e}")
 
-@app.get("/api/sessions/{session_id}/messages", response_model=SessionMessagesResponse)
+@sessionRouter.get("/api/sessions/{session_id}/messages", response_model=SessionMessagesResponse)
 async def get_session_messages(
     session_id: str, db: OrmSession = Depends(get_db)
 ) -> SessionMessagesResponse:
@@ -550,7 +552,7 @@ async def get_session_messages(
         ],
     )
 
-@app.post("/api/sessions/{session_id}/evaluate", response_model=EvaluationResponse)
+@sessionRouter.post("/api/sessions/{session_id}/evaluate", response_model=EvaluationResponse)
 async def evaluate_session(
     session_id: str, request: Request, db: OrmSession = Depends(get_db)
 ) -> EvaluationResponse:
@@ -713,7 +715,7 @@ async def evaluate_session(
         raise HTTPException(status_code=500, detail=f"Evaluation failed: {str(e)}")
 
 
-@app.get("/api/sessions/summary", response_model=SessionsSummaryResponse)
+@sessionRouter.get("/api/sessions/summary", response_model=SessionsSummaryResponse)
 async def get_last_session_summary(
     request: Request, db: OrmSession = Depends(get_db)
 ) -> SessionsSummaryResponse:

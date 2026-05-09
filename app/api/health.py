@@ -1,20 +1,20 @@
-from fastapi import Depends
+from fastapi import Depends, APIRouter
 from sqlalchemy import func
 
-from app.api.api import app
 from app.config.config import settings
 
 from sqlalchemy.orm import Session as OrmSession
 
 from app.db.db import get_db
 
+healthRouter = APIRouter()
 
-@app.get("/health")
+@healthRouter.get("/health")
 async def health() -> dict:
     return {"status": "ok"}
 
 
-@app.get("/health/oidc")
+@healthRouter.get("/health/oidc")
 async def health_oidc() -> dict:
     """Debug endpoint to check OIDC configuration (sanitized)."""
     return {
@@ -48,7 +48,7 @@ async def health_oidc() -> dict:
     }
 
 
-@app.get("/health/db")
+@healthRouter.get("/health/db")
 async def health_db(db: OrmSession = Depends(get_db)) -> dict:
     """Check database connectivity."""
     try:

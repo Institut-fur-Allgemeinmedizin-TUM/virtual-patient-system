@@ -1,18 +1,20 @@
-import logging
-import logging
 import os
 import re
-from typing import Dict
 
 from fastapi import (
     FastAPI,
 )
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api import auth, session, util, health
 from app.config.config import settings
 
 # Trigger redeployment with OIDC_AUTH_URL secret now configured
 app = FastAPI(title="Virtual Patient Backend", version="0.1.0")
+app.include_router(auth.authRouter)
+app.include_router(session.sessionRouter)
+app.include_router(util.utilRouter)
+app.include_router(health.healthRouter)
 
 # Add CORS middleware
 # In production, the frontend is served from the same origin
@@ -36,15 +38,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# In-memory storage for VHB sessions (not persisted to database)
-# Structure: {session_id: {"case_id": str, "messages": [{"role": str, "content": str}]}}
-vhb_sessions: Dict[str, Dict] = {}
-
-
-
-logger = logging.getLogger("uvicorn.info")
-
 
 def _read_mobile_index_html(frontend_dist: str) -> str:
     index_path = os.path.join(frontend_dist, "index.html")

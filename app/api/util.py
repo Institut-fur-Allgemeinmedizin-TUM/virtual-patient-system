@@ -6,13 +6,12 @@ from fastapi import (
     HTTPException,
     Query,
     File,
-    UploadFile,
+    UploadFile, APIRouter,
 )
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, desc
 from sqlalchemy.orm import Session as OrmSession
 
-from app.api.api import app
 from app.db.db import get_db
 from app.llm import chat as chat_functions
 from app.model.cases import GetCasesResponse
@@ -23,8 +22,9 @@ from app.model.models import (
     SessionSummary,
 )
 
+utilRouter = APIRouter()
 
-@app.post("/api/transcribe")
+@utilRouter.post("/api/transcribe")
 async def transcribe_audio(
     audio: UploadFile = File(...),
 ) -> JSONResponse:
@@ -50,7 +50,7 @@ async def transcribe_audio(
 
 
 # Analytics and Export endpoints
-@app.get("/api/export", response_model=ExportResponse)
+@utilRouter.get("/api/export", response_model=ExportResponse)
 async def export_sessions(
     case_id: Optional[str] = Query(None, description="Filter by case ID"),
     days: int = Query(7, description="Number of days to look back"),
@@ -104,7 +104,7 @@ async def export_sessions(
     )
 
 
-@app.get("/api/cases/{case_id}")
+@utilRouter.get("/api/cases/{case_id}")
 async def get_case_details(case_id: str) -> JSONResponse:
     """Get case details including patient persona information."""
     try:
@@ -127,7 +127,7 @@ async def get_case_details(case_id: str) -> JSONResponse:
         raise HTTPException(status_code=500, detail=f"Failed to load case: {str(e)}")
 
 
-@app.get("/api/cases", response_model=GetCasesResponse)
+@utilRouter.get("/api/cases", response_model=GetCasesResponse)
 async def get_cases() -> GetCasesResponse:
     """Get case details including patient persona information."""
     try:
@@ -151,7 +151,7 @@ async def get_cases() -> GetCasesResponse:
         raise HTTPException(status_code=500, detail=f"Failed to load case: {str(e)}")
 
 
-@app.get("/api/analytics/summary")
+@utilRouter.get("/api/analytics/summary")
 async def get_analytics_summary(
     days: int = Query(7, description="Number of days to look back"),
     db: OrmSession = Depends(get_db),
