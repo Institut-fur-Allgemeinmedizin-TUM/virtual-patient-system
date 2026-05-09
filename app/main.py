@@ -44,7 +44,14 @@ from app.llm.prompts.evaluation import get_evaluation_prompt
 from app.model.auth import VHBLoginRequest, VHBLoginResponse
 from app.model.cases import GetCasesResponse
 from app.model.evaluation import EvaluationResponse
-from app.model.models import Evaluation, SessionSummaryData, SessionsSummaryResponse, SessionLiveDefaultTime, Session, UserMaxDailyUsage
+from app.model.models import (
+    Evaluation,
+    SessionSummaryData,
+    SessionsSummaryResponse,
+    SessionLiveDefaultTime,
+    Session,
+    UserMaxDailyUsage,
+)
 from app.model.llm import (
     CreateSessionResponse,
     CreateSessionRequest,
@@ -90,6 +97,7 @@ app.add_middleware(
 vhb_sessions: Dict[str, Dict] = {}
 
 logger = logging.getLogger("uvicorn.info")
+
 
 def _read_mobile_index_html(frontend_dist: str) -> str:
     index_path = os.path.join(frontend_dist, "index.html")
@@ -202,8 +210,8 @@ async def auth_login(
         value=state_token,
         max_age=600,
         httponly=True,
-        samesite="lax",             # MUST be 'lax' to survive the redirect back from TUM
-        secure=not is_localhost     # False for local HTTP, True for production HTTPS
+        samesite="lax",  # MUST be 'lax' to survive the redirect back from TUM
+        secure=not is_localhost,  # False for local HTTP, True for production HTTPS
     )
 
     return response
@@ -274,7 +282,11 @@ async def auth_callback(
     frontend_path = st.get("redirect_to") or "/"
     # Check if the redirect URL is a mobile app deep link
     # (Checking for custom scheme, Expo's development scheme, and the actual mobile app scheme)
-    is_mobile = frontend_path.startswith("virtualpatient://") or frontend_path.startswith("myapp://") or frontend_path.startswith("exp://")
+    is_mobile = (
+        frontend_path.startswith("virtualpatient://")
+        or frontend_path.startswith("myapp://")
+        or frontend_path.startswith("exp://")
+    )
 
     if is_mobile:
         mobile_session_token = auth.create_mobile_session_token(claims)
@@ -286,7 +298,11 @@ async def auth_callback(
         response = RedirectResponse(redirect_to, status_code=302)
     else:
         # Standard web flow handling
-        redirect_to = frontend_path if frontend_path.startswith("http") else f"{settings.frontend_url}{frontend_path}"
+        redirect_to = (
+            frontend_path
+            if frontend_path.startswith("http")
+            else f"{settings.frontend_url}{frontend_path}"
+        )
         response = RedirectResponse(redirect_to, status_code=302)
         auth.set_session(response, claims)
 
@@ -1187,11 +1203,10 @@ async def evaluate_session(
 
 
 @app.get("/api/sessions/summary", response_model=SessionsSummaryResponse)
-async def get_last_session_summary( request: Request,
-     db: OrmSession = Depends(get_db)
+async def get_last_session_summary(
+    request: Request, db: OrmSession = Depends(get_db)
 ) -> SessionsSummaryResponse:
     """Get a summary of the last sessions the user did per case."""
-
 
     user = auth.require_user(request)
     session_id = str(uuid.uuid4())
@@ -1213,7 +1228,9 @@ async def get_last_session_summary( request: Request,
     )
     session_summary = SessionsSummaryResponse(sessions={})
     for session in last_sessions:
-        evaluation = db.query(Evaluation).filter(Evaluation.session_id == session.id).first()
+        evaluation = (
+            db.query(Evaluation).filter(Evaluation.session_id == session.id).first()
+        )
         if evaluation:
             summary = SessionSummaryData(
                 sessionId=session.id,
@@ -1226,12 +1243,12 @@ async def get_last_session_summary( request: Request,
                     + evaluation.criterion6_score
                     + evaluation.criterion7_score
                     + evaluation.criterion8_score
-                ) / 8.0,
+                )
+                / 8.0,
             )
             session_summary.sessions[session.case_id] = summary
 
     return session_summary
-
 
 
 # Mount static files and serve the mobile web frontend (production only)

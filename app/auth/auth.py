@@ -18,6 +18,7 @@ async def fetch_jwks() -> dict:
         res.raise_for_status()
         return res.json()
 
+
 # TODO combine with create_mobile_session_token
 def set_session(response: RedirectResponse, claims: dict) -> None:
     """Store user claims in session cookie. Extracts TUM ID at auth time."""

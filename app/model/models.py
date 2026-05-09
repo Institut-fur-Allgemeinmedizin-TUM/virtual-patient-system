@@ -148,10 +148,13 @@ class SessionMessagesResponse(BaseModel):
     started_at: datetime
     ended_at: Optional[datetime]
     messages: List[SessionMessageItem]
+
+
 class SessionSummaryData(BaseModel):
     sessionId: str
     score: float
-    
+
+
 class SessionsSummaryResponse(BaseModel):
     # Key: case_id -> Value: SessionSummaryData object
     sessions: dict[str, SessionSummaryData]
