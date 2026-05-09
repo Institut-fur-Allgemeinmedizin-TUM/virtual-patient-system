@@ -6,7 +6,7 @@ import re
 from random import Random
 import time
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from typing import Any, Dict, List, Optional
 
 import google.genai.types
@@ -43,7 +43,7 @@ from app.llm.prompts.evaluation import get_evaluation_prompt
 from app.model.auth import VHBLoginRequest, VHBLoginResponse
 from app.model.cases import GetCasesResponse
 from app.model.evaluation import EvaluationResponse
-from app.model.models import Evaluation, SessionSummaryData, SessionsSummaryResponse
+from app.model.models import Evaluation, SessionSummaryData, SessionsSummaryResponse, SessionLiveDefaultTime, Session, UserMaxDailyUsage
 from app.model.llm import (
     CreateSessionResponse,
     CreateSessionRequest,
@@ -492,6 +492,21 @@ async def chat(
 
     return ChatResponse(reply=reply, session_id=req.session_id)
 
+def check_user_remaining_time_total(db: OrmSession, user_id: str) -> bool:
+    # Define today start and end of day
+    today = datetime.now().date()
+    today_start = datetime.combine(today, time.min)
+    today_end = datetime.combine(today, time.max)
+
+    user_sessions_query = (select(ChatSession)
+                           .filter(ChatSession.user_id == user_id)
+                           .filter(ChatSession.started_at.between(today_start, today_end)))
+    user_sessions = db.execute(user_sessions_query).scalars().all()
+
+    total_time_used = 0
+    for session in user_sessions:
+        total_time_used += SessionLiveDefaultTime - session.live_time_remaining
+    return total_time_used < UserMaxDailyUsage - 60
 
 # Gemini Live API
 @app.websocket("/api/live/{session_id}/ws")
@@ -527,7 +542,7 @@ async def live_websocket(
     if chat_session is None:
         raise WebSocketDisconnect(reason="Session not found")
 
-    if chat_session.live_time_remaining <= 0:
+    if chat_session.live_time_remaining <= 0 or not check_user_remaining_time_total(db, chat_session.user_id):
         await websocket.accept()
         await websocket.send_json({"error": "no live time remaining"})
         await websocket.close(code=1011)

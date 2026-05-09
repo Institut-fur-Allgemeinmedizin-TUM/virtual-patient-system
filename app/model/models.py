@@ -4,6 +4,8 @@ from sqlalchemy import String, Text, ForeignKey, DateTime, func, Integer, JSON, 
 from typing import List, Optional
 from datetime import datetime
 
+SessionLiveDefaultTime = 600
+UserMaxDailyUsage = 1800
 
 class Base(DeclarativeBase):
     pass
@@ -39,7 +41,7 @@ class Session(Base):
     )
 
     live_api_handle: Mapped[str] = mapped_column(String, nullable=True)
-    live_time_remaining: Mapped[int] = mapped_column(Integer, nullable=False, default=600)
+    live_time_remaining: Mapped[int] = mapped_column(Integer, nullable=False, default=SessionLiveDefaultTime)
 
 
 class Message(Base):
