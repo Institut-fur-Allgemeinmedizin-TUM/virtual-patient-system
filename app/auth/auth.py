@@ -69,6 +69,7 @@ def get_current_user(request: Request) -> Optional[dict]:
     except HTTPException:
         return None
 
+
 def get_current_user_websocket(websocket: WebSocket):
     token = websocket.cookies.get("session")
     if not token:
@@ -87,6 +88,7 @@ def require_user(request: Request) -> dict:
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
+
 
 def require_user_websocket(websocket: WebSocket):
     if not settings.require_auth:

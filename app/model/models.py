@@ -7,6 +7,7 @@ from datetime import datetime
 SessionLiveDefaultTime = 600
 UserMaxDailyUsage = 1800
 
+
 class Base(DeclarativeBase):
     pass
 
@@ -41,7 +42,9 @@ class Session(Base):
     )
 
     live_api_handle: Mapped[str] = mapped_column(String, nullable=True)
-    live_time_remaining: Mapped[int] = mapped_column(Integer, nullable=False, default=SessionLiveDefaultTime)
+    live_time_remaining: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=SessionLiveDefaultTime
+    )
 
 
 class Message(Base):
@@ -57,7 +60,9 @@ class Message(Base):
     tokens_in: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     tokens_out: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
-    audio_transcript: Mapped[Optional[bool]] = mapped_column(Boolean, default=False, nullable=False)
+    audio_transcript: Mapped[Optional[bool]] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
 
     session: Mapped[Session] = relationship(back_populates="messages")
 

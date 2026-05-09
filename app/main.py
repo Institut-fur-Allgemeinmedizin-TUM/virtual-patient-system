@@ -492,21 +492,25 @@ async def chat(
 
     return ChatResponse(reply=reply, session_id=req.session_id)
 
+
 def check_user_remaining_time_total(db: OrmSession, user_id: str) -> bool:
     # Define today start and end of day
     today = datetime.now().date()
     today_start = datetime.combine(today, time.min)
     today_end = datetime.combine(today, time.max)
 
-    user_sessions_query = (select(ChatSession)
-                           .filter(ChatSession.user_id == user_id)
-                           .filter(ChatSession.started_at.between(today_start, today_end)))
+    user_sessions_query = (
+        select(ChatSession)
+        .filter(ChatSession.user_id == user_id)
+        .filter(ChatSession.started_at.between(today_start, today_end))
+    )
     user_sessions = db.execute(user_sessions_query).scalars().all()
 
     total_time_used = 0
     for session in user_sessions:
         total_time_used += SessionLiveDefaultTime - session.live_time_remaining
     return total_time_used < UserMaxDailyUsage - 60
+
 
 # Gemini Live API
 @app.websocket("/api/live/{session_id}/ws")
@@ -542,7 +546,9 @@ async def live_websocket(
     if chat_session is None:
         raise WebSocketDisconnect(reason="Session not found")
 
-    if chat_session.live_time_remaining <= 0 or not check_user_remaining_time_total(db, chat_session.user_id):
+    if chat_session.live_time_remaining <= 0 or not check_user_remaining_time_total(
+        db, chat_session.user_id
+    ):
         await websocket.accept()
         await websocket.send_json({"error": "no live time remaining"})
         await websocket.close(code=1011)
@@ -559,20 +565,26 @@ async def live_websocket(
     session_metadata = {"latest_handle": None}
 
     try:
-        previous_messages_query = select(Message).filter_by(session_id=chat_session.id).order_by(
-            Message.created_at.asc())
+        previous_messages_query = (
+            select(Message)
+            .filter_by(session_id=chat_session.id)
+            .order_by(Message.created_at.asc())
+        )
         previous_messages = db.execute(previous_messages_query).scalars().all()
 
         history = []
         message: Message
         for message in previous_messages:
-            if message.role == 'system':
+            if message.role == "system":
                 continue
             role = message.role
             if role == "assistant":
                 role = "model"
             history.append(
-                google.genai.types.Content(role=role, parts=[google.genai.types.Part(text=message.content)]))
+                google.genai.types.Content(
+                    role=role, parts=[google.genai.types.Part(text=message.content)]
+                )
+            )
 
         client = genai.Client(api_key=settings.gemini_api_key)
         live_config: google.genai.types.LiveConnectConfigDict = {
@@ -581,20 +593,21 @@ async def live_websocket(
             "output_audio_transcription": {},
             "input_audio_transcription": {},
             # Nest proactive_audio inside the 'proactivity' key
-            #"proactivity": {
+            # "proactivity": {
             #    "proactive_audio": True,
-            #}
+            # }
         }
-        history_config : HistoryConfigDict = {
-            "initial_history_in_client_content": True
-        }
+        history_config: HistoryConfigDict = {"initial_history_in_client_content": True}
         if len(history) > 0:
-                live_config["history_config"] = history_config
+            live_config["history_config"] = history_config
 
-
-        async with client.aio.live.connect(model=model_name, config=live_config) as live_session:
+        async with client.aio.live.connect(
+            model=model_name, config=live_config
+        ) as live_session:
             if len(history) > 0:
-                await live_session.send_client_content(turns=history, turn_complete=True)
+                await live_session.send_client_content(
+                    turns=history, turn_complete=True
+                )
                 print("Sent client history")
 
             async def browser_to_gemini() -> None:
@@ -605,7 +618,6 @@ async def live_websocket(
                         await websocket.send_json({"error": "no live time remaining"})
                         await websocket.close()
                         break
-
 
                     incoming = await websocket.receive()
                     if incoming.get("type") == "websocket.disconnect":
@@ -625,7 +637,9 @@ async def live_websocket(
                         except json.JSONDecodeError:
                             parsed = {"type": "text", "text": text_data}
 
-                        event_type = parsed.get("type") if isinstance(parsed, dict) else None
+                        event_type = (
+                            parsed.get("type") if isinstance(parsed, dict) else None
+                        )
 
                         if event_type == "audio":
                             encoded_audio = parsed.get("data")
@@ -699,7 +713,9 @@ async def live_websocket(
                                         "data": base64.b64encode(data).decode("ascii"),
                                     }
                                     await websocket.send_json(payload)
-                        output_transcription = getattr(server_content, "output_transcription", None)
+                        output_transcription = getattr(
+                            server_content, "output_transcription", None
+                        )
                         if output_transcription:
                             text = getattr(output_transcription, "text", None)
                             if text:
@@ -708,16 +724,20 @@ async def live_websocket(
                                 await websocket.send_json(payload)
                                 print(f"Transcription: {text}")
 
-                        input_transcription = getattr(server_content, "input_transcription", None)
+                        input_transcription = getattr(
+                            server_content, "input_transcription", None
+                        )
                         if input_transcription:
-                            text : str | None = getattr(input_transcription, "text", None)
+                            text: str | None = getattr(
+                                input_transcription, "text", None
+                            )
                             if text is not None:
                                 db.add(
                                     Message(
                                         session_id=session_id,
                                         role="user",
                                         content=text,
-                                        audio_transcript=True
+                                        audio_transcript=True,
                                     )
                                 )
                                 db.commit()
@@ -732,7 +752,7 @@ async def live_websocket(
                                         session_id=session_id,
                                         role="assistant",
                                         content=current_model_transcript,
-                                        audio_transcript=True
+                                        audio_transcript=True,
                                     )
                                 )
                                 db.commit()
@@ -765,7 +785,9 @@ async def live_websocket(
 
             session_end_time = datetime.now()
             time_used = session_end_time - session_start_time
-            chat_session.live_time_remaining = chat_session.live_time_remaining - int(time_used.total_seconds())
+            chat_session.live_time_remaining = chat_session.live_time_remaining - int(
+                time_used.total_seconds()
+            )
             db.add(chat_session)
 
     except WebSocketDisconnect as e:
