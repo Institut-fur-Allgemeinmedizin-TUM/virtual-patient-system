@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { FlatList, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { Button, Text, Avatar, useTheme, Surface, TouchableRipple } from 'react-native-paper';
+import { Button, Text, Avatar, useTheme, Surface, TouchableRipple, Icon } from 'react-native-paper';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { router } from 'expo-router';
@@ -46,6 +46,12 @@ export default function HomeScreen() {
       default:
         return { bg: '#fef3e5', text: '#d67e00' };
     }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score <= 2.5) return '#d93025'; // red
+    if (score <= 4) return '#d67e00'; // orange
+    return '#0b7f5a'; // green
   };
 
   return (
@@ -123,18 +129,17 @@ export default function HomeScreen() {
                             { borderTopColor: theme.colors.outlineVariant },
                           ]}
                         >
-                          <Avatar.Icon
-                            size={20}
-                            icon="check-circle"
-                            color="#2ecc71"
-                            style={{ backgroundColor: 'transparent', margin: 0 }}
+                          <Icon
+                            source="check-circle"
+                            color={getScoreColor(score)} size={14}                           
                           />
                           <Text
                             variant="bodySmall"
                             style={{
-                              color: theme.colors.onSurfaceVariant,
+                              color: getScoreColor(score),
                               marginLeft: 6,
                               fontWeight: '600',
+                              marginTop: 4,
                             }}
                           >
                             Absolviert • Letzter Score: {score.toFixed(2)}
