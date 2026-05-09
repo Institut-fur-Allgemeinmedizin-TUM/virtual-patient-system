@@ -4,12 +4,7 @@ import { Platform } from 'react-native';
 import { create } from 'zustand';
 
 import { apiClient } from '@/lib/apiClient';
-import {
-  API_BASE_URL,
-  clearAccessToken,
-  getAccessToken,
-  saveAccessToken,
-} from '@/lib/auth';
+import { API_BASE_URL, clearAccessToken, getAccessToken, saveAccessToken } from '@/lib/auth';
 
 interface User {
   sub?: string;

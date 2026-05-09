@@ -11,21 +11,22 @@ export const getApiBaseUrl = () => {
     console.log(`Using BACKEND_URL from env: ${envUrl}`);
     return envUrl;
   }
-  
+
   // Production/Docker: Frontend and backend on same origin
   // This works because app.main.py serves both on the same port
   if (typeof window !== 'undefined') {
     console.log(`Using origin: ${window.location.origin}`);
     return window.location.origin;
   }
-  
+
   // Fallback for SSR/build time
   return 'http://localhost:8080';
 };
 
 // Don't call getApiBaseUrl() at module load time - defer to runtime
 // Import this function and call it where needed
-export const API_BASE_URL = typeof window !== 'undefined' ? getApiBaseUrl() : 'http://localhost:8080';
+export const API_BASE_URL =
+  typeof window !== 'undefined' ? getApiBaseUrl() : 'http://localhost:8080';
 
 export interface MobileExchangeResponse {
   access_token: string;

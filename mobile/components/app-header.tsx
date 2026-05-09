@@ -136,6 +136,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   profileTumId: {
-    fontSize: 12
+    fontSize: 12,
   },
 });
