@@ -18,9 +18,11 @@ from fastapi import (
     APIRouter,
 )
 from google.genai.types import HistoryConfigDict
+from pydantic import BaseModel
 from langchain.agents import create_agent
 from sqlalchemy import select, desc
 from sqlalchemy.orm import Session as OrmSession
+from starlette.responses import JSONResponse
 
 from app.api.memory import vhb_sessions, logger
 from app.auth import auth
@@ -774,3 +776,60 @@ async def get_last_session_summary(
             session_summary.sessions[session.case_id] = summary
 
     return session_summary
+
+class DiagnosisUpdate(BaseModel):
+    diagnosis: str
+
+@sessionRouter.post("/api/sessions/{session_id}/diagnosis")
+async def set_diagnosis(
+        session_id: str,
+        request: Request,
+        payload: DiagnosisUpdate,
+        db: OrmSession = Depends(get_db)
+):
+    """Set current diagnosis of student"""
+    user = auth.require_user(request)
+
+    # Check if this is a VHB user - they cannot use evaluation / diagnosis feature
+    if user.get("is_vhb_user", False):
+        raise HTTPException(
+            status_code=403,
+            detail="Evaluation feature is only available for TUM users"
+        )
+    # Check if session is in VHB sessions (shouldn't happen, but double-check)
+    if session_id in vhb_sessions:
+        raise HTTPException(
+            status_code=403,
+            detail="Evaluation not available for VHB sessions"
+        )
+
+    diagnosis_value = payload.diagnosis
+    chat_session = db.get(ChatSession, session_id)
+    if chat_session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    tum_id = user.get("tum_id") or user.get("sub")
+    if chat_session.user_id != tum_id:
+        raise HTTPException(status_code=403, detail="Invalid user ID for session")
+
+    existing_evaluation = (
+        db.query(Evaluation).filter(Evaluation.session_id == session_id).first()
+    )
+
+    if existing_evaluation:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot set diagnosis after evaluation has been done",
+        )
+
+    updated_rows = (
+        db.query(ChatSession)
+        .filter(ChatSession.id == session_id, ChatSession.user_id == tum_id)
+        .update({ChatSession.student_diagnosis: diagnosis_value}, synchronize_session=False)
+    )
+
+    if updated_rows == 0:
+        raise HTTPException(status_code=500, detail="Failed to update diagnosis")
+
+    db.commit()
+    return JSONResponse(status_code=200, content={"ok": True, "diagnosis": diagnosis_value})
