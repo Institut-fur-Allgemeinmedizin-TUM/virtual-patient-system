@@ -11,6 +11,7 @@ import {
 import { useLocalSearchParams } from 'expo-router';
 import { Avatar, Button, IconButton, Surface, Text, TextInput, useTheme } from 'react-native-paper';
 import EvaluationModal from '../components/EvaluationModal';
+import { useLiveAudioSession } from '@/hooks/useLiveAudioSession';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { getCaseImage } from '@/lib/cases/case';
@@ -75,7 +76,6 @@ export default function SessionScreen() {
 
   const sendMessage = () => {
     if (!canSend) return;
-    // Add user message to chat history
     setDraft('');
     session.chat(draft);
   };
@@ -99,6 +99,47 @@ export default function SessionScreen() {
       session.evaluate();
     }
   };
+
+  // Live audio session hook
+  const liveAudio = useLiveAudioSession(sessionId, (role, text) => {
+    if (!text || !text.trim()) return;
+
+    const trimmed = text.trim();
+
+    if (role === 'user') {
+      // Keep the current speech transcript as one bubble while live mode is active.
+
+
+      useSessionStore.setState((state) => {
+      const history = state.chatHistory || [];
+      const last = history[history.length - 1];
+      if (last && last.role === 'bot' && last.text === trimmed) {
+        return { chatHistory: history };
+      }
+      return {
+        chatHistory: [...history, { role: 'user', text: trimmed }],
+      };
+    });
+     
+      return;
+    }
+
+
+
+    useSessionStore.setState((state) => {
+      const history = state.chatHistory || [];
+      const last = history[history.length - 1];
+      if (last && last.role === 'bot') {
+        history[history.length - 1].text = history[history.length - 1].text + " " + trimmed;
+        return { chatHistory: history };
+      }
+      return {
+        chatHistory: [...history, { role: 'bot', text: trimmed }],
+      };
+    });
+  });
+
+  
 
   if (!session.loaded) {
     return (
@@ -214,9 +255,9 @@ export default function SessionScreen() {
                   </View>
                 </Surface>
 
-                {session.chatHistory!.map((message) => (
+                {session.chatHistory!.map((message, index) => (
                   <View
-                    key={1}
+                    key={`${message.role}-${index}-${message.text}`}
                     style={[
                       styles.messageRow,
                       message.role === 'user' ? styles.userRow : styles.assistantRow,
@@ -272,19 +313,83 @@ export default function SessionScreen() {
             </View>
 
             {/* Input Composer Pinned to Bottom */}
+            {liveAudio.error && (
+              <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+                <Surface
+                  elevation={0}
+                  style={{
+                    backgroundColor: theme.colors.errorContainer,
+                    padding: 12,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Text style={{ color: theme.colors.onErrorContainer, fontSize: 12 }}>
+                    {liveAudio.error}
+                  </Text>
+                </Surface>
+              </View>
+            )}
+
+            {liveAudio.isActive && (
+              <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+                <Surface
+                  elevation={0}
+                  style={{
+                    backgroundColor: theme.colors.tertiaryContainer,
+                    padding: 12,
+                    borderRadius: 8,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 4,
+                      backgroundColor: theme.colors.tertiary,
+                    }}
+                  />
+                  <Text style={{ color: theme.colors.onTertiaryContainer, fontSize: 12, flex: 1 }}>
+                    Live aktiv: Sprechen Sie jetzt mit dem Patienten
+                  </Text>
+                </Surface>
+              </View>
+            )}
+
             <View style={[styles.composer, { borderTopColor: theme.colors.outlineVariant }]}>
               <TextInput
                 mode="outlined"
                 value={draft}
-                disabled={isBotTyping}
+                disabled={isBotTyping || liveAudio.isActive}
                 onChangeText={setDraft}
                 onKeyPress={handleComposerKeyPress}
-                placeholder="Schreiben Sie eine Nachricht ..."
+                placeholder={liveAudio.isActive ? 'Sprechen Sie ins Mikrofon...' : 'Schreiben Sie eine Nachricht ...'}
                 multiline
                 style={styles.composerInput}
                 dense
                 returnKeyType="send"
               />
+
+              {/* Live Audio Button - single unified button */}
+              <IconButton
+                icon={liveAudio.isActive ? 'stop' : 'microphone'}
+                mode={liveAudio.isActive ? 'contained' : 'contained-tonal'}
+                size={24}
+                iconColor={liveAudio.isActive ? theme.colors.onPrimary : undefined}
+                onPress={async () => {
+                  if (liveAudio.isActive) {
+                    await liveAudio.stop();
+                  } else {
+                    await liveAudio.start();
+                  }
+                }}
+                disabled={liveAudio.isConnecting || isBotTyping}
+                accessibilityLabel={liveAudio.isActive ? 'Aufnahme stoppen' : 'Mit Patient sprechen'}
+              />
+
+              {/* Send Button */}
               <IconButton
                 icon="send"
                 mode="contained-tonal"
