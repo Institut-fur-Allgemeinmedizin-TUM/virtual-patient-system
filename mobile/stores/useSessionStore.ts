@@ -16,10 +16,14 @@ interface SessionState {
   waitingForBotresponse?: boolean;
   evaluationResponse: EvaluationResponse | undefined;
   waitingForEvaluationResponse: boolean;
+  evaluationMessages: ChatMessage[];
+  waitingForEvaluationMessages: boolean;
+  evaluationMessagesError?: string;
   startSession: (caseId: string, caseData: Case) => Promise<string | undefined>;
   loadSession: () => Promise<void>;
   chat: (msg: string) => void;
   evaluate: () => void;
+  loadEvaluationMessages: (sessionId?: string, force?: boolean) => Promise<void>;
   resetEvaluation: () => void;
 }
 
@@ -31,6 +35,9 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   waitingForBotresponse: false,
   evaluationResponse: undefined,
   waitingForEvaluationResponse: false,
+  evaluationMessages: [],
+  waitingForEvaluationMessages: false,
+  evaluationMessagesError: undefined,
 
   startSession: async (caseId: string, caseData: Case) => {
     const resp = await apiClient.api.createSessionApiSessionsPost({ case_id: caseId });
@@ -47,13 +54,9 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       .getSessionMessagesApiSessionsSessionIdMessagesGet(get().sessionId!)
       .then((resp) => {
         const messages = resp.data
-          .messages!.filter(
-            (msg: { id: string; role: 'user' | 'assistant' | 'system'; content: string }) => {
-              return msg.role !== 'system';
-            },
-          )
-          .map((msg: { id: string; role: 'user' | 'assistant'; content: string }) => ({
-            role: msg.role === 'user' ? 'user' : 'bot',
+          .messages!.filter((msg) => msg.role !== 'system')
+          .map((msg) => ({
+            role: (msg.role === 'user' ? 'user' : 'bot') as ChatRole,
             text: msg.content,
           }));
         let caseModel;
@@ -107,6 +110,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   evaluate: () => {
     set((state) => ({
       waitingForEvaluationResponse: true,
+      evaluationMessagesError: undefined,
     }));
     apiClient.api
       .evaluateSessionApiSessionsSessionIdEvaluatePost(get().sessionId!)
@@ -130,7 +134,54 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         }));
       });
   },
+  loadEvaluationMessages: async (sessionId?: string, force = false) => {
+    const resolvedSessionId = sessionId || get().evaluationResponse?.session_id || get().sessionId;
+
+    if (!resolvedSessionId) {
+      set({
+        evaluationMessagesError: 'Keine Session-ID für Gesprächsverlauf verfügbar.',
+      });
+      return;
+    }
+
+    const existingMessages = get().evaluationMessages;
+    if (existingMessages.length > 0 && !force) {
+      return;
+    }
+
+    set({ waitingForEvaluationMessages: true, evaluationMessagesError: undefined });
+
+    try {
+      const resp = await apiClient.api.getSessionMessagesApiSessionsSessionIdMessagesGet(
+        resolvedSessionId,
+      );
+      const messages = (resp.data.messages || [])
+        .filter((msg) => msg.role !== 'system')
+        .map((msg) => ({
+          role: (msg.role === 'user' ? 'user' : 'bot') as ChatRole,
+          text: msg.content,
+        }));
+
+      set({
+        evaluationMessages: messages,
+        waitingForEvaluationMessages: false,
+        evaluationMessagesError: undefined,
+      });
+    } catch (error) {
+      console.error('Failed to load evaluation messages:', error);
+      set({
+        waitingForEvaluationMessages: false,
+        evaluationMessagesError: 'Gesprächsverlauf konnte nicht geladen werden.',
+      });
+    }
+  },
   resetEvaluation: () => {
-    set({ evaluationResponse: undefined, waitingForEvaluationResponse: false });
+    set({
+      evaluationResponse: undefined,
+      waitingForEvaluationResponse: false,
+      evaluationMessages: [],
+      waitingForEvaluationMessages: false,
+      evaluationMessagesError: undefined,
+    });
   },
 }));

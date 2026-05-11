@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import {
   Portal,
@@ -20,9 +20,26 @@ export default function EvaluationModal() {
 
   const evaluation = useSessionStore((s) => s.evaluationResponse);
   const loading = useSessionStore((s) => s.waitingForEvaluationResponse);
+  const evaluationMessages = useSessionStore((s) => s.evaluationMessages);
+  const loadingMessages = useSessionStore((s) => s.waitingForEvaluationMessages);
+  const messagesError = useSessionStore((s) => s.evaluationMessagesError);
+  const loadEvaluationMessages = useSessionStore((s) => s.loadEvaluationMessages);
   const resetEvaluation = useSessionStore((s) => s.resetEvaluation);
+  const [showTranscript, setShowTranscript] = useState(false);
 
   const visible = Boolean(loading || evaluation);
+
+  useEffect(() => {
+    setShowTranscript(false);
+  }, [evaluation?.session_id]);
+
+  useEffect(() => {
+    if (!showTranscript || !evaluation?.session_id) {
+      return;
+    }
+
+    void loadEvaluationMessages(evaluation.session_id);
+  }, [evaluation?.session_id, loadEvaluationMessages, showTranscript]);
 
   const close = () => {
     resetEvaluation();
@@ -60,7 +77,8 @@ export default function EvaluationModal() {
         <Surface style={containerStyle} elevation={2}>
           {/* HEADER */}
           <View style={styles.header}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={styles.headerTopRow}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
               <Avatar.Icon
                 size={40}
                 icon="chart-bar"
@@ -78,6 +96,9 @@ export default function EvaluationModal() {
                   Detailliertes Feedback zu Ihrer Gesprächsführung
                 </Text>
               </View>
+            </View>
+
+              
             </View>
           </View>
 
@@ -211,7 +232,118 @@ export default function EvaluationModal() {
                   </Surface>
                 ))}
 
-                {/* IMPROVEMENT SUGGESTIONS CARD */}
+               
+
+                <Surface
+                  style={[
+                    styles.card,
+                    styles.transcriptCard,
+                    {
+                      backgroundColor: theme.colors.elevation.level1,
+                      borderColor: theme.colors.outlineVariant,
+                    },
+                  ]}
+                  elevation={0}
+                >
+                  <List.Accordion
+                    title="Gesprächsverlauf"
+                    description="Einsehbar, falls Sie einzelne Antworten nachverfolgen möchten"
+                    expanded={showTranscript}
+                    onPress={() => setShowTranscript((prev) => !prev)}
+                    titleStyle={{ color: theme.colors.primary, fontWeight: '700' }}
+                    descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+                    style={styles.transcriptAccordion}
+                    right={(props) => (
+                      loadingMessages ? (
+                        <ActivityIndicator size="small" color={theme.colors.primary} />
+                      ) : (
+                        <List.Icon
+                          {...props}
+                          icon={showTranscript ? 'chevron-up' : 'chevron-down'}
+                          color={theme.colors.onSurfaceVariant}
+                        />
+                      )
+                    )}
+                  >
+                    <View
+                      style={[
+                        styles.transcriptContent,
+                        { borderTopColor: theme.colors.outlineVariant },
+                      ]}
+                    >
+                      {messagesError ? (
+                        <Surface
+                          elevation={0}
+                          style={[
+                            styles.transcriptMessageError,
+                            { backgroundColor: theme.colors.errorContainer },
+                          ]}
+                        >
+                          <Text style={{ color: theme.colors.onErrorContainer }}>
+                            {messagesError}
+                          </Text>
+                          <Button
+                            mode="text"
+                            onPress={() => void loadEvaluationMessages(evaluation.session_id, true)}
+                            textColor={theme.colors.error}
+                          >
+                            Erneut laden
+                          </Button>
+                        </Surface>
+                      ) : !loadingMessages && evaluationMessages.length === 0 ? (
+                        <Text style={{ color: theme.colors.onSurfaceVariant }}>
+                          Für diese Sitzung liegen keine sichtbaren Nachrichten vor.
+                        </Text>
+                      ) : (
+                        <ScrollView
+                          style={styles.transcriptMessagesScroll}
+                          contentContainerStyle={styles.transcriptMessagesWrap}
+                          nestedScrollEnabled
+                          showsVerticalScrollIndicator
+                        >
+                          {evaluationMessages.map((message, index) => {
+                            const isUser = message.role === 'user';
+                            return (
+                              <View
+                                key={`eval-transcript-${index}`}
+                                style={[
+                                  styles.transcriptMessageRow,
+                                  isUser ? styles.transcriptMessageRowUser : styles.transcriptMessageRowBot,
+                                ]}
+                              >
+                                <Surface
+                                  elevation={0}
+                                  style={[
+                                    styles.transcriptMessageBubble,
+                                    {
+                                      backgroundColor: isUser
+                                        ? theme.colors.primaryContainer
+                                        : theme.colors.surfaceVariant,
+                                    },
+                                  ]}
+                                >
+                                  <Text
+                                    style={{
+                                      color: isUser
+                                        ? theme.colors.onPrimaryContainer
+                                        : theme.colors.onSurfaceVariant,
+                                      lineHeight: 20,
+                                    }}
+                                  >
+                                    {message.text}
+                                  </Text>
+                                </Surface>
+                              </View>
+                            );
+                          })}
+                        </ScrollView>
+                      )}
+                    </View>
+                  </List.Accordion>
+                </Surface>
+
+
+                 {/* IMPROVEMENT SUGGESTIONS CARD */}
                 <Surface
                   style={[
                     styles.card,
@@ -303,10 +435,16 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   header: {
+    padding: 16,
+  },
+  headerTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    gap: 12,
+  },
+  headerTranscriptButton: {
+    borderRadius: 18,
   },
   headerTitle: {
     fontWeight: 'bold',
@@ -355,6 +493,47 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 24,
     marginBottom: 12,
+  },
+  transcriptCard: {
+    marginTop: 16,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 0,
+    overflow: 'hidden',
+  },
+  transcriptAccordion: {
+    backgroundColor: 'transparent',
+  },
+  transcriptContent: {
+    borderTopWidth: 1,
+    padding: 12,
+  },
+  transcriptMessagesScroll: {
+    maxHeight: 550,
+  },
+  transcriptMessagesWrap: {
+    paddingBottom: 12,
+  },
+  transcriptMessageRow: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  transcriptMessageRowUser: {
+    justifyContent: 'flex-end',
+  },
+  transcriptMessageRowBot: {
+    justifyContent: 'flex-start',
+  },
+  transcriptMessageBubble: {
+    maxWidth: '88%',
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  transcriptMessageError: {
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
   },
   accordionCard: {
     borderWidth: 1,
