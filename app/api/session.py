@@ -450,7 +450,7 @@ async def live_websocket(
                                 db.commit()
                                 payload = {"type": "user_text", "text": text}
                                 await websocket.send_json(payload)
-                                logger.Debug(f"Sent to website: {payload}")
+                                logger.debug(f"Sent to website: {payload}")
 
                         if getattr(server_content, "turn_complete", False):
                             if current_model_transcript.strip():
