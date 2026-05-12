@@ -1,4 +1,3 @@
-
 import asyncio
 import base64
 import json
@@ -15,7 +14,8 @@ from fastapi import (
     HTTPException,
     Request,
     WebSocket,
-    WebSocketDisconnect, APIRouter,
+    WebSocketDisconnect,
+    APIRouter,
 )
 from google.genai.types import HistoryConfigDict
 from sqlalchemy import select, desc
@@ -35,7 +35,8 @@ from app.model.llm import (
 )
 from app.model.models import (
     Session as ChatSession,
-    Message, SessionMessagesResponse,
+    Message,
+    SessionMessagesResponse,
 )
 from app.model.models import (
     SessionLiveDefaultTime,
@@ -50,6 +51,7 @@ from app.model.models import (
 )
 
 sessionRouter = APIRouter()
+
 
 @sessionRouter.post("/api/sessions", response_model=CreateSessionResponse)
 async def create_session(
@@ -517,7 +519,10 @@ async def live_websocket(
                 db.rollback()
                 logger.error(f"Failed to save handle to database: {e}")
 
-@sessionRouter.get("/api/sessions/{session_id}/messages", response_model=SessionMessagesResponse)
+
+@sessionRouter.get(
+    "/api/sessions/{session_id}/messages", response_model=SessionMessagesResponse
+)
 async def get_session_messages(
     session_id: str, db: OrmSession = Depends(get_db)
 ) -> SessionMessagesResponse:
@@ -552,7 +557,10 @@ async def get_session_messages(
         ],
     )
 
-@sessionRouter.post("/api/sessions/{session_id}/evaluate", response_model=EvaluationResponse)
+
+@sessionRouter.post(
+    "/api/sessions/{session_id}/evaluate", response_model=EvaluationResponse
+)
 async def evaluate_session(
     session_id: str, request: Request, db: OrmSession = Depends(get_db)
 ) -> EvaluationResponse:

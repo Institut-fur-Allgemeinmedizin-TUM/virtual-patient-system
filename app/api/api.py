@@ -39,6 +39,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 def _read_mobile_index_html(frontend_dist: str) -> str:
     index_path = os.path.join(frontend_dist, "index.html")
     with open(index_path, encoding="utf-8") as index_file:

@@ -6,7 +6,8 @@ from fastapi import (
     HTTPException,
     Query,
     File,
-    UploadFile, APIRouter,
+    UploadFile,
+    APIRouter,
 )
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, desc
@@ -23,6 +24,7 @@ from app.model.models import (
 )
 
 utilRouter = APIRouter()
+
 
 @utilRouter.post("/api/transcribe")
 async def transcribe_audio(

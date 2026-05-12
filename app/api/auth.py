@@ -7,7 +7,8 @@ import httpx
 from fastapi import (
     HTTPException,
     Request,
-    Response, APIRouter,
+    Response,
+    APIRouter,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
 from jose import jwt, JWTError
@@ -17,6 +18,7 @@ from app.config.config import settings
 from app.model.auth import VHBLoginRequest, VHBLoginResponse
 
 authRouter = APIRouter()
+
 
 @authRouter.get("/auth/login")
 async def auth_login(

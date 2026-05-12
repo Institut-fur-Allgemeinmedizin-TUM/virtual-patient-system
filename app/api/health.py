@@ -9,6 +9,7 @@ from app.db.db import get_db
 
 healthRouter = APIRouter()
 
+
 @healthRouter.get("/health")
 async def health() -> dict:
     return {"status": "ok"}

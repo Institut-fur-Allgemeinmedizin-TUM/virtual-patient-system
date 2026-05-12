@@ -2,15 +2,10 @@ import os
 
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi import (
-    HTTPException,
-    Response
-)
+from fastapi import HTTPException, Response
 
 from app.api.api import app, _read_mobile_index_html
 from app.config.config import settings
-
-
 
 # Mount static files and serve the mobile web frontend (production only)
 if settings.environment == "production" or settings.environment == "beta":
