@@ -298,7 +298,8 @@ async def live_websocket(
         client = genai.Client(api_key=settings.gemini_api_key)
         live_config: google.genai.types.LiveConnectConfigDict = {
             "response_modalities": ["AUDIO"],
-            "system_instruction": system_prompt + " Antworte ausschließlich mit Audio!!! Schalte hierfür dein Mikrofon an!",
+            "system_instruction": system_prompt
+            + " Antworte ausschließlich mit Audio!!! Schalte hierfür dein Mikrofon an!",
             "output_audio_transcription": {},
             "input_audio_transcription": {},
             # Let this in the code for later use (newer models support this feature)
@@ -361,9 +362,7 @@ async def live_websocket(
                         elif event_type == "text":
                             text_value = parsed.get("text")
                             if text_value:
-                                await live_session.send_realtime_input(
-                                    text=text_value
-                                )
+                                await live_session.send_realtime_input(text=text_value)
                                 db.add(
                                     Message(
                                         session_id=session_id,
