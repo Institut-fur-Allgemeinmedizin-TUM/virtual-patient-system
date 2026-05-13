@@ -7,8 +7,10 @@ import { API_BASE_URL, getAccessToken } from '@/lib/auth';
 
 function buildWsUrl(sessionId: string) {
   const base = API_BASE_URL;
-  if (base.startsWith('https://')) return base.replace('https://', 'wss://') + `/api/live/${encodeURIComponent(sessionId)}/ws`;
-  if (base.startsWith('http://')) return base.replace('http://', 'ws://') + `/api/live/${encodeURIComponent(sessionId)}/ws`;
+  if (base.startsWith('https://'))
+    return base.replace('https://', 'wss://') + `/api/live/${encodeURIComponent(sessionId)}/ws`;
+  if (base.startsWith('http://'))
+    return base.replace('http://', 'ws://') + `/api/live/${encodeURIComponent(sessionId)}/ws`;
   return `${base}/api/live/${encodeURIComponent(sessionId)}/ws`;
 }
 // Utility to create a WAV header for raw PCM data so expo-av can play it
@@ -39,15 +41,6 @@ function createWavHeader(dataLength: number, sampleRate: number = 24000) {
   return new Uint8Array(buffer);
 }
 
-function base64ToBytes(base64Data: string): Uint8Array {
-  const binary = atob(base64Data);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
-}
-
 function floatToPCM16Base64(floatData: Float32Array): string {
   const pcm = new Int16Array(floatData.length);
   for (let i = 0; i < floatData.length; i += 1) {
@@ -65,7 +58,7 @@ function floatToPCM16Base64(floatData: Float32Array): string {
 
 export function useLiveAudioSession(
   sessionId?: string,
-  onTranscript?: (role: 'user' | 'assistant', text: string) => void
+  onTranscript?: (role: 'user' | 'assistant', text: string) => void,
 ) {
   const wsRef = useRef<WebSocket | null>(null);
   const [isActive, setIsActive] = useState(false);
@@ -75,26 +68,48 @@ export function useLiveAudioSession(
   // Buffer to hold incoming chunks until they are large enough to play seamlessly
   const playbackBufferRef = useRef<string[]>([]);
   const isPlayingRef = useRef(false);
+  const currentSoundRef = useRef<Audio.Sound | null>(null);
+
+  const stopAndUnloadCurrentSound = async () => {
+    const sound = currentSoundRef.current;
+    if (!sound) return;
+
+    currentSoundRef.current = null;
+    sound.setOnPlaybackStatusUpdate(null);
+
+    try {
+      await sound.stopAsync();
+    } catch {
+      // Ignore stop errors for already-stopped/unloaded sounds.
+    }
+
+    try {
+      await sound.unloadAsync();
+    } catch {
+      // Ignore unload errors; cleanup should be best-effort.
+    }
+  };
 
   const cleanup = async () => {
     Speech.stop();
     LiveAudioStream.stop();
+    await stopAndUnloadCurrentSound();
     playbackBufferRef.current = [];
     isPlayingRef.current = false;
   };
 
-  const MIN_CHUNKS_TO_PLAY = 20; 
+  const MIN_CHUNKS_TO_PLAY = 20;
   const isReceivingRef = useRef(false);
 
   // Playback logic using expo-av Data URIs
   const playBufferedAudio = async (forcePlay = false) => {
     if (isPlayingRef.current || playbackBufferRef.current.length === 0) return;
     if (!forcePlay && playbackBufferRef.current.length < MIN_CHUNKS_TO_PLAY) {
-      return; 
+      return;
     }
     isPlayingRef.current = true;
 
-   try {
+    try {
       // Grab ALL currently buffered chunks at once
       const chunksToPlay = [...playbackBufferRef.current];
       playbackBufferRef.current = []; // Clear buffer immediately for next incoming chunks
@@ -111,21 +126,36 @@ export function useLiveAudioSession(
       const uri = `data:audio/wav;base64,${wavBase64}`;
 
       const { sound } = await Audio.Sound.createAsync({ uri });
-      
+      currentSoundRef.current = sound;
+
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
-          isPlayingRef.current = false;
-          
-          // As soon as this large chunk finishes, immediately check if more arrived
-          // We use forcePlay = true here so it doesn't wait for MIN_CHUNKS if it's lagging behind
-          playBufferedAudio(true); 
+          sound.setOnPlaybackStatusUpdate(null);
+          sound
+            .unloadAsync()
+            .then(() => {
+              if (currentSoundRef.current === sound) {
+                currentSoundRef.current = null;
+              }
+              isPlayingRef.current = false;
+
+              // As soon as this large chunk finishes, immediately check if more arrived
+              // We use forcePlay = true here so it doesn't wait for MIN_CHUNKS if it's lagging behind
+              playBufferedAudio(true);
+            })
+            .catch(() => {
+              if (currentSoundRef.current === sound) {
+                currentSoundRef.current = null;
+              }
+              setError('Fehler beim Abspielen des Audios');
+              isPlayingRef.current = false;
+            });
         }
       });
 
       await sound.playAsync();
     } catch (err) {
-      console.error("Playback error:", err);
+      console.error('Playback error:', err);
       isPlayingRef.current = false;
     }
   };
@@ -186,15 +216,12 @@ export function useLiveAudioSession(
             isReceivingRef.current = true;
             playbackBufferRef.current.push(payload.data);
             playBufferedAudio(false);
-            
-            // Trigger playback if we aren't currently playing something
-            playBufferedAudio();
           }
 
           if (payload.type === 'turn_complete' || payload.type === 'model_turn_end') {
-             isReceivingRef.current = false;
-             // Force play whatever is left in the buffer, even if it's tiny
-             playBufferedAudio(true); 
+            isReceivingRef.current = false;
+            // Force play whatever is left in the buffer, even if it's tiny
+            playBufferedAudio(true);
           }
 
           if (payload.error) {
@@ -222,11 +249,10 @@ export function useLiveAudioSession(
               type: 'audio',
               data: base64Audio,
               mime_type: 'audio/pcm',
-            })
+            }),
           );
         }
       });
-
     } catch (err) {
       console.error('Failed to start live audio', err);
       setError('Live-Modus konnte nicht gestartet werden');

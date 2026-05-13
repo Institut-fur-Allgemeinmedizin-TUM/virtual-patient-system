@@ -109,37 +109,33 @@ export default function SessionScreen() {
     if (role === 'user') {
       // Keep the current speech transcript as one bubble while live mode is active.
 
-
       useSessionStore.setState((state) => {
-      const history = state.chatHistory || [];
-      const last = history[history.length - 1];
-      if (last && last.role === 'bot' && last.text === trimmed) {
-        return { chatHistory: history };
-      }
-      return {
-        chatHistory: [...history, { role: 'user', text: trimmed }],
-      };
-    });
-     
+        const history = state.chatHistory || [];
+        const last = history[history.length - 1];
+        if (last && last.role === 'bot' && last.text === trimmed) {
+          return { chatHistory: history };
+        }
+        return {
+          chatHistory: [...history, { role: 'user', text: trimmed }],
+        };
+      });
+
       return;
     }
-
-
 
     useSessionStore.setState((state) => {
       const history = state.chatHistory || [];
       const last = history[history.length - 1];
       if (last && last.role === 'bot') {
-        history[history.length - 1].text = history[history.length - 1].text + " " + trimmed;
-        return { chatHistory: history };
+        return {
+          chatHistory: [...history.slice(0, -1), { ...last, text: last.text + ' ' + trimmed }],
+        };
       }
       return {
         chatHistory: [...history, { role: 'bot', text: trimmed }],
       };
     });
   });
-
-  
 
   if (!session.loaded) {
     return (
@@ -365,7 +361,11 @@ export default function SessionScreen() {
                 disabled={isBotTyping || liveAudio.isActive}
                 onChangeText={setDraft}
                 onKeyPress={handleComposerKeyPress}
-                placeholder={liveAudio.isActive ? 'Sprechen Sie ins Mikrofon...' : 'Schreiben Sie eine Nachricht ...'}
+                placeholder={
+                  liveAudio.isActive
+                    ? 'Sprechen Sie ins Mikrofon...'
+                    : 'Schreiben Sie eine Nachricht ...'
+                }
                 multiline
                 style={styles.composerInput}
                 dense
@@ -386,7 +386,9 @@ export default function SessionScreen() {
                   }
                 }}
                 disabled={liveAudio.isConnecting || isBotTyping}
-                accessibilityLabel={liveAudio.isActive ? 'Aufnahme stoppen' : 'Mit Patient sprechen'}
+                accessibilityLabel={
+                  liveAudio.isActive ? 'Aufnahme stoppen' : 'Mit Patient sprechen'
+                }
               />
 
               {/* Send Button */}

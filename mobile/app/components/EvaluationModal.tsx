@@ -79,26 +79,24 @@ export default function EvaluationModal() {
           <View style={styles.header}>
             <View style={styles.headerTopRow}>
               <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-              <Avatar.Icon
-                size={40}
-                icon="chart-bar"
-                style={{ backgroundColor: theme.colors.primary }}
-                color={theme.colors.onPrimary}
-              />
-              <View style={{ marginLeft: 16 }}>
-                <Text
-                  variant="titleLarge"
-                  style={[styles.headerTitle, { color: theme.colors.primary }]}
-                >
-                  Anamnese-Evaluation
-                </Text>
-                <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                  Detailliertes Feedback zu Ihrer Gesprächsführung
-                </Text>
+                <Avatar.Icon
+                  size={40}
+                  icon="chart-bar"
+                  style={{ backgroundColor: theme.colors.primary }}
+                  color={theme.colors.onPrimary}
+                />
+                <View style={{ marginLeft: 16 }}>
+                  <Text
+                    variant="titleLarge"
+                    style={[styles.headerTitle, { color: theme.colors.primary }]}
+                  >
+                    Anamnese-Evaluation
+                  </Text>
+                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                    Detailliertes Feedback zu Ihrer Gesprächsführung
+                  </Text>
+                </View>
               </View>
-            </View>
-
-              
             </View>
           </View>
 
@@ -232,8 +230,6 @@ export default function EvaluationModal() {
                   </Surface>
                 ))}
 
-               
-
                 <Surface
                   style={[
                     styles.card,
@@ -253,7 +249,7 @@ export default function EvaluationModal() {
                     titleStyle={{ color: theme.colors.primary, fontWeight: '700' }}
                     descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
                     style={styles.transcriptAccordion}
-                    right={(props) => (
+                    right={(props) =>
                       loadingMessages ? (
                         <ActivityIndicator size="small" color={theme.colors.primary} />
                       ) : (
@@ -263,7 +259,7 @@ export default function EvaluationModal() {
                           color={theme.colors.onSurfaceVariant}
                         />
                       )
-                    )}
+                    }
                   >
                     <View
                       style={[
@@ -308,7 +304,9 @@ export default function EvaluationModal() {
                                 key={`eval-transcript-${index}`}
                                 style={[
                                   styles.transcriptMessageRow,
-                                  isUser ? styles.transcriptMessageRowUser : styles.transcriptMessageRowBot,
+                                  isUser
+                                    ? styles.transcriptMessageRowUser
+                                    : styles.transcriptMessageRowBot,
                                 ]}
                               >
                                 <Surface
@@ -342,8 +340,7 @@ export default function EvaluationModal() {
                   </List.Accordion>
                 </Surface>
 
-
-                 {/* IMPROVEMENT SUGGESTIONS CARD */}
+                {/* IMPROVEMENT SUGGESTIONS CARD */}
                 <Surface
                   style={[
                     styles.card,

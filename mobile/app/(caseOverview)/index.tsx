@@ -129,10 +129,7 @@ export default function HomeScreen() {
                             { borderTopColor: theme.colors.outlineVariant },
                           ]}
                         >
-                          <Icon
-                            source="check-circle"
-                            color={getScoreColor(score)} size={14}                           
-                          />
+                          <Icon source="check-circle" color={getScoreColor(score)} size={14} />
                           <Text
                             variant="bodySmall"
                             style={{

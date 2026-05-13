@@ -152,9 +152,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     set({ waitingForEvaluationMessages: true, evaluationMessagesError: undefined });
 
     try {
-      const resp = await apiClient.api.getSessionMessagesApiSessionsSessionIdMessagesGet(
-        resolvedSessionId,
-      );
+      const resp =
+        await apiClient.api.getSessionMessagesApiSessionsSessionIdMessagesGet(resolvedSessionId);
       const messages = (resp.data.messages || [])
         .filter((msg) => msg.role !== 'system')
         .map((msg) => ({
