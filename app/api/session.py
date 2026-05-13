@@ -116,24 +116,21 @@ async def chat(
         if os.environ.get("SIMULATE_AI") == "true":
             # Simulate AI response for testing without OpenAI calls
             time.sleep(1)
-            reply = f"Simulated response to: {req.message}"
+            reply_text = f"Simulated response to: {req.message}"
         else:
-            # Call OpenAI
-            client = chat_functions.get_openai_client()
-            completion = client.chat.completions.create(
-                model=settings.openai_model,
-                messages=messages_to_send,  # type: ignore[arg-type]
-                temperature=0.6,
-                max_tokens=300,
+            agent = create_agent(
+                model=chat_llm,
+                tools=[],
             )
-
-            reply = completion.choices[0].message.content or ""
+            reply_raw = agent.invoke({"messages": messages_to_send})
+            reply = reply_raw["messages"][-1]
+            reply_text = reply.text
 
         # Store messages in memory only (no DB persistence)
         vhb_session["messages"].append({"role": "user", "content": req.message})
-        vhb_session["messages"].append({"role": "assistant", "content": reply})
+        vhb_session["messages"].append({"role": "assistant", "content": reply_text})
 
-        return ChatResponse(reply=reply, session_id=req.session_id)
+        return ChatResponse(reply=reply_text, session_id=req.session_id)
 
     # Normal TUM user session: handle from database
     chat_session = db.get(ChatSession, req.session_id)
@@ -153,7 +150,7 @@ async def chat(
     )
 
     case_id = chat_session.case_id
-    persona = chat_functions.load_case_prompt(case_id)
+    persona = chat_functions.load_case_prompt(case_id) + "\nAntworte nicht zu genau und vor allem niemals medizinisch, falls die Frage nicht spezifisch genug gestellt ist!!! Frage selbst nach, wenn du dir über die Frage unsicher bist!"
 
     messages_to_send = [{"role": "system", "content": persona}]
     for m in msgs:
@@ -167,20 +164,18 @@ async def chat(
         tokens_in = 1
         tokens_out = 2
     else:
-        client = chat_functions.get_openai_client()
-        completion = client.chat.completions.create(
-            model=settings.openai_model,
-            messages=messages_to_send,  # type: ignore[arg-type]
-            temperature=0.6,
-            max_tokens=300,
+        agent = create_agent(
+            model=chat_llm,
+            tools=[],
         )
-
-        reply = completion.choices[0].message.content or ""
+        reply_raw = agent.invoke({"messages": messages_to_send})
+        reply = reply_raw["messages"][-1]
+        reply_text = reply.text
 
         # Extract token usage
-        usage = completion.usage
-        tokens_in = usage.prompt_tokens if usage else None
-        tokens_out = usage.completion_tokens if usage else None
+        usage = reply.usage_metadata
+        tokens_in = usage['input_tokens'] if usage else None
+        tokens_out = usage['total_tokens'] - tokens_in if usage else None
 
     # Persist turn with token usage
     db.add(
@@ -195,13 +190,13 @@ async def chat(
         Message(
             session_id=req.session_id,
             role="assistant",
-            content=reply,
+            content=reply_text,
             tokens_out=tokens_out,
         )
     )
     db.commit()
 
-    return ChatResponse(reply=reply, session_id=req.session_id)
+    return ChatResponse(reply=reply_text, session_id=req.session_id)
 
 
 def check_user_remaining_time_total(db: OrmSession, user_id: str) -> bool:

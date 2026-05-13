@@ -13,6 +13,8 @@ from app.model.models import Case
 chat_llm = ChatGoogleGenerativeAI(
     model=settings.gemini_model,
     api_key=settings.gemini_api_key,
+    temperature=0.6,
+    max_output_tokens=600,
 )
 
 reasoning_llm = ChatGoogleGenerativeAI(
