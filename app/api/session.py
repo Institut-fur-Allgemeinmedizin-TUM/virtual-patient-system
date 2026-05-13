@@ -18,6 +18,7 @@ from fastapi import (
     APIRouter,
 )
 from google.genai.types import HistoryConfigDict
+from langchain.agents import create_agent
 from sqlalchemy import select, desc
 from sqlalchemy.orm import Session as OrmSession
 
@@ -26,6 +27,7 @@ from app.auth import auth
 from app.config.config import settings
 from app.db.db import get_db
 from app.llm import chat as chat_functions, formatting
+from app.llm.chat import chat_llm, reasoning_llm
 from app.llm.prompts.evaluation import get_evaluation_prompt
 from app.model.llm import (
     CreateSessionResponse,
@@ -637,21 +639,17 @@ async def evaluate_session(
                 ],
             }
         else:
-            client = chat_functions.get_openai_client()
-            completion = client.chat.completions.create(
-                model=settings.openai_model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "Sie sind ein medizinischer Ausbilder. Antworten Sie ausschließlich im angeforderten JSON-Format.",
-                    },
-                    {"role": "user", "content": evaluation_prompt},
-                ],
-                temperature=0.7,
-                max_tokens=2000,
+            agent = create_agent(
+                model=reasoning_llm,
+                tools=[],
+                system_prompt="Sie sind ein medizinischer Ausbilder. Antworten Sie ausschließlich im angeforderten JSON-Format."
             )
-
-            response_text = completion.choices[0].message.content or ""
+            user_message = {
+                "role": "user",
+                "content": evaluation_prompt
+            }
+            response = agent.invoke({"messages": [user_message]})
+            response_text = response["messages"][-1].text  or ""
 
             # Parse JSON response
             try:

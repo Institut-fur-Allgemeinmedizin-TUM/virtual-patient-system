@@ -3,12 +3,24 @@ import os
 from typing import Dict
 
 from fastapi import HTTPException
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from sqlalchemy.orm import Session as OrmSession
 
 from app.config.config import settings
 from app.model.models import Case
 
+chat_llm = ChatGoogleGenerativeAI(
+    model=settings.gemini_model,
+    api_key=settings.gemini_api_key,
+)
+
+reasoning_llm = ChatGoogleGenerativeAI(
+    model=settings.gemini_reasoning_model,
+    api_key=settings.gemini_api_key,
+    temperature=0.7,
+    max_output_tokens=6000,
+)
 
 def _load_case_data_from_disk(case_id: str) -> Dict:
     """Load case data from JSON file."""

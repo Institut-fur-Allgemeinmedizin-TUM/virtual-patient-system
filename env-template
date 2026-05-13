@@ -18,6 +18,8 @@ OPENAI_MODEL=gpt-4o
 # Gemini Live API (backend proxy only)
 GEMINI_API_KEY=your-gemini-api-key-here
 GEMINI_LIVE_MODEL=gemini-2.0-flash-live-001
+GEMINI_MODEL=gemini-3-flash-preview
+GEMINI_REASONING_MODEL=gemini-3.1-pro-preview
 
 # TUM OIDC Authentication
 OIDC_ISSUER=https://tumidp.lrz.de/idp/shibboleth

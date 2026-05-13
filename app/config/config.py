@@ -15,6 +15,9 @@ class Settings:
         self.gemini_live_model: str = os.getenv(
             "GEMINI_LIVE_MODEL", "gemini-2.0-flash-live-001"
         )
+        self.gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
+        self.gemini_reasoning_model: str = os.getenv("GEMINI_REASONING_MODEL", "gemini-3.1-pro-preview")
+
         # OIDC (TUM) configuration
         self.oidc_issuer: Optional[str] = os.getenv("OIDC_ISSUER")
         self.oidc_client_id: Optional[str] = os.getenv("OIDC_CLIENT_ID")
