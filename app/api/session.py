@@ -53,6 +53,11 @@ from app.model.models import (
 )
 
 sessionRouter = APIRouter()
+NON_SPECIFIC_QUESTION_PROMPT_SUFFIX = (
+    "\nAntworte nicht zu genau und vor allem niemals medizinisch, falls die Frage "
+    "nicht spezifisch genug gestellt ist!!! Frage selbst nach, wenn du dir über "
+    "die Frage unsicher bist!"
+)
 
 
 @sessionRouter.post("/api/sessions", response_model=CreateSessionResponse)
@@ -150,7 +155,7 @@ async def chat(
     )
 
     case_id = chat_session.case_id
-    persona = chat_functions.load_case_prompt(case_id) + "\nAntworte nicht zu genau und vor allem niemals medizinisch, falls die Frage nicht spezifisch genug gestellt ist!!! Frage selbst nach, wenn du dir über die Frage unsicher bist!"
+    persona = chat_functions.load_case_prompt(case_id) + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX
 
     messages_to_send = [{"role": "system", "content": persona}]
     for m in msgs:
