@@ -6,7 +6,7 @@ from fastapi import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth, session, util, health
+from app.api import auth, session, util, health, medical_background
 from app.config.config import settings
 
 # Trigger redeployment with OIDC_AUTH_URL secret now configured
@@ -15,6 +15,7 @@ app.include_router(auth.authRouter)
 app.include_router(session.sessionRouter)
 app.include_router(util.utilRouter)
 app.include_router(health.healthRouter)
+app.include_router(medical_background.medical_background_router)
 
 # Add CORS middleware
 # In production, the frontend is served from the same origin

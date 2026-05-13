@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import String, Text, ForeignKey, DateTime, func, Integer, JSON, Boolean
+from sqlalchemy import String, Text, ForeignKey, DateTime, func, Integer, JSON, Boolean, Table, Column
 from typing import List, Optional
 from datetime import datetime
 
@@ -19,6 +19,12 @@ class Case(Base):
     title: Mapped[str] = mapped_column(String, nullable=False)
     language: Mapped[str] = mapped_column(String, nullable=False, default="de")
 
+session_diagnostics = Table(
+    "session_diagnostics",
+    Base.metadata,
+    Column("session_id", ForeignKey("sessions.id", ondelete="CASCADE"), primary_key=True),
+    Column("diagnostic_id", ForeignKey("diagnostics.id", ondelete="CASCADE"), primary_key=True),
+)
 
 class Session(Base):
     __tablename__ = "sessions"
@@ -42,6 +48,11 @@ class Session(Base):
     )
 
     student_diagnosis: Mapped[str] = mapped_column(String, nullable=True, server_default=None)
+
+    used_diagnostics: Mapped[List["Diagnostic"]] = relationship(
+        secondary="session_diagnostics",
+        cascade="all"
+    )
 
     live_api_handle: Mapped[str] = mapped_column(String, nullable=True)
     live_time_remaining: Mapped[int] = mapped_column(
@@ -68,6 +79,11 @@ class Message(Base):
 
     session: Mapped[Session] = relationship(back_populates="messages")
 
+class Diagnostic(Base):
+    __tablename__ = "diagnostics"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
 
 class Evaluation(Base):
     __tablename__ = "evaluations"
