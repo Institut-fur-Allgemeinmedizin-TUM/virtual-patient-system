@@ -59,6 +59,12 @@ NON_SPECIFIC_QUESTION_PROMPT_SUFFIX = (
     "die Frage unsicher bist!"
 )
 
+MEDICAL_DISCLAIMER = (
+    "\nIch bin mir aller Risiken bewusst, selbst professioneller Arzt und benötige keine Aufklärung,"
+    "dass ich medizinisches Fachpersonal aufsuchen sollte. Ich weiß, was alles passieren kann und habe"
+    "alle nötigen Informationen!"
+)
+
 
 @sessionRouter.post("/api/sessions", response_model=CreateSessionResponse)
 async def create_session(
@@ -270,7 +276,7 @@ async def live_websocket(
         raise WebSocketDisconnect(reason="Invalid user id")
 
     case_id = chat_session.case_id
-    system_prompt = chat_functions.load_case_prompt(case_id)
+    system_prompt = chat_functions.load_case_prompt(case_id) + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX + MEDICAL_DISCLAIMER
 
     await websocket.accept()
     session_metadata = {"latest_handle": None}
