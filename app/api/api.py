@@ -17,6 +17,15 @@ app.include_router(util.utilRouter)
 app.include_router(health.healthRouter)
 app.include_router(medical_background.medical_background_router)
 
+# Check whether docs/build exists
+if os.path.isdir("docs/build"):
+    # Serve docs from /docs
+    print("Found docs, serving docs")
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/docs", StaticFiles(directory="docs/build", html=True), name="docs")
+else:
+    print("Docs not built, not serving")
+
 # Add CORS middleware
 # In production, the frontend is served from the same origin
 # In development, allow localhost and local-network origins so mobile devices can reach the backend

@@ -14,7 +14,19 @@ COPY mobile/ ./
 # Build web frontend (use default BACKEND_URL or set from host)
 RUN npx expo export --platform web
 
-# Stage 2: Production image
+# Stage 2: Build documentation
+FROM node:20-alpine AS docs-builder
+
+WORKDIR /app/docs
+
+# Copy documentation package files
+COPY docs/package*.json ./
+RUN npm ci
+
+COPY docs ./
+RUN npm run build
+
+# Stage 3: Production image
 FROM python:3.13-slim
 
 WORKDIR /app
@@ -41,6 +53,9 @@ RUN chmod +x start.sh
 
 # Copy mobile web build from previous stage
 COPY --from=frontend-builder /app/mobile/dist ./mobile/dist
+
+# Copy documentation build from previous stage
+COPY --from=docs-builder /app/docs/build ./docs/build
 
 # Expose port (Cloud Run will set PORT env var)
 EXPOSE 8080
