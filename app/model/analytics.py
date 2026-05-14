@@ -1,7 +1,7 @@
 from enum import Enum
 
 from pydantic import BaseModel, Field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from app.model.models import Evaluation, Session
 
@@ -30,15 +30,34 @@ class SessionHistoryColumn(str, Enum):
     criterion8_explanation = "criterion8_explanation"
     improvement_suggestions = "improvement_suggestions"
 
+class AggregationFunction(str, Enum):
+    avg = "avg"
+    sum = "sum"
+    min = "min"
+    max = "max"
+    count = "count"
 
 class SortDirection(str, Enum):
     asc = "asc"
     desc = "desc"
 
+class AggregationParam(BaseModel):
+    column: SessionHistoryColumn
+    function: AggregationFunction = AggregationFunction.avg
+
+    @property
+    def alias(self) -> str:
+        """Generates a dynamic column name, e.g., 'avg_criterion1_score'"""
+        return f"{self.function.value}_{self.column.value}"
 
 class SessionHistoryOrderBy(BaseModel):
-    column: SessionHistoryColumn
+    column: Union[SessionHistoryColumn, str]
     direction: SortDirection = SortDirection.asc
+
+
+class SessionHistoryFilter(BaseModel):
+    column: SessionHistoryColumn
+    value: Any
 
 
 column_db_map = {
@@ -55,6 +74,14 @@ column_db_map = {
     SessionHistoryColumn.criterion6_score: Evaluation.criterion6_score,
     SessionHistoryColumn.criterion7_score: Evaluation.criterion7_score,
     SessionHistoryColumn.criterion8_score: Evaluation.criterion8_score,
+    SessionHistoryColumn.criterion1_explanation: Evaluation.criterion1_explanation,
+    SessionHistoryColumn.criterion2_explanation: Evaluation.criterion2_explanation,
+    SessionHistoryColumn.criterion3_explanation: Evaluation.criterion3_explanation,
+    SessionHistoryColumn.criterion4_explanation: Evaluation.criterion4_explanation,
+    SessionHistoryColumn.criterion5_explanation: Evaluation.criterion5_explanation,
+    SessionHistoryColumn.criterion6_explanation: Evaluation.criterion6_explanation,
+    SessionHistoryColumn.criterion7_explanation: Evaluation.criterion7_explanation,
+    SessionHistoryColumn.criterion8_explanation: Evaluation.criterion8_explanation,
     SessionHistoryColumn.improvement_suggestions: Evaluation.improvement_suggestions,
 }
 
@@ -63,6 +90,7 @@ class GetSessionsHistoryRequest(BaseModel):
     only_evaluated: bool = False
     include_messages: bool = False
     include_columns: list[SessionHistoryColumn] | None = None
+    filters: list[SessionHistoryFilter] | None = None
     order_by: list[SessionHistoryOrderBy] = Field(
         default_factory=lambda: [
             SessionHistoryOrderBy(
@@ -71,6 +99,9 @@ class GetSessionsHistoryRequest(BaseModel):
             )
         ]
     )
+
+    group_by: list[SessionHistoryColumn] | None = None
+    aggregations: list[AggregationParam] | None = None
 
     limit: int = 100
     offset: int = 0
@@ -89,13 +120,8 @@ class SessionHistoryRow(BaseModel):
 
 
 class GetSessionsHistoryResponse(BaseModel):
-    # The ordered list of columns (names) being returned. Use this to render table headers.
-    columns: List[SessionHistoryColumn]
-
-    # Rows are dictionaries mapping column name -> value. Values can be None.
+    columns: List[str]
     rows: List[SessionHistoryRow]
-
-    # Pagination / meta
     total: int
     limit: int
     offset: int

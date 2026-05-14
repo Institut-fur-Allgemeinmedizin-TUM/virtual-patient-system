@@ -10,6 +10,54 @@
  * ---------------------------------------------------------------
  */
 
+/** SortDirection */
+export enum SortDirection {
+  Asc = "asc",
+  Desc = "desc",
+}
+
+/** SessionHistoryColumn */
+export enum SessionHistoryColumn {
+  Id = "id",
+  Case = "case",
+  StartedAt = "started_at",
+  EndedAt = "ended_at",
+  UserId = "user_id",
+  Criterion1Score = "criterion1_score",
+  Criterion1Explanation = "criterion1_explanation",
+  Criterion2Score = "criterion2_score",
+  Criterion2Explanation = "criterion2_explanation",
+  Criterion3Score = "criterion3_score",
+  Criterion3Explanation = "criterion3_explanation",
+  Criterion4Score = "criterion4_score",
+  Criterion4Explanation = "criterion4_explanation",
+  Criterion5Score = "criterion5_score",
+  Criterion5Explanation = "criterion5_explanation",
+  Criterion6Score = "criterion6_score",
+  Criterion6Explanation = "criterion6_explanation",
+  Criterion7Score = "criterion7_score",
+  Criterion7Explanation = "criterion7_explanation",
+  Criterion8Score = "criterion8_score",
+  Criterion8Explanation = "criterion8_explanation",
+  ImprovementSuggestions = "improvement_suggestions",
+}
+
+/** AggregationFunction */
+export enum AggregationFunction {
+  Avg = "avg",
+  Sum = "sum",
+  Min = "min",
+  Max = "max",
+  Count = "count",
+}
+
+/** AggregationParam */
+export interface AggregationParam {
+  column: SessionHistoryColumn;
+  /** @default "avg" */
+  function?: AggregationFunction;
+}
+
 /** Body_transcribe_audio_api_transcribe_post */
 export interface BodyTranscribeAudioApiTranscribePost {
   /**
@@ -108,10 +156,79 @@ export interface GetCasesResponse {
   cases: CaseItemModel[];
 }
 
+/** GetSessionsHistoryRequest */
+export interface GetSessionsHistoryRequest {
+  /**
+   * Only Evaluated
+   * @default false
+   */
+  only_evaluated?: boolean;
+  /**
+   * Include Messages
+   * @default false
+   */
+  include_messages?: boolean;
+  /** Include Columns */
+  include_columns?: SessionHistoryColumn[] | null;
+  /** Filters */
+  filters?: SessionHistoryFilter[] | null;
+  /** Order By */
+  order_by?: SessionHistoryOrderBy[];
+  /** Group By */
+  group_by?: SessionHistoryColumn[] | null;
+  /** Aggregations */
+  aggregations?: AggregationParam[] | null;
+  /**
+   * Limit
+   * @default 100
+   */
+  limit?: number;
+  /**
+   * Offset
+   * @default 0
+   */
+  offset?: number;
+}
+
+/** GetSessionsHistoryResponse */
+export interface GetSessionsHistoryResponse {
+  /** Columns */
+  columns: string[];
+  /** Rows */
+  rows: SessionHistoryRow[];
+  /** Total */
+  total: number;
+  /** Limit */
+  limit: number;
+  /** Offset */
+  offset: number;
+}
+
 /** HTTPValidationError */
 export interface HTTPValidationError {
   /** Detail */
   detail?: ValidationError[];
+}
+
+/** SessionHistoryFilter */
+export interface SessionHistoryFilter {
+  column: SessionHistoryColumn;
+  /** Value */
+  value: any;
+}
+
+/** SessionHistoryOrderBy */
+export interface SessionHistoryOrderBy {
+  /** Column */
+  column: SessionHistoryColumn | string;
+  /** @default "asc" */
+  direction?: SortDirection;
+}
+
+/** SessionHistoryRow */
+export interface SessionHistoryRow {
+  /** Values */
+  values: Record<string, any>;
 }
 
 /** SessionMessageItem */
@@ -393,52 +510,6 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
-  health = {
-    /**
-     * No description
-     *
-     * @name HealthHealthGet
-     * @summary Health
-     * @request GET:/health
-     */
-    healthHealthGet: (params: RequestParams = {}) =>
-      this.request<Record<string, any>, any>({
-        path: `/health`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Debug endpoint to check OIDC configuration (sanitized).
-     *
-     * @name HealthOidcHealthOidcGet
-     * @summary Health Oidc
-     * @request GET:/health/oidc
-     */
-    healthOidcHealthOidcGet: (params: RequestParams = {}) =>
-      this.request<Record<string, any>, any>({
-        path: `/health/oidc`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Check database connectivity.
-     *
-     * @name HealthDbHealthDbGet
-     * @summary Health Db
-     * @request GET:/health/db
-     */
-    healthDbHealthDbGet: (params: RequestParams = {}) =>
-      this.request<Record<string, any>, any>({
-        path: `/health/db`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-  };
   auth = {
     /**
      * No description
@@ -575,6 +646,57 @@ export class Api<
       }),
 
     /**
+     * @description Get all messages for a specific session.
+     *
+     * @name GetSessionMessagesApiSessionsSessionIdMessagesGet
+     * @summary Get Session Messages
+     * @request GET:/api/sessions/{session_id}/messages
+     */
+    getSessionMessagesApiSessionsSessionIdMessagesGet: (
+      sessionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<SessionMessagesResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/messages`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Evaluate anamnesis performance for a session.
+     *
+     * @name EvaluateSessionApiSessionsSessionIdEvaluatePost
+     * @summary Evaluate Session
+     * @request POST:/api/sessions/{session_id}/evaluate
+     */
+    evaluateSessionApiSessionsSessionIdEvaluatePost: (
+      sessionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<EvaluationResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/evaluate`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get a summary of the last sessions the user did per case.
+     *
+     * @name GetLastSessionSummaryApiSessionsSummaryGet
+     * @summary Get Last Session Summary
+     * @request GET:/api/sessions/summary
+     */
+    getLastSessionSummaryApiSessionsSummaryGet: (params: RequestParams = {}) =>
+      this.request<SessionsSummaryResponse, any>({
+        path: `/api/sessions/summary`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Transcribe audio to text using OpenAI Whisper.
      *
      * @name TranscribeAudioApiTranscribePost
@@ -621,24 +743,6 @@ export class Api<
         path: `/api/export`,
         method: "GET",
         query: query,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Get all messages for a specific session.
-     *
-     * @name GetSessionMessagesApiSessionsSessionIdMessagesGet
-     * @summary Get Session Messages
-     * @request GET:/api/sessions/{session_id}/messages
-     */
-    getSessionMessagesApiSessionsSessionIdMessagesGet: (
-      sessionId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<SessionMessagesResponse, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/messages`,
-        method: "GET",
         format: "json",
         ...params,
       }),
@@ -703,33 +807,116 @@ export class Api<
       }),
 
     /**
-     * @description Evaluate anamnesis performance for a session.
+     * No description
      *
-     * @name EvaluateSessionApiSessionsSessionIdEvaluatePost
-     * @summary Evaluate Session
-     * @request POST:/api/sessions/{session_id}/evaluate
+     * @name GetSessionsStatsApiAnalyticsSessionsStatsPost
+     * @summary Get Sessions Stats
+     * @request POST:/api/analytics/sessions/stats
      */
-    evaluateSessionApiSessionsSessionIdEvaluatePost: (
-      sessionId: string,
+    getSessionsStatsApiAnalyticsSessionsStatsPost: (
+      data: GetSessionsHistoryRequest,
+      query?: {
+        /**
+         * As Csv
+         * @default false
+         */
+        as_csv?: boolean;
+      },
       params: RequestParams = {},
     ) =>
-      this.request<EvaluationResponse, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/evaluate`,
+      this.request<GetSessionsHistoryResponse, HTTPValidationError>({
+        path: `/api/analytics/sessions/stats`,
         method: "POST",
+        query: query,
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  health = {
+    /**
+     * No description
+     *
+     * @name HealthHealthGet
+     * @summary Health
+     * @request GET:/health
+     */
+    healthHealthGet: (params: RequestParams = {}) =>
+      this.request<Record<string, any>, any>({
+        path: `/health`,
+        method: "GET",
         format: "json",
         ...params,
       }),
 
     /**
-     * @description Get a summary of the last sessions the user did per case.
+     * @description Debug endpoint to check OIDC configuration (sanitized).
      *
-     * @name GetLastSessionSummaryApiSessionsSummaryGet
-     * @summary Get Last Session Summary
-     * @request GET:/api/sessions/summary
+     * @name HealthOidcHealthOidcGet
+     * @summary Health Oidc
+     * @request GET:/health/oidc
      */
-    getLastSessionSummaryApiSessionsSummaryGet: (params: RequestParams = {}) =>
-      this.request<SessionsSummaryResponse, any>({
-        path: `/api/sessions/summary`,
+    healthOidcHealthOidcGet: (params: RequestParams = {}) =>
+      this.request<Record<string, any>, any>({
+        path: `/health/oidc`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Check database connectivity.
+     *
+     * @name HealthDbHealthDbGet
+     * @summary Health Db
+     * @request GET:/health/db
+     */
+    healthDbHealthDbGet: (params: RequestParams = {}) =>
+      this.request<Record<string, any>, any>({
+        path: `/health/db`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  faviconIco = {
+    /**
+     * No description
+     *
+     * @name ServeStaticFileFaviconIcoGet
+     * @summary Serve Static File
+     * @request GET:/favicon.ico
+     */
+    serveStaticFileFaviconIcoGet: (
+      query?: {
+        /**
+         * File Name
+         * @default "favicon.ico"
+         */
+        file_name?: any;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<any, HTTPValidationError>({
+        path: `/favicon.ico`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+  };
+  fullPath = {
+    /**
+     * No description
+     *
+     * @name ServeSpaFullPathGet
+     * @summary Serve Spa
+     * @request GET:/{full_path}
+     */
+    serveSpaFullPathGet: (fullPath: string, params: RequestParams = {}) =>
+      this.request<any, HTTPValidationError>({
+        path: `/${fullPath}`,
         method: "GET",
         format: "json",
         ...params,

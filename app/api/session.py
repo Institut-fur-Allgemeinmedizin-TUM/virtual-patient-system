@@ -583,17 +583,18 @@ async def evaluate_session(
     """Evaluate anamnesis performance for a session."""
     user = auth.require_user(request)
 
-    # Check if this is a VHB user - they cannot use evaluation feature
-    if user.get("is_vhb_user", False):
-        raise HTTPException(
-            status_code=403, detail="Evaluation feature is only available for TUM users"
-        )
+    if not user.get("is_admin", False):
+        # Check if this is a VHB user - they cannot use evaluation feature
+        if user.get("is_vhb_user", False):
+            raise HTTPException(
+                status_code=403, detail="Evaluation feature is only available for TUM users"
+            )
 
-    # Check if session is in VHB sessions (shouldn't happen, but double-check)
-    if session_id in vhb_sessions:
-        raise HTTPException(
-            status_code=403, detail="Evaluation not available for VHB sessions"
-        )
+        # Check if session is in VHB sessions (shouldn't happen, but double-check)
+        if session_id in vhb_sessions:
+            raise HTTPException(
+                status_code=403, detail="Evaluation not available for VHB sessions"
+            )
 
     # Get session from database
     chat_session = db.get(ChatSession, session_id)
@@ -601,8 +602,14 @@ async def evaluate_session(
         raise HTTPException(status_code=404, detail="Session not found")
 
     tum_id = user.get("tum_id") or user.get("sub")
+    # Ensures that admins can only see existing evaluations, but not create new ones for sessions they don't own
+    mustExist = False
     if chat_session.user_id != tum_id:
-        raise HTTPException(status_code=403, detail="Invalid user id")
+        if not user.get("is_admin", False):
+            raise HTTPException(status_code=403, detail="Invalid user id")
+        else: 
+            mustExist = True
+
     # Check if evaluation already exists
     existing_evaluation = (
         db.query(Evaluation).filter(Evaluation.session_id == session_id).first()
@@ -613,6 +620,9 @@ async def evaluate_session(
             pytime.sleep(4)
         # Return existing evaluation
         return formatting.format_evaluation_response(existing_evaluation)
+    if mustExist:
+        raise HTTPException(status_code=404, detail="Evaluation not found")
+
 
     # Get all messages for this session
     messages = (
