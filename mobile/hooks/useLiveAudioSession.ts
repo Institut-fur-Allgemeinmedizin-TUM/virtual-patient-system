@@ -410,11 +410,25 @@ export function useLiveAudioSession(
     setIsConnecting(false);
   };
 
+  const sendMessage = (text: string) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+       onTranscript?.('user', text);
+      wsRef.current.send(
+        JSON.stringify({
+          type: 'text',
+          text,
+        }),
+      );
+    } else {
+      console.warn('WebSocket is not open. Cannot send message:', text);
+    }
+  }
+
   useEffect(() => {
     return () => {
       void stopLiveAudio();
     };
   }, []);
 
-  return { isActive, isConnecting, error, start: startLiveAudio, stop: stopLiveAudio } as const;
+  return { isActive, isConnecting, error, start: startLiveAudio, stop: stopLiveAudio, sendMessage: sendMessage } as const;
 }

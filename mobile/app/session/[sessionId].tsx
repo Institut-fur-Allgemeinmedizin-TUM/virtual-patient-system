@@ -77,7 +77,11 @@ export default function SessionScreen() {
   const sendMessage = () => {
     if (!canSend) return;
     setDraft('');
-    session.chat(draft);
+    if (liveAudio.isActive)  {
+      liveAudio.sendMessage(draft.trim());
+    } else {
+      session.chat(draft);
+    }
   };
 
   const handleComposerKeyPress = (event: { nativeEvent: { key: string; shiftKey?: boolean } }) => {
@@ -358,7 +362,7 @@ export default function SessionScreen() {
               <TextInput
                 mode="outlined"
                 value={draft}
-                disabled={isBotTyping || liveAudio.isActive}
+                disabled={isBotTyping}
                 onChangeText={setDraft}
                 onKeyPress={handleComposerKeyPress}
                 placeholder={
