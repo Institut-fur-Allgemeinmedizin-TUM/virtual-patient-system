@@ -526,13 +526,19 @@ async def live_websocket(
     "/api/sessions/{session_id}/messages", response_model=SessionMessagesResponse
 )
 async def get_session_messages(
-    session_id: str, db: OrmSession = Depends(get_db)
+    session_id: str, request: Request, db: OrmSession = Depends(get_db)
 ) -> SessionMessagesResponse:
     """Get all messages for a specific session."""
 
     session = db.get(ChatSession, session_id)
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
+
+    user = auth.require_user(request)
+
+    tum_id = user.get("tum_id") or user.get("sub")
+    if session.user_id != tum_id:
+        raise HTTPException(status_code=403, detail="Invalid user id")
 
     messages = (
         db.query(Message)
