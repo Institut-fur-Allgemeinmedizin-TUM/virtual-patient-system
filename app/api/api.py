@@ -10,7 +10,7 @@ from app.api import auth, session, util, health, medical_background
 from app.config.config import settings
 
 # Trigger redeployment with OIDC_AUTH_URL secret now configured
-app = FastAPI(title="Virtual Patient Backend", version="0.1.0")
+app = FastAPI(title="Virtual Patient Backend", version="0.1.0", docs_url="/api/docs")
 app.include_router(auth.authRouter)
 app.include_router(session.sessionRouter)
 app.include_router(util.utilRouter)
