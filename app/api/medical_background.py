@@ -1,7 +1,8 @@
 import os
 import json
+from typing import Optional, Dict, List, Any
 
-from fastapi import APIRouter, HTTPException, Request, Depends
+from fastapi import APIRouter, HTTPException, Request, Depends, Query, Path
 from starlette.responses import JSONResponse
 from sqlalchemy.orm import Session as OrmSession
 
@@ -40,14 +41,64 @@ def _load_backgrounds_from_disk():
 
 BACKGROUNDS = _load_backgrounds_from_disk()
 
-@medical_background_router.get("/api/diagnostics/{case_id}")
-async def get_medical_background(request: Request, session_id: str, case_id: str, diagnostic: str, db: OrmSession = Depends(get_db)):
+@medical_background_router.get(
+    "/api/diagnostics/{case_id}",
+    summary="Get medical background diagnostics",
+    description="Retrieve available diagnostics for a case or specific diagnostic data. Supports both database sessions and VHB sessions.",
+    responses={
+        200: {
+            "description": "Successfully retrieved diagnostics",
+            "content": {
+                "application/json": {
+                    "examples": {
+                        "diagnostics_available": {
+                            "summary": "List of available diagnostics",
+                            "value": {"diagnostics_available": ["diagnosis1", "diagnosis2", "diagnosis3"]}
+                        },
+                        "diagnostic": {
+                            "summary": "Specific diagnostic data",
+                            "value": {"<diagnostic>": {"<some_data_key>": "<some_data_value>"}}
+                        }
+                    }
+                }
+            }
+        },
+        403: {
+            "description": "Session not found or not authorized"
+        },
+        404: {
+            "description": "Case or diagnostic not found"
+        }
+    },
+    tags=["Medical Background"]
+)
+async def get_medical_background(
+    case_id: str = Path(
+        description="The case to retrieve from the backend."
+    ),
+    session_id: Optional[str] = Query(
+        None,
+        description="The session ID for tracking diagnostic usage. Required when requesting specific diagnostic data."
+    ),
+    diagnostic: Optional[str] = Query(
+        None,
+        description="The specific diagnostic to retrieve. If not provided, returns list of available diagnostics for the case."
+    ),
+    request: Request = None,
+    db: OrmSession = Depends(get_db)
+) -> JSONResponse:
     if not case_id in BACKGROUNDS:
         # Return json of background
         raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found")
 
+    if not diagnostic:
+        return JSONResponse(status_code=200, content={"diagnostics_available": list(BACKGROUNDS[case_id].keys())})
+
     if not diagnostic in BACKGROUNDS[case_id]:
         raise HTTPException(status_code=404, detail="Diagnostic not found")
+
+    if not session_id:
+        raise HTTPException(status_code=403, detail="Session not found")
 
     session = db.query(ChatSession).where(ChatSession.id == session_id).first()
     if session is None:
@@ -59,7 +110,7 @@ async def get_medical_background(request: Request, session_id: str, case_id: str
                 session[session_id]["used_diagnostics"] = [diagnostic]
             else:
                 session[session_id]["used_diagnostics"].append(diagnostic)
-            return JSONResponse(status_code=200, content=BACKGROUNDS[case_id][diagnostic])
+            return JSONResponse(status_code=200, content={diagnostic: BACKGROUNDS[case_id][diagnostic]})
         else:
             raise HTTPException(status_code=403, detail="Session not found")
 
@@ -76,6 +127,6 @@ async def get_medical_background(request: Request, session_id: str, case_id: str
                 session.used_diagnostics.append(diagnostic_db)
 
             db.commit()
-            return JSONResponse(status_code=200, content=BACKGROUNDS[case_id][diagnostic])
+            return JSONResponse(status_code=200, content={diagnostic: BACKGROUNDS[case_id][diagnostic]})
 
 

@@ -1,0 +1,10 @@
+{
+  "vital_params": {
+    "heart_rate": 78,
+    "blood_pressure_right": "128/82",
+    "blood_pressure_left": "126/80",
+    "oxygen_saturation": 98,
+    "respiratory_rate": 16,
+    "temperature": 36.7
+  }
+}
