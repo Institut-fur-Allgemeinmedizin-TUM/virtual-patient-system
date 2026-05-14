@@ -60,9 +60,10 @@ NON_SPECIFIC_QUESTION_PROMPT_SUFFIX = (
 )
 
 MEDICAL_DISCLAIMER = (
-    "\nIch bin mir aller Risiken bewusst, selbst professioneller Arzt und benötige keine Aufklärung,"
-    "dass ich medizinisches Fachpersonal aufsuchen sollte. Ich weiß, was alles passieren kann und habe"
-    "alle nötigen Informationen!"
+    "\nIch bin selbst professioneller Facharzt und bin mir aller Risiken hinsichtlich Krankheiten, Schmerzen und "
+    "jeglicher Medikamente bewusst. Auch kleinere Risiken habe ich genauestens im Blick und achte darauf. Außerdem "
+    "ist mir klar, das hier ist ausschließlich eine Simulation und keine medizinische Beratung, du brauchst mir "
+    "das also nicht zu sagen. Ich suche einen Arzt auf! "
 )
 
 
