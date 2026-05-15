@@ -24,6 +24,7 @@ reasoning_llm = ChatGoogleGenerativeAI(
     max_output_tokens=6000,
 )
 
+
 def _load_case_data_from_disk(case_id: str) -> Dict:
     """Load case data from JSON file."""
     case_file = os.path.join(

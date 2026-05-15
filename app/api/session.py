@@ -164,7 +164,9 @@ async def chat(
     )
 
     case_id = chat_session.case_id
-    persona = chat_functions.load_case_prompt(case_id) + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX
+    persona = (
+        chat_functions.load_case_prompt(case_id) + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX
+    )
 
     messages_to_send = [{"role": "system", "content": persona}]
     for m in msgs:
@@ -188,8 +190,8 @@ async def chat(
 
         # Extract token usage
         usage = reply.usage_metadata
-        tokens_in = usage['input_tokens'] if usage else None
-        tokens_out = usage['total_tokens'] - tokens_in if usage else None
+        tokens_in = usage["input_tokens"] if usage else None
+        tokens_out = usage["total_tokens"] - tokens_in if usage else None
 
     # Persist turn with token usage
     db.add(
@@ -657,14 +659,11 @@ async def evaluate_session(
             agent = create_agent(
                 model=reasoning_llm,
                 tools=[],
-                system_prompt="Sie sind ein medizinischer Ausbilder. Antworten Sie ausschließlich im angeforderten JSON-Format."
+                system_prompt="Sie sind ein medizinischer Ausbilder. Antworten Sie ausschließlich im angeforderten JSON-Format.",
             )
-            user_message = {
-                "role": "user",
-                "content": evaluation_prompt
-            }
+            user_message = {"role": "user", "content": evaluation_prompt}
             response = agent.invoke({"messages": [user_message]})
-            response_text = response["messages"][-1].text  or ""
+            response_text = response["messages"][-1].text or ""
 
             # Parse JSON response
             try:
@@ -777,15 +776,17 @@ async def get_last_session_summary(
 
     return session_summary
 
+
 class DiagnosisUpdate(BaseModel):
     diagnosis: str
 
+
 @sessionRouter.post("/api/sessions/{session_id}/diagnosis")
 async def set_diagnosis(
-        session_id: str,
-        request: Request,
-        payload: DiagnosisUpdate,
-        db: OrmSession = Depends(get_db)
+    session_id: str,
+    request: Request,
+    payload: DiagnosisUpdate,
+    db: OrmSession = Depends(get_db),
 ):
     """Set current diagnosis of student"""
     user = auth.require_user(request)
@@ -793,14 +794,12 @@ async def set_diagnosis(
     # Check if this is a VHB user - they cannot use evaluation / diagnosis feature
     if user.get("is_vhb_user", False):
         raise HTTPException(
-            status_code=403,
-            detail="Evaluation feature is only available for TUM users"
+            status_code=403, detail="Evaluation feature is only available for TUM users"
         )
     # Check if session is in VHB sessions (shouldn't happen, but double-check)
     if session_id in vhb_sessions:
         raise HTTPException(
-            status_code=403,
-            detail="Evaluation not available for VHB sessions"
+            status_code=403, detail="Evaluation not available for VHB sessions"
         )
 
     diagnosis_value = payload.diagnosis
@@ -825,11 +824,15 @@ async def set_diagnosis(
     updated_rows = (
         db.query(ChatSession)
         .filter(ChatSession.id == session_id, ChatSession.user_id == tum_id)
-        .update({ChatSession.student_diagnosis: diagnosis_value}, synchronize_session=False)
+        .update(
+            {ChatSession.student_diagnosis: diagnosis_value}, synchronize_session=False
+        )
     )
 
     if updated_rows == 0:
         raise HTTPException(status_code=500, detail="Failed to update diagnosis")
 
     db.commit()
-    return JSONResponse(status_code=200, content={"ok": True, "diagnosis": diagnosis_value})
+    return JSONResponse(
+        status_code=200, content={"ok": True, "diagnosis": diagnosis_value}
+    )
