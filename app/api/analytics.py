@@ -10,7 +10,7 @@ import io
 import json
 from typing import Union
 from sqlalchemy.orm import Session as OrmSession
-from sqlalchemy import func
+from sqlalchemy import func, String, cast
 from sqlalchemy.orm import aliased
 from app.auth import auth
 from app.db.db import get_db
@@ -111,6 +111,8 @@ async def get_sessions_stats(
         col = column_db_map[filter_item.column]
         if filter_item.value is None:
             query = query.filter(col.is_(None))
+        elif isinstance(filter_item.value, str) and "%" in filter_item.value:
+            query = query.filter(cast(col, String).ilike(filter_item.value))
         else:
             query = query.filter(col == filter_item.value)
 
@@ -146,6 +148,8 @@ async def get_sessions_stats(
         col = column_db_map[filter_item.column]
         if filter_item.value is None:
             total_q = total_q.filter(col.is_(None))
+        elif isinstance(filter_item.value, str) and "%" in filter_item.value:
+            total_q = total_q.filter(cast(col, String).ilike(filter_item.value))
         else:
             total_q = total_q.filter(col == filter_item.value)
     total = total_q.scalar() or 0

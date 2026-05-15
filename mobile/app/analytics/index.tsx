@@ -11,6 +11,7 @@ import {
   Portal,
   Dialog,
   Button,
+  Searchbar,
 } from 'react-native-paper';
 import Svg, { Path } from 'react-native-svg';
 import Animated, {
@@ -26,7 +27,7 @@ import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { mapEvalauationKeyToLabel } from '@/lib/evaluations';
 import EvaluationModal from '@/app/components/EvaluationModal';
-import { SortDirection, SessionHistoryOrderBy } from '@/services/api';
+import { SortDirection, SessionHistoryOrderBy, SessionHistoryFilter, SessionHistoryColumn } from '@/services/api';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -272,6 +273,10 @@ const AnalyticsDashboard = () => {
   const [columnMenuState, setColumnMenuState] = useState<Record<string, boolean>>({});
   const [addMenuVisible, setAddMenuVisible] = useState(false);
 
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchColumn, setSearchColumn] = useState<ColumnId>('id');
+
   const dashboardOverview = useAnalyticsStore((state) => state.dashboardOverview);
   const loadDashboardOverview = useAnalyticsStore((state) => state.loadDashboardOverview);
   const sessionRecords = useAnalyticsStore((state) => state.sessionRecords);
@@ -290,8 +295,21 @@ const AnalyticsDashboard = () => {
     const orderBy: SessionHistoryOrderBy[] = sortColumn
       ? [{ column: sortColumn, direction: sortDirection }]
       : [];
-    loadSessionRecords(itemsPerPage, page * itemsPerPage, orderBy);
-  }, [page, sortColumn, sortDirection, loadSessionRecords]);
+
+    const filters: SessionHistoryFilter[] = [];
+    if (selectedCase !== ALL_CASES_VALUE) {
+      filters.push({ column: SessionHistoryColumn.Case, value: selectedCase });
+    }
+    if (searchQuery.trim()) {
+      // Use % for partial match as supported by updated backend
+      filters.push({
+        column: searchColumn as SessionHistoryColumn,
+        value: `%${searchQuery.trim()}%`,
+      });
+    }
+
+    loadSessionRecords(itemsPerPage, page * itemsPerPage, orderBy, filters);
+  }, [page, sortColumn, sortDirection, loadSessionRecords, selectedCase, searchQuery, searchColumn]);
 
   useEffect(() => {
     const caseId = selectedCase === ALL_CASES_VALUE ? undefined : selectedCase;
@@ -306,6 +324,13 @@ const AnalyticsDashboard = () => {
 
     return [{ label: 'All Cases', value: ALL_CASES_VALUE }, ...dynamicOptions];
   }, [cases]);
+
+  const searchColumnOptions = useMemo(() => {
+    return PREDEFINED_COLUMNS.map((col) => ({
+      label: col.label,
+      value: col.id,
+    }));
+  }, []);
 
   const palette = useMemo(
     () => ({
@@ -377,37 +402,39 @@ const AnalyticsDashboard = () => {
       <Text variant="headlineMedium" style={[styles.pageTitle, { color: palette.title }]}>
         Dashboard Overview
       </Text>
-      <Dropdown
-        style={[
-          styles.timeRangeDropdown,
-          {
-            marginBottom: 20,
-            backgroundColor: palette.surface,
-            borderColor: palette.border,
-          },
-        ]}
-        placeholder="Select Case"
-        data={caseOptions}
-        labelField="label"
-        valueField="value"
-        value={selectedCase}
-        placeholderStyle={[styles.timeRangePlaceholder, { color: palette.subtitle }]}
-        selectedTextStyle={[styles.timeRangeSelectedText, { color: palette.text }]}
-        iconStyle={[styles.timeRangeIcon, { tintColor: palette.subtitle }]}
-        containerStyle={[
-          styles.timeRangeMenu,
-          {
-            backgroundColor: palette.surface,
-            borderColor: palette.border,
-          },
-        ]}
-        itemContainerStyle={{ borderRadius: 10 }}
-        itemTextStyle={{ color: palette.text }}
-        activeColor={theme.dark ? theme.colors.elevation.level3 : theme.colors.elevation.level1}
-        onChange={(item: CaseOption) => {
-          setSelectedCase(item.value);
-        }}
-      />
+      <View style={{ gap: 12, marginBottom: 20 }}>
+        <Dropdown
+          style={[
+            styles.timeRangeDropdown,
+            {
+              backgroundColor: palette.surface,
+              borderColor: palette.border,
+            },
+          ]}
+          placeholder="Select Case"
+          data={caseOptions}
+          labelField="label"
+          valueField="value"
+          value={selectedCase}
+          placeholderStyle={[styles.timeRangePlaceholder, { color: palette.subtitle }]}
+          selectedTextStyle={[styles.timeRangeSelectedText, { color: palette.text }]}
+          iconStyle={[styles.timeRangeIcon, { tintColor: palette.subtitle }]}
+          containerStyle={[
+            styles.timeRangeMenu,
+            {
+              backgroundColor: palette.surface,
+              borderColor: palette.border,
+            },
+          ]}
+          itemContainerStyle={{ borderRadius: 10 }}
+          itemTextStyle={{ color: palette.text }}
+          activeColor={theme.dark ? theme.colors.elevation.level3 : theme.colors.elevation.level1}
+          onChange={(item: CaseOption) => {
+            setSelectedCase(item.value);
+            setPage(0);
+          }}
+        />
+      </View>
 
       {/* --- Top Section: The Grid Boxes remain unchanged --- */}
       <View style={styles.gridContainer}>
@@ -478,11 +505,70 @@ const AnalyticsDashboard = () => {
             const orderBy: SessionHistoryOrderBy[] = sortColumn
               ? [{ column: sortColumn, direction: sortDirection }]
               : [];
-            downloadCSV(selectedCase === ALL_CASES_VALUE ? undefined : selectedCase, orderBy);
+
+            const filters: SessionHistoryFilter[] = [];
+            if (searchQuery.trim()) {
+              filters.push({
+                column: searchColumn as SessionHistoryColumn,
+                value: `%${searchQuery.trim()}%`,
+              });
+            }
+
+            downloadCSV(selectedCase === ALL_CASES_VALUE ? undefined : selectedCase, orderBy, filters);
           }}
         >
           Export CSV
         </Button>
+      </View>
+
+      <View style={[styles.searchContainer, { marginBottom: 16 }]}>
+        <Dropdown
+          style={[
+            styles.searchColumnDropdown,
+            {
+              backgroundColor: palette.surface,
+              borderColor: palette.border,
+            },
+          ]}
+          data={searchColumnOptions}
+          labelField="label"
+          valueField="value"
+          value={searchColumn}
+          placeholderStyle={[styles.timeRangePlaceholder, { color: palette.subtitle }]}
+          selectedTextStyle={[styles.timeRangeSelectedText, { color: palette.text }]}
+          iconStyle={[styles.timeRangeIcon, { tintColor: palette.subtitle }]}
+          containerStyle={[
+            styles.timeRangeMenu,
+            {
+              backgroundColor: palette.surface,
+              borderColor: palette.border,
+            },
+          ]}
+          itemTextStyle={{ color: palette.text }}
+          activeColor={theme.dark ? theme.colors.elevation.level3 : theme.colors.elevation.level1}
+          onChange={(item) => {
+            setSearchColumn(item.value as ColumnId);
+            setPage(0);
+          }}
+        />
+        <Searchbar
+          placeholder="Search..."
+          onChangeText={(query) => {
+            setSearchQuery(query);
+            setPage(0);
+          }}
+          value={searchQuery}
+          style={[
+            styles.searchbar,
+            {
+              backgroundColor: palette.surface,
+              borderColor: palette.border,
+            },
+          ]}
+          inputStyle={{ color: palette.text, fontSize: 14 }}
+          placeholderTextColor={palette.subtitle}
+          iconColor={palette.subtitle}
+        />
       </View>
 
       <Surface
@@ -759,6 +845,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
     padding: 8,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  searchColumnDropdown: {
+    flex: 1,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 14,
+    height: 52,
+  },
+  searchbar: {
+    flex: 2,
+    height: 52,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    elevation: 0,
   },
 
   // --- NEW COLUMN-BASED TABLE STYLES ---

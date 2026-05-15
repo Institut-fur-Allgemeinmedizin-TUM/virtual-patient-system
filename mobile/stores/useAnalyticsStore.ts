@@ -3,6 +3,7 @@ import {
   AggregationFunction,
   GetSessionsHistoryRequest,
   SessionHistoryColumn,
+  SessionHistoryFilter,
   SessionHistoryOrderBy,
 } from '@/services/api';
 import { create } from 'zustand';
@@ -31,8 +32,13 @@ type AnalyticsStore = {
     limit?: number,
     offset?: number,
     orderBy?: SessionHistoryOrderBy[],
+    filters?: SessionHistoryFilter[],
   ) => Promise<void>;
-  downloadCSV: (caseId?: string, orderBy?: SessionHistoryOrderBy[]) => Promise<void>;
+  downloadCSV: (
+    caseId?: string,
+    orderBy?: SessionHistoryOrderBy[],
+    filters?: SessionHistoryFilter[],
+  ) => Promise<void>;
 };
 
 export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
@@ -42,9 +48,25 @@ export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
   isLoadingSessions: false,
   isDownloadingCSV: false,
 
-  downloadCSV: async (caseId?: string, orderBy: SessionHistoryOrderBy[] = []) => {
+  downloadCSV: async (
+    caseId?: string,
+    orderBy: SessionHistoryOrderBy[] = [],
+    filters: SessionHistoryFilter[] = [],
+  ) => {
     set({ isDownloadingCSV: true });
     try {
+      const effectiveFilters = [...filters];
+      if (
+        caseId &&
+        caseId !== '__all__' &&
+        !effectiveFilters.some((f) => f.column === SessionHistoryColumn.Case)
+      ) {
+        effectiveFilters.push({
+          column: SessionHistoryColumn.Case,
+          value: caseId,
+        });
+      }
+
       const req: GetSessionsHistoryRequest = {
         limit: 0,
         offset: 0,
@@ -75,15 +97,7 @@ export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
           SessionHistoryColumn.Criterion8Explanation,
         ],
         aggregations: [],
-        filters:
-          caseId && caseId !== '__all__'
-            ? [
-                {
-                  column: SessionHistoryColumn.Case,
-                  value: caseId,
-                },
-              ]
-            : [],
+        filters: effectiveFilters,
       };
 
       const resp = await apiClient.api.getSessionsStatsApiAnalyticsSessionsStatsPost(
@@ -182,7 +196,12 @@ export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
     });
   },
 
-  loadSessionRecords: async (limit = 25, offset = 0, orderBy: SessionHistoryOrderBy[] = []) => {
+  loadSessionRecords: async (
+    limit = 25,
+    offset = 0,
+    orderBy: SessionHistoryOrderBy[] = [],
+    filters: SessionHistoryFilter[] = [],
+  ) => {
     set({ isLoadingSessions: true });
     try {
       const req: GetSessionsHistoryRequest = {
@@ -192,7 +211,7 @@ export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
         group_by: [],
         order_by: orderBy,
         include_messages: false,
-
+        filters: filters,
         include_columns: [
           SessionHistoryColumn.Id,
           SessionHistoryColumn.Case,
