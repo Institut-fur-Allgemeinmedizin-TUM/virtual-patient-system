@@ -47,7 +47,7 @@ class Session(Base):
         back_populates="session", uselist=False, cascade="all, delete-orphan"
     )
 
-    student_diagnosis: Mapped[str] = mapped_column(String, nullable=True, server_default=None)
+    student_diagnosis: Mapped[Optional[str]] = mapped_column(String, nullable=True, server_default=None)
 
     used_diagnostics: Mapped[List["Diagnostic"]] = relationship(
         secondary="session_diagnostics",
