@@ -51,7 +51,7 @@ class Session(Base):
 
     used_diagnostics: Mapped[List["Diagnostic"]] = relationship(
         secondary="session_diagnostics",
-        cascade="all"
+        cascade="save-update, merge"
     )
 
     live_api_handle: Mapped[str] = mapped_column(String, nullable=True)
