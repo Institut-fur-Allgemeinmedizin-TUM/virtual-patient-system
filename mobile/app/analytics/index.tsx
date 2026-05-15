@@ -103,9 +103,9 @@ const WaveScoreCard: React.FC<WaveScoreCardProps> = ({ score, maxScore, label })
 
     // Continuous, smooth wave motion
     waveOffset.value = withRepeat(
-      withTiming(1, { 
-        duration: WAVE_CONFIG.WAVE_DURATION, 
-        easing: Easing.linear 
+      withTiming(1, {
+        duration: WAVE_CONFIG.WAVE_DURATION,
+        easing: Easing.linear,
       }),
       -1,
       false,
@@ -114,11 +114,7 @@ const WaveScoreCard: React.FC<WaveScoreCardProps> = ({ score, maxScore, label })
 
   const animatedProps = useAnimatedProps(() => {
     // Shift wave horizontally for continuous motion effect
-    const moveX = interpolate(
-      waveOffset.value,
-      [0, 1],
-      [0, -WAVE_CONFIG.FREQUENCY],
-    );
+    const moveX = interpolate(waveOffset.value, [0, 1], [0, -WAVE_CONFIG.FREQUENCY]);
 
     // Invert Y: higher score moves wave up (lower Y value)
     const moveY = interpolate(
@@ -189,6 +185,7 @@ const WaveScoreCard: React.FC<WaveScoreCardProps> = ({ score, maxScore, label })
 // ==========================================
 
 type ColumnId =
+  |'id'
   | 'case'
   | 'ended_at'
   | 'started_at'
@@ -222,6 +219,7 @@ interface CaseOption {
 const ALL_CASES_VALUE = '__all__';
 
 const PREDEFINED_COLUMNS: ColumnDef[] = [
+  { id: 'id', label: 'Session ID' },
   { id: 'case', label: 'Case' },
   { id: 'ended_at', label: 'End Date' },
   { id: 'started_at', label: 'Start Date' },
@@ -279,6 +277,8 @@ const AnalyticsDashboard = () => {
   const sessionRecords = useAnalyticsStore((state) => state.sessionRecords);
   const loadSessionRecords = useAnalyticsStore((state) => state.loadSessionRecords);
   const totalSessionRecords = useAnalyticsStore((state) => state.totalSessionRecords);
+  const downloadCSV = useAnalyticsStore((state) => state.downloadCSV);
+  const isDownloadingCSV = useAnalyticsStore((state) => state.isDownloadingCSV);
   const cases = useCasesStore((state) => state.cases);
   const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
 
@@ -287,8 +287,8 @@ const AnalyticsDashboard = () => {
   }, [loadAndGetCases]);
 
   useEffect(() => {
-    const orderBy: SessionHistoryOrderBy[] = sortColumn 
-      ? [{ column: sortColumn, direction: sortDirection }] 
+    const orderBy: SessionHistoryOrderBy[] = sortColumn
+      ? [{ column: sortColumn, direction: sortDirection }]
       : [];
     loadSessionRecords(itemsPerPage, page * itemsPerPage, orderBy);
   }, [page, sortColumn, sortDirection, loadSessionRecords]);
@@ -454,9 +454,36 @@ const AnalyticsDashboard = () => {
       </View>
 
       {/* --- Bottom Section: Column-Oriented Data Table --- */}
-      <Text variant="titleLarge" style={[styles.sectionTitle, { color: palette.title }]}>
-        Detailed Records
-      </Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: 10,
+          marginBottom: 12,
+        }}
+      >
+        <Text
+          variant="titleLarge"
+          style={[styles.sectionTitle, { color: palette.title, marginTop: 0, marginBottom: 0 }]}
+        >
+          Detailed Records
+        </Text>
+        <Button
+          mode="contained-tonal"
+          icon="download"
+          loading={isDownloadingCSV}
+          disabled={isDownloadingCSV}
+          onPress={() => {
+            const orderBy: SessionHistoryOrderBy[] = sortColumn
+              ? [{ column: sortColumn, direction: sortDirection }]
+              : [];
+            downloadCSV(selectedCase === ALL_CASES_VALUE ? undefined : selectedCase, orderBy);
+          }}
+        >
+          Export CSV
+        </Button>
+      </View>
 
       <Surface
         style={[
@@ -489,9 +516,14 @@ const AnalyticsDashboard = () => {
                       { backgroundColor: palette.headerSurface, borderBottomColor: palette.border },
                     ]}
                   >
-                    <TouchableRipple 
+                    <TouchableRipple
                       onPress={() => handleSort(colDef.id)}
-                      style={{ flexDirection: 'row', alignItems: 'center', flex: 1, paddingVertical: 12 }}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        flex: 1,
+                        paddingVertical: 12,
+                      }}
                     >
                       <>
                         <Text
@@ -618,9 +650,9 @@ const AnalyticsDashboard = () => {
 
       {/* Pagination Controls */}
       <View style={styles.paginationContainer}>
-        <Button 
+        <Button
           mode="outlined"
-          disabled={page === 0} 
+          disabled={page === 0}
           onPress={() => setPage((p) => Math.max(0, p - 1))}
         >
           Previous
@@ -628,9 +660,9 @@ const AnalyticsDashboard = () => {
         <Text style={[styles.paginationText, { color: palette.text }]}>
           Page {page + 1} of {Math.max(1, Math.ceil(totalSessionRecords / itemsPerPage))}
         </Text>
-        <Button 
+        <Button
           mode="outlined"
-          disabled={(page + 1) * itemsPerPage >= totalSessionRecords} 
+          disabled={(page + 1) * itemsPerPage >= totalSessionRecords}
           onPress={() => setPage((p) => p + 1)}
         >
           Next
@@ -688,20 +720,20 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: StyleSheet.hairlineWidth,
   },
-  cardContent: { 
-    alignItems: 'center', 
+  cardContent: {
+    alignItems: 'center',
     zIndex: 2,
     // Enhanced shadow effect for depth
     elevation: 1,
   },
-  scoreText: { 
-    fontWeight: '900', 
+  scoreText: {
+    fontWeight: '900',
     marginBottom: 6,
     letterSpacing: 0.5,
   },
-  labelText: { 
+  labelText: {
     opacity: 0.8,
-    textTransform: 'uppercase', 
+    textTransform: 'uppercase',
     letterSpacing: 1.2,
     fontSize: 11,
   },
