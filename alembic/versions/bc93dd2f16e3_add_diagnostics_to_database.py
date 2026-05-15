@@ -24,7 +24,8 @@ def upgrade() -> None:
     op.create_table('diagnostics',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
     )
     op.create_table('session_diagnostics',
     sa.Column('session_id', sa.String(), nullable=False),
