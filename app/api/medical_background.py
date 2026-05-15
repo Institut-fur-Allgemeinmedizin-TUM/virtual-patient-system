@@ -106,10 +106,9 @@ async def get_medical_background(
         if session_id in vhb_sessions:
             # Session is vhb session
             session = vhb_sessions.get(session_id)
-            if not session[session_id]["used_diagnostics"]:
-                session[session_id]["used_diagnostics"] = [diagnostic]
-            else:
-                session[session_id]["used_diagnostics"].append(diagnostic)
+            if session.get("used_diagnostics") is None:
+                session["used_diagnostics"] = []
+            session["used_diagnostics"].append(diagnostic)
             return JSONResponse(status_code=200, content={diagnostic: BACKGROUNDS[case_id][diagnostic]})
         else:
             raise HTTPException(status_code=403, detail="Session not found")
