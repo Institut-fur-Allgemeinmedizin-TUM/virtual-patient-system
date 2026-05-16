@@ -21,7 +21,7 @@ An interactive web application that simulates patient encounters for medical stu
 ## 🏗️ Architecture
 
 - **Backend**: FastAPI (Python 3.9) with PostgreSQL database
-- **Frontend**: React 18 + TypeScript + Vite + Material UI
+- **Frontend**: React 19 + React Native + Expo (web, iOS, Android)
 - **Database**: PostgreSQL 17 (Cloud SQL on Google Cloud)
 - **Deployment**: Google Cloud Run (containerized)
 - **AI**: OpenAI GPT-4 mini for patient simulation
@@ -99,17 +99,31 @@ The system includes the following medical scenarios:
 
 1. **Install dependencies**
    ```bash
-   cd frontend
+   cd mobile
    npm install
    ```
 
-2. **Run development server**
+2. **Configure backend URL**
    ```bash
-   npm run dev
+   export EXPO_PUBLIC_BACKEND_URL='http://localhost:8000'
    ```
 
-3. **Access the application**
-   - Frontend: http://localhost:3000
+3. **Start development server**
+   
+   Choose your platform:
+   
+   - **Web**
+     ```bash
+     npm run web
+     ```
+   
+   - **Android**
+     ```bash
+     npm run android
+     ```
+
+4. **Access the application**
+   - Frontend: http://localhost:8081
    - Backend API: http://localhost:8000
    - API docs: http://localhost:8000/docs
 
@@ -151,11 +165,13 @@ Export endpoints available at `/api/export` and `/api/analytics/summary`
 - Psycopg 3 (PostgreSQL driver)
 
 **Frontend**
-- React 18
+- React 19
+- React Native 0.81
+- Expo 54
+- Expo Router
+- React Native Paper
 - TypeScript 5.6
-- Vite 6
-- Material UI 6
-- React Router 7
+- Axios (HTTP client)
 
 **Infrastructure**
 - Google Cloud Run
