@@ -1,0 +1,48 @@
+---
+sidebar_position: 1
+---
+
+# Local Development
+
+This project has three codebases in one repository: backend, web frontend, and mobile app.
+
+## Prerequisites
+
+- Python 3.11 or newer
+- Node.js 20 or newer
+- PostgreSQL 16 or newer
+- A configured `.env` file for backend credentials
+
+## Backend setup
+
+1. Create and activate a virtual environment.
+2. Install dependencies with `pip install -r requirements.txt`.
+3. Copy `env-template` to `.env` and fill in the required values.
+4. Create the local database and run migrations with Alembic.
+5. Start the backend with `uvicorn app.main:app --reload`.
+
+## Frontend setup
+
+1. Install the frontend dependencies in `mobile/`.
+2. Start the dev server with ```npx expo start --web```.
+3. Open the web app in the browser and sign in.
+
+## Mobile setup
+
+The mobile app is an Expo application in `mobile/`.
+
+1. Install the Expo dependencies in `mobile/`.
+2. Start the Expo dev server.
+3. Run the app on a simulator, device, or Expo web target.
+
+## Useful local URLs
+
+- Backend API: `http://localhost:8000`
+- Backend docs: `http://localhost:8000/api/docs`
+- Frontend: `http://localhost:3000`
+
+## Notes for local testing
+
+- Use `localhost` rather than `127.0.0.1` so cookies behave consistently across frontend and backend.
+- Set `REQUIRE_AUTH=false` only for local development or controlled testing.
+- Live audio requires a Gemini Live API key in the backend environment.

@@ -1,0 +1,43 @@
+---
+sidebar_position: 1
+---
+
+# API Overview
+
+The backend API is a FastAPI service that exposes both HTTP endpoints and a websocket endpoint.
+
+This page focuses on the shared rules that apply to the API as a whole. The individual HTTP endpoints are already described in Swagger UI.
+
+## API groups
+
+- Authentication and login
+- Session creation and message history
+- Evaluation and analytics
+- Live websocket relay for audio conversations
+
+## Authentication model
+
+Most requests require a signed session cookie named `session`.
+
+- For TUM users, the cookie is set during OIDC login.
+- For VHB users, the cookie is derived from the shared-password login flow.
+- If `REQUIRE_AUTH=false`, the backend falls back to an anonymous user.
+
+The websocket endpoint uses the same cookie-based session identity as the HTTP API.
+
+## Session model
+
+The backend treats a session as the unit of work for a patient case.
+
+- A session belongs to one case.
+- A session belongs to one authenticated user unless auth is disabled.
+- Messages are appended in order and reused as conversation history.
+- Live audio uses the same session id as text chat.
+
+## Response style
+
+The API uses normal HTTP status codes and JSON error bodies for regular endpoints. The websocket sends JSON event objects with a `type` field and sometimes an `error` field.
+
+## Live feature in one sentence
+
+The live feature opens a websocket, forwards microphone audio to Gemini Live, and streams transcript and audio events back to the client while tracking the remaining live time for the session.

@@ -4,6 +4,16 @@ sidebar_position: 2
 
 # Production Setup Guide
 
+This page covers the production-specific runtime checks that matter most after deployment.
+
+## Deployment target
+
+The backend is designed to run in Cloud Run with PostgreSQL on Cloud SQL. The docs site is served from the backend when the Docusaurus build has been generated into `docs/build`.
+
+## Authentication check
+
+If you see `user_id = "anon"` in the database, authentication is not enabled in the running environment. Set `REQUIRE_AUTH=true` for production deployments.
+
 ## Fixing "anon" user_id in Database
 
 If you're seeing `user_id = "anon"` in your database, it means authentication is not properly enabled.

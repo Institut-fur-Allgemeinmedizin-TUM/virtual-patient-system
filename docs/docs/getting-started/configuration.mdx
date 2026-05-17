@@ -1,0 +1,48 @@
+---
+sidebar_position: 2
+---
+
+# Configuration
+
+The backend reads configuration from environment variables. The most important ones are below.
+
+## Core settings
+
+| Variable | Purpose |
+| --- | --- |
+| `ENVIRONMENT` | Controls local, beta, or production behavior |
+| `PORT` | Backend port |
+| `DATABASE_URL` | Explicit database connection string |
+| `APP_SECRET_KEY` | Session token signing key |
+
+## Authentication
+
+| Variable | Purpose |
+| --- | --- |
+| `REQUIRE_AUTH` | Enables or disables authentication checks |
+| `OIDC_ISSUER` | OIDC issuer for TUM login |
+| `OIDC_CLIENT_ID` | OIDC client id |
+| `OIDC_CLIENT_SECRET` | OIDC client secret |
+| `OIDC_AUTH_URL` | Authorization endpoint |
+| `OIDC_TOKEN_URL` | Token endpoint |
+| `OIDC_JWKS_URL` | Public key set used for token validation |
+| `OIDC_REDIRECT_URI` | Redirect URI after login |
+| `VHB_PASSWORD` | Shared password for VHB users |
+
+## LLM settings
+
+| Variable | Purpose |
+| --- | --- |
+| `OPENAI_API_KEY` | Legacy chat and reasoning integration |
+| `OPENAI_MODEL` | OpenAI chat model name |
+| `GEMINI_API_KEY` | Required for live audio mode |
+| `GEMINI_LIVE_MODEL` | Gemini Live model name |
+| `GEMINI_MODEL` | Gemini text model name |
+| `GEMINI_REASONING_MODEL` | Gemini reasoning model name |
+
+## Runtime behavior
+
+- If `DATABASE_URL` is missing, the app falls back to a local PostgreSQL connection.
+- In production or beta, the backend can build a Cloud SQL Unix socket connection from the remaining database settings.
+- If `GEMINI_API_KEY` is missing, live websocket connections are accepted and then closed with an error payload.
+- If `REQUIRE_AUTH=false`, requests and websocket connections use an anonymous user identity.

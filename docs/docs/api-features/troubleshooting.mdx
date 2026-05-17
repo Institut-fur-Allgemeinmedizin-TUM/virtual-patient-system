@@ -1,0 +1,38 @@
+---
+sidebar_position: 3
+---
+
+# Troubleshooting
+
+This page collects the most common setup and runtime issues.
+
+## Live mode closes immediately
+
+Check these first:
+
+- the user is authenticated
+- the session id belongs to the current user
+- the session still has live time remaining
+- `GEMINI_API_KEY` is set in the backend environment
+- the Gemini Live client dependency is installed
+
+## Websocket connects but no audio is heard
+
+Possible causes:
+
+- the client is not sending microphone chunks
+- the browser or device denied microphone permission
+- the audio format is not PCM16
+- the client is not buffering or decoding the `model_audio` chunks correctly
+
+## Session shows `anon` as user id
+
+That usually means authentication is disabled. Set `REQUIRE_AUTH=true` in the environment when you want production-like behavior.
+
+## VHB users cannot use live mode
+
+That is expected. VHB sessions are stored in memory and the live websocket is intentionally disabled for them.
+
+## Backend runs but docs are not shown
+
+The backend only serves the generated Docusaurus site when `docs/build` exists. Build the docs site before expecting `/docs` to work.

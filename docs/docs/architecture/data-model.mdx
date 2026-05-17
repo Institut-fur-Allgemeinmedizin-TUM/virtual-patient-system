@@ -1,0 +1,51 @@
+---
+sidebar_position: 2
+---
+
+# Data Model
+
+The database schema is intentionally small. Most of the application state is derived from sessions and messages.
+
+## Tables
+
+| Table | Purpose | Notes |
+| --- | --- | --- |
+| `cases` | Medical case definitions | Stores case id, title, and language |
+| `sessions` | One conversation session per case run | Stores user ownership, timestamps, and live session state |
+| `messages` | Conversation turns | Stores user, assistant, and system messages with timestamps and token usage |
+| `evaluations` | Automated feedback for completed sessions | One record per session |
+
+## Session record
+
+The `sessions` table is the main anchor for the rest of the data model.
+
+Important fields:
+
+- `id`: session UUID
+- `case_id`: the selected case
+- `user_id`: TUM user id or `anon` if authentication is disabled
+- `started_at` / `ended_at`: lifecycle timestamps
+- `live_api_handle`: resumable Gemini Live handle, if one was returned
+- `live_time_remaining`: per-session live usage budget
+
+The default live time is defined in code as 600 seconds.
+
+## Message record
+
+The `messages` table stores the conversation history in order.
+
+Important fields:
+
+- `role`: `system`, `user`, or `assistant`
+- `content`: message text
+- `tokens_in` and `tokens_out`: token usage for normal chat requests when available
+- `audio_transcript`: marks transcript records produced by the live audio pipeline
+
+## Session types
+
+There are two runtime modes:
+
+- TUM sessions are persisted to the database.
+- VHB sessions are stored in memory and are not written to the database.
+
+That split affects chat, live mode, and evaluation. The live websocket is not available for VHB sessions.

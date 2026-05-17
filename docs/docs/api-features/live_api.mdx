@@ -1,5 +1,150 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 ---
 
-# Live API
+# Live Websocket API
+
+The live feature is the most important non-HTTP API in the system. It connects the client to the backend over a websocket and lets the backend relay the conversation to Gemini Live.
+
+## Endpoint
+
+`/api/live/{session_id}/ws`
+
+The client opens this websocket using the same session cookie that is used for the HTTP API. The mobile and web clients both build the websocket URL from the configured API base URL.
+
+## What the websocket does
+
+The websocket is a relay. It does not implement the model itself. Instead, it:
+
+1. authenticates the user
+2. checks that the session exists and belongs to that user
+3. checks that live time is still available
+4. connects to Gemini Live with the session prompt and previous history
+5. forwards microphone input to Gemini Live
+6. forwards transcript and audio output back to the client
+7. stores transcript content in the database when available
+
+## Client to server messages
+
+The client sends JSON messages to the websocket.
+
+### Audio chunks
+
+```json
+{
+  "type": "audio",
+  "data": "<base64 PCM16 payload>",
+  "mime_type": "audio/pcm"
+}
+```
+
+Binary websocket frames are also accepted by the backend and forwarded as raw PCM audio.
+
+### Text input
+
+```json
+{
+  "type": "text",
+  "text": "Patient asks a question or the client sends a manual turn"
+}
+```
+
+Text is stored as a user message and forwarded to Gemini Live as realtime text input.
+
+### End turn signal
+
+```json
+{
+  "type": "end_turn"
+}
+```
+
+This tells the backend to finalize the current turn.
+
+## Server to client messages
+
+The backend sends JSON event objects back to the client.
+
+### Assistant text
+
+```json
+{
+  "type": "model_text",
+  "text": "..."
+}
+```
+
+The client uses these events to update the transcript display while live mode is active.
+
+### Assistant audio
+
+```json
+{
+  "type": "model_audio",
+  "mime_type": "audio/pcm",
+  "data": "<base64 PCM16 payload>"
+}
+```
+
+The client buffers these chunks and plays them back as speech.
+
+### User transcript
+
+```json
+{
+  "type": "user_text",
+  "text": "..."
+}
+```
+
+These events are emitted when the Gemini Live transcription pipeline recognizes user speech.
+
+### Errors
+
+```json
+{
+  "error": "no live time remaining"
+}
+```
+
+Error payloads are usually followed by a websocket close with code `1011`.
+
+## Connection requirements
+
+The backend rejects or closes the websocket when one of the following is true:
+
+- the user is not authenticated
+- the session does not exist
+- the session belongs to another user
+- the session is a VHB session
+- Gemini Live is not configured on the backend
+- the Gemini client library is not available
+- the session has no live time left
+
+## Session history and resume support
+
+Before opening the Gemini Live stream, the backend loads previous messages from the session and seeds them into the live context.
+
+If Gemini returns a resumable handle, the backend stores that handle in `sessions.live_api_handle` for later use.
+
+## Time accounting
+
+Live mode is limited by two checks:
+
+- per-session remaining live time
+- total daily usage for the user
+
+The session starts with the default live budget from the model layer. When the websocket session ends, the elapsed time is subtracted from the session budget.
+
+## Notes for client implementers
+
+- Keep the websocket open only while the user is actively in live mode.
+- Send `end_turn` before closing if you want the model to finish the current response cleanly.
+- Treat `model_text` and `user_text` as transcript events, not as authoritative conversation history.
+- Buffer audio playback on the client side; Gemini Live sends small chunks.
+
+## Implementation references
+
+- Websocket route: `app/api/session.py`
+- Client hook: `mobile/hooks/useLiveAudioSession.ts`
+- Session auth for websockets: `app/auth/auth.py`
