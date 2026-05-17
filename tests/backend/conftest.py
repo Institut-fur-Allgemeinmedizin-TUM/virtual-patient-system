@@ -1,6 +1,8 @@
 import os
 from collections.abc import Generator
 
+os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -19,6 +21,7 @@ def reset_global_state(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None,
     vhb_sessions.clear()
     monkeypatch.delenv("SIMULATE_AI", raising=False)
     monkeypatch.setattr(settings, "require_auth", False)
+    monkeypatch.setattr(settings, "gemini_api_key", "test-gemini-key")
     yield
     vhb_sessions.clear()
 
@@ -120,7 +123,9 @@ def fixed_oidc_settings(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(settings, "oidc_token_url", "https://oidc.example/token")
     monkeypatch.setattr(settings, "oidc_client_id", "client-id")
     monkeypatch.setattr(settings, "oidc_client_secret", "client-secret")
-    monkeypatch.setattr(settings, "oidc_redirect_uri", "http://localhost:8000/auth/callback")
+    monkeypatch.setattr(
+        settings, "oidc_redirect_uri", "http://localhost:8000/auth/callback"
+    )
     monkeypatch.setattr(settings, "oidc_issuer", "https://oidc.example")
     monkeypatch.setattr(settings, "frontend_url", "http://localhost:3000")
     monkeypatch.setattr(settings, "app_secret_key", "test-secret-key")

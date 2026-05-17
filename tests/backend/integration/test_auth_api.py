@@ -16,7 +16,9 @@ def test_auth_login_missing_config_returns_500(client, monkeypatch):
 
 
 def test_auth_login_sets_state_cookie_and_redirects(client, fixed_oidc_settings):
-    response = client.get("/auth/login", params={"redirect_to": "/dashboard"})
+    response = client.get(
+        "/auth/login", params={"redirect_to": "/dashboard"}, follow_redirects=False
+    )
     assert response.status_code == 302
     assert response.headers["location"].startswith("https://oidc.example/authorize?")
     assert "oidc_state=" in response.headers.get("set-cookie", "")
@@ -59,29 +61,36 @@ def test_auth_callback_token_exchange_failure(client, fixed_oidc_settings, monke
         {}, should_raise=httpx.HTTPStatusError("bad", request=None, response=None)
     )
     monkeypatch.setattr(
-        "app.api.auth.httpx.AsyncClient", lambda timeout=10.0: FakeAsyncClient(fake_response)
+        "app.api.auth.httpx.AsyncClient",
+        lambda timeout=10.0: FakeAsyncClient(fake_response),
     )
 
-    response = client.get("/auth/callback", params={"code": "abc", "state": "ok"})
+    response = client.get(
+        "/auth/callback", params={"code": "abc", "state": "ok"}, follow_redirects=False
+    )
     assert response.status_code == 500
 
 
 def test_auth_callback_mobile_redirect_sets_token(
     client, fixed_oidc_settings, monkeypatch
 ):
-    state_token = oidc.sign(
-        {
+    client.cookies.set("oidc_state", "dummy-state-token")
+    monkeypatch.setattr(
+        "app.api.auth.oidc.verify",
+        lambda _token: {
             "state": "ok",
             "nonce": "nonce-x",
             "issued_at": 1,
             "redirect_to": "virtualpatient://auth-callback",
-        }
+        },
     )
-    client.cookies.set("oidc_state", state_token)
 
-    fake_response = FakeTokenResponse({"id_token": "id-token", "access_token": "access"})
+    fake_response = FakeTokenResponse(
+        {"id_token": "id-token", "access_token": "access"}
+    )
     monkeypatch.setattr(
-        "app.api.auth.httpx.AsyncClient", lambda timeout=10.0: FakeAsyncClient(fake_response)
+        "app.api.auth.httpx.AsyncClient",
+        lambda timeout=10.0: FakeAsyncClient(fake_response),
     )
 
     async def _fake_jwks():
@@ -90,10 +99,16 @@ def test_auth_callback_mobile_redirect_sets_token(
     monkeypatch.setattr("app.api.auth.auth.fetch_jwks", _fake_jwks)
     monkeypatch.setattr(
         "app.api.auth.jwt.decode",
-        lambda *args, **kwargs: {"nonce": "nonce-x", "sub": "u-1", "email": "u@mytum.de"},
+        lambda *args, **kwargs: {
+            "nonce": "nonce-x",
+            "sub": "u-1",
+            "email": "u@mytum.de",
+        },
     )
 
-    response = client.get("/auth/callback", params={"code": "abc", "state": "ok"})
+    response = client.get(
+        "/auth/callback", params={"code": "abc", "state": "ok"}, follow_redirects=False
+    )
 
     assert response.status_code == 302
     assert response.headers["location"].startswith("virtualpatient://auth-callback?")
@@ -103,14 +118,23 @@ def test_auth_callback_mobile_redirect_sets_token(
 def test_auth_callback_web_redirect_sets_session_cookie(
     client, fixed_oidc_settings, monkeypatch
 ):
-    state_token = oidc.sign(
-        {"state": "ok", "nonce": "nonce-x", "issued_at": 1, "redirect_to": "/home"}
-    )
-    client.cookies.set("oidc_state", state_token)
-
-    fake_response = FakeTokenResponse({"id_token": "id-token", "access_token": "access"})
+    client.cookies.set("oidc_state", "dummy-state-token")
     monkeypatch.setattr(
-        "app.api.auth.httpx.AsyncClient", lambda timeout=10.0: FakeAsyncClient(fake_response)
+        "app.api.auth.oidc.verify",
+        lambda _token: {
+            "state": "ok",
+            "nonce": "nonce-x",
+            "issued_at": 1,
+            "redirect_to": "/home",
+        },
+    )
+
+    fake_response = FakeTokenResponse(
+        {"id_token": "id-token", "access_token": "access"}
+    )
+    monkeypatch.setattr(
+        "app.api.auth.httpx.AsyncClient",
+        lambda timeout=10.0: FakeAsyncClient(fake_response),
     )
 
     async def _fake_jwks():
@@ -119,10 +143,16 @@ def test_auth_callback_web_redirect_sets_session_cookie(
     monkeypatch.setattr("app.api.auth.auth.fetch_jwks", _fake_jwks)
     monkeypatch.setattr(
         "app.api.auth.jwt.decode",
-        lambda *args, **kwargs: {"nonce": "nonce-x", "sub": "u-1", "email": "u@mytum.de"},
+        lambda *args, **kwargs: {
+            "nonce": "nonce-x",
+            "sub": "u-1",
+            "email": "u@mytum.de",
+        },
     )
 
-    response = client.get("/auth/callback", params={"code": "abc", "state": "ok"})
+    response = client.get(
+        "/auth/callback", params={"code": "abc", "state": "ok"}, follow_redirects=False
+    )
     assert response.status_code == 302
     assert response.headers["location"].endswith("/home")
     assert "session=" in response.headers.get("set-cookie", "")

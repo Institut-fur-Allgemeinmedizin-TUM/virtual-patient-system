@@ -10,4 +10,4 @@ def test_read_mobile_index_html_adds_cache_buster(tmp_path):
 
     html = _read_mobile_index_html(str(tmp_path))
 
-    assert '/_expo/static/js/web/index-ABC.js?v=mobile-web-1' in html
+    assert "/_expo/static/js/web/index-ABC.js?v=mobile-web-1" in html

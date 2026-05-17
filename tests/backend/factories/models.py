@@ -56,7 +56,11 @@ def create_evaluation(db, session_id: str, score: int = 4) -> Evaluation:
         criterion7_explanation="Good",
         criterion8_score=score,
         criterion8_explanation="Good",
-        improvement_suggestions=["Ask more open questions", "Summarize", "Check red flags"],
+        improvement_suggestions=[
+            "Ask more open questions",
+            "Summarize",
+            "Check red flags",
+        ],
     )
     db.add(evaluation)
     db.commit()

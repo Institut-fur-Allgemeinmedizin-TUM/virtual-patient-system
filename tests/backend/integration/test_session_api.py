@@ -56,7 +56,9 @@ def test_chat_tum_wrong_user_forbidden(client, force_user, tum_user, db_session)
     create_session(db_session, "s-chat-1", user_id="different-user")
     force_user(tum_user)
 
-    response = client.post("/api/chat", json={"session_id": "s-chat-1", "message": "Hi"})
+    response = client.post(
+        "/api/chat", json={"session_id": "s-chat-1", "message": "Hi"}
+    )
     assert response.status_code == 403
 
 
@@ -88,9 +90,7 @@ def test_get_session_messages_happy_path(client, force_user, tum_user, db_sessio
     assert len(response.json()["messages"]) >= 1
 
 
-def test_get_session_messages_forbidden(
-    client, force_user, other_tum_user, db_session
-):
+def test_get_session_messages_forbidden(client, force_user, other_tum_user, db_session):
     create_case(db_session)
     create_session(db_session, "s-msg-2", user_id="someone-else")
     force_user(other_tum_user)
@@ -113,7 +113,9 @@ def test_evaluate_session_existing_evaluation_returns_cached(
     assert len(response.json()["criteria"]) == 8
 
 
-def test_evaluate_session_insufficient_messages(client, force_user, tum_user, db_session):
+def test_evaluate_session_insufficient_messages(
+    client, force_user, tum_user, db_session
+):
     create_case(db_session)
     create_session(db_session, "s-eval-few", user_id=tum_user["tum_id"])
     create_message(db_session, "s-eval-few", "user", "Frage 1")

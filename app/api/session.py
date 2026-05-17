@@ -2,9 +2,9 @@ import asyncio
 import base64
 import json
 import os
-import time
+import time as pytime
 import uuid
-from datetime import datetime, time
+from datetime import datetime, time as dt_time
 from random import Random
 from typing import List
 
@@ -129,7 +129,7 @@ async def chat(
         messages_to_send.append({"role": "user", "content": req.message})
         if os.environ.get("SIMULATE_AI") == "true":
             # Simulate AI response for testing without OpenAI calls
-            time.sleep(1)
+            pytime.sleep(1)
             reply_text = f"Simulated response to: {req.message}"
         else:
             agent = create_agent(
@@ -175,7 +175,7 @@ async def chat(
     messages_to_send.append({"role": "user", "content": req.message})
     if os.environ.get("SIMULATE_AI") == "true":
         # Simulate AI response for testing without OpenAI calls
-        time.sleep(1)
+        pytime.sleep(1)
         reply_text = f"Simulated response to: {req.message}"
         tokens_in = 1
         tokens_out = 2
@@ -218,8 +218,8 @@ async def chat(
 def check_user_remaining_time_total(db: OrmSession, user_id: str) -> bool:
     # Define today start and end of day
     today = datetime.now().date()
-    today_start = datetime.combine(today, time.min)
-    today_end = datetime.combine(today, time.max)
+    today_start = datetime.combine(today, dt_time.min)
+    today_end = datetime.combine(today, dt_time.max)
 
     user_sessions_query = (
         select(ChatSession)
@@ -610,7 +610,7 @@ async def evaluate_session(
 
     if existing_evaluation:
         if os.environ.get("SIMULATE_AI") == "true":
-            time.sleep(4)
+            pytime.sleep(4)
         # Return existing evaluation
         return formatting.format_evaluation_response(existing_evaluation)
 
@@ -644,7 +644,7 @@ async def evaluate_session(
     # Call OpenAI to generate evaluation (or simulate in test mode)
     try:
         if os.environ.get("SIMULATE_AI") == "true":
-            time.sleep(8)
+            pytime.sleep(8)
             evaluation_data = {
                 "criteria": [
                     {
