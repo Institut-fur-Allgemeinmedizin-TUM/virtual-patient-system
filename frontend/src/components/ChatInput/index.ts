@@ -1,2 +1,0 @@
-export { ChatInput } from './ChatInput';
-

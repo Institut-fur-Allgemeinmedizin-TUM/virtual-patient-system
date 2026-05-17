@@ -1,2 +1,0 @@
-export { ChatInterface } from './ChatInterface';
-
