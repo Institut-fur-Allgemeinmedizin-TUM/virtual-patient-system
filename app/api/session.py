@@ -176,7 +176,7 @@ async def chat(
     if os.environ.get("SIMULATE_AI") == "true":
         # Simulate AI response for testing without OpenAI calls
         time.sleep(1)
-        reply = f"Simulated response to: {req.message}"
+        reply_text = f"Simulated response to: {req.message}"
         tokens_in = 1
         tokens_out = 2
     else:

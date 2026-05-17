@@ -95,6 +95,39 @@ The system includes the following medical scenarios:
    uvicorn app.main:app --reload
    ```
 
+### Backend Test Framework
+
+The backend API test framework lives in `tests/backend/` and is split into:
+
+- `unit/`: pure function/formatting helper tests
+- `integration/`: HTTP endpoint tests with dependency overrides
+- `websocket/`: live websocket behavior and error contract tests
+- `contract/`: schema/error-envelope regression checks
+
+Shared infrastructure:
+
+- `tests/backend/conftest.py`: app/db fixtures, auth helpers, state isolation
+- `tests/backend/factories/`: DB test-data factories
+- `tests/backend/mocks/`: deterministic OIDC/LLM/OpenAI mocks
+
+#### Install test dependencies
+
+```bash
+pip install -r requirements-test.txt
+```
+
+#### Canonical backend test command (local + CI)
+
+```bash
+pytest tests/backend --cov=app/api --cov-report=term-missing --cov-report=xml --cov-fail-under=60
+```
+
+#### Test-mode conventions
+
+- External boundaries are mocked by default (OIDC token exchange/JWKS, Gemini/OpenAI/LLM calls).
+- No real OIDC provider or real Gemini/OpenAI network calls are required for standard CI runs.
+- Tests isolate in-memory VHB session state and reset test env flags (`SIMULATE_AI`, auth toggles) per test.
+
 ### Frontend Setup
 
 1. **Install dependencies**
