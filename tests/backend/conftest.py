@@ -42,7 +42,7 @@ def db_engine(tmp_path):
 
 @pytest.fixture
 def session_local(db_engine):
-    return sessionmaker(bind=db_engine, autoflush=False, autocommit=False, future=True)
+    return sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
 
 
 @pytest.fixture

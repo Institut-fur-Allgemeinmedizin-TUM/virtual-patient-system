@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from types import SimpleNamespace
 
 from app.llm.formatting import format_evaluation_response
@@ -8,7 +8,7 @@ def test_format_evaluation_response_maps_all_criteria():
     evaluation = SimpleNamespace(
         id=1,
         session_id="s-1",
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
         criterion1_score=1,
         criterion1_explanation="a",
         criterion2_score=2,
