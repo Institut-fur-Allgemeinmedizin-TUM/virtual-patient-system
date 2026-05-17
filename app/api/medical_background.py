@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session as OrmSession
 
 from app.api.memory import vhb_sessions
 from app.auth import auth
+from app.model.cases import MedicalBackgroundResponse, MedicalBackgroundResponseType
 from app.model.models import Session as ChatSession, Diagnostic
 
 from app.db.db import get_db
@@ -47,7 +48,6 @@ def _load_backgrounds_from_disk():
 
 
 BACKGROUNDS = _load_backgrounds_from_disk()
-
 
 @medical_background_router.get(
     "/api/diagnostics/{case_id}",
@@ -96,15 +96,15 @@ async def get_medical_background(
         description="The specific diagnostic to retrieve. If not provided, returns list of available diagnostics for the case.",
     ),
     db: OrmSession = Depends(get_db),
-) -> JSONResponse:
+) -> MedicalBackgroundResponse:
     if not case_id in BACKGROUNDS:
         # Return json of background
         raise HTTPException(status_code=404, detail=f"Case '{case_id}' not found")
 
     if not diagnostic:
-        return JSONResponse(
-            status_code=200,
-            content={"diagnostics_available": list(BACKGROUNDS[case_id].keys())},
+        return MedicalBackgroundResponse(
+            type=MedicalBackgroundResponseType.LIST_AVAILABLE,
+            diagnostics_available=list(BACKGROUNDS[case_id].keys())
         )
 
     if not diagnostic in BACKGROUNDS[case_id]:
@@ -122,8 +122,9 @@ async def get_medical_background(
             if session.get("used_diagnostics") is None:
                 session["used_diagnostics"] = []
             session["used_diagnostics"].append(diagnostic)
-            return JSONResponse(
-                status_code=200, content={diagnostic: BACKGROUNDS[case_id][diagnostic]}
+            return MedicalBackgroundResponse(
+                type=MedicalBackgroundResponseType.DIAGNOSTIC_RESPONSE,
+                diagnostic_data={diagnostic: BACKGROUNDS[case_id][diagnostic]}
             )
         else:
             raise HTTPException(status_code=403, detail="Session not found")
@@ -146,6 +147,7 @@ async def get_medical_background(
             session.used_diagnostics.append(diagnostic_db)
 
         db.commit()
-        return JSONResponse(
-            status_code=200, content={diagnostic: BACKGROUNDS[case_id][diagnostic]}
+        return MedicalBackgroundResponse(
+            type=MedicalBackgroundResponseType.DIAGNOSTIC_RESPONSE,
+            diagnostic_data={diagnostic: BACKGROUNDS[case_id][diagnostic]}
         )
