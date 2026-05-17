@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -15,7 +15,6 @@ import { useLiveAudioSession } from '@/hooks/useLiveAudioSession';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { getCaseImage } from '@/lib/cases/case';
-import React from 'react';
 
 type SessionProfile = {
   title: string;
@@ -76,20 +75,22 @@ export default function SessionScreen() {
 
   const sendMessage = () => {
     if (!canSend) return;
-    setDraft('');
+    
     if (liveAudio.isActive)  {
       liveAudio.sendMessage(draft.trim());
     } else {
       session.chat(draft);
     }
+    setDraft('');
   };
 
-  const handleComposerKeyPress = (event: { nativeEvent: { key: string; shiftKey?: boolean } }) => {
+  const handleComposerKeyPress = (event: { nativeEvent: { key: string; shiftKey?: boolean }; preventDefault?: () => void }) => {
     if (Platform.OS !== 'web') {
       return;
     }
 
     if (event.nativeEvent.key === 'Enter' && !event.nativeEvent.shiftKey) {
+      event.preventDefault?.();
       sendMessage();
     }
   };
