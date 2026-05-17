@@ -22,6 +22,7 @@ if os.path.isdir("docs/build"):
     # Serve docs from /docs
     print("Found docs, serving docs")
     from fastapi.staticfiles import StaticFiles
+
     app.mount("/docs", StaticFiles(directory="docs/build", html=True), name="docs")
 else:
     print("Docs not built, not serving")

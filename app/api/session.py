@@ -281,7 +281,11 @@ async def live_websocket(
         raise WebSocketDisconnect(reason="Invalid user id")
 
     case_id = chat_session.case_id
-    system_prompt = chat_functions.load_case_prompt(case_id) + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX + MEDICAL_DISCLAIMER
+    system_prompt = (
+        chat_functions.load_case_prompt(case_id)
+        + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX
+        + MEDICAL_DISCLAIMER
+    )
 
     await websocket.accept()
     session_metadata = {"latest_handle": None}
