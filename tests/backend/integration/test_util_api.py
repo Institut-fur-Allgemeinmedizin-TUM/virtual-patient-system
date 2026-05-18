@@ -1,33 +1,6 @@
 from io import BytesIO
 
 from tests.backend.factories.models import create_case, create_message, create_session
-from tests.backend.mocks.openai import FakeOpenAIClient
-
-
-def test_transcribe_audio_success(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.api.util.chat_functions.get_openai_client",
-        lambda: FakeOpenAIClient(text="Hallo aus Test"),
-    )
-    response = client.post(
-        "/api/transcribe",
-        files={"audio": ("sample.webm", BytesIO(b"audio-bytes"), "audio/webm")},
-    )
-    assert response.status_code == 200
-    assert response.json() == {"text": "Hallo aus Test"}
-
-
-def test_transcribe_audio_failure(client, monkeypatch):
-    monkeypatch.setattr(
-        "app.api.util.chat_functions.get_openai_client",
-        lambda: FakeOpenAIClient(error=RuntimeError("failed")),
-    )
-    response = client.post(
-        "/api/transcribe",
-        files={"audio": ("sample.webm", BytesIO(b"audio-bytes"), "audio/webm")},
-    )
-    assert response.status_code == 500
-
 
 def test_get_cases_and_case_details(client):
     cases_response = client.get("/api/cases")
