@@ -1,5 +1,6 @@
 import os
 import re
+from contextlib import asynccontextmanager
 
 from fastapi import (
     FastAPI,
@@ -9,9 +10,21 @@ from starlette.responses import RedirectResponse
 
 from app.api import auth, session, util, health, medical_background
 from app.config.config import settings
+from app.db.db import SessionLocal
+from app.db.init_db import init_roles
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize roles in the database
+    db = SessionLocal()
+    try:
+        init_roles(db)
+    finally:
+        db.close()
+    yield
 
 # Trigger redeployment with OIDC_AUTH_URL secret now configured
-app = FastAPI(title="Virtual Patient Backend", version="0.1.0", docs_url="/api/docs")
+app = FastAPI(title="Virtual Patient Backend", version="0.1.0", lifespan=lifespan, docs_url="/api/docs")
 app.include_router(auth.authRouter)
 app.include_router(session.sessionRouter)
 app.include_router(util.utilRouter)

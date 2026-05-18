@@ -1,3 +1,4 @@
+import uuid
 from pydantic import BaseModel
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import (
@@ -9,6 +10,7 @@ from sqlalchemy import (
     Integer,
     JSON,
     Boolean,
+    UUID,
     Table,
     Column,
 )
@@ -21,6 +23,42 @@ UserMaxDailyUsage = 1800
 
 class Base(DeclarativeBase):
     pass
+
+
+# Association table for User and Role (Many-to-Many)
+user_roles = Table(
+    "user_roles",
+    Base.metadata,
+    Column("user_id", ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
+    Column("role_id", ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
+)
+
+class Role(Base):
+    __tablename__ = "roles"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    users: Mapped[List["User"]] = relationship(
+        secondary=user_roles, back_populates="roles"
+    )
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    oidc_id: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
+    pronouns: Mapped[str] = mapped_column(String(50), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    roles: Mapped[List[Role]] = relationship(secondary=user_roles, back_populates="users")
+    sessions: Mapped[List["Session"]] = relationship(back_populates="user")
 
 
 class Case(Base):
@@ -50,7 +88,9 @@ class Session(Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
     case_id: Mapped[str] = mapped_column(ForeignKey("cases.id"), nullable=False)
-    user_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("users.oidc_id"), nullable=True
+    )
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -59,9 +99,11 @@ class Session(Base):
     )
 
     case: Mapped[Case] = relationship()
+    user: Mapped[Optional[User]] = relationship(back_populates="sessions")
     messages: Mapped[List["Message"]] = relationship(
         back_populates="session", cascade="all, delete-orphan"
     )
+
     evaluation: Mapped[Optional["Evaluation"]] = relationship(
         back_populates="session", uselist=False, cascade="all, delete-orphan"
     )
