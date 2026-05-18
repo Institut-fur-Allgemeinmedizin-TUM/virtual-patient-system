@@ -129,9 +129,14 @@ The system includes the following medical scenarios:
 
 ## 📊 Database Schema
 
-- **cases**: Patient case definitions
-- **sessions**: User conversation sessions (includes TUM user_id)
-- **messages**: Individual chat messages with token tracking
+| Table                 | Purpose                                             | Notes                                                                       |
+|-----------------------|-----------------------------------------------------|-----------------------------------------------------------------------------|
+| `cases`               | Medical case definitions                            | Stores case id, title, and language                                         |
+| `sessions`            | One conversation session per case run               | Stores user ownership, timestamps, and live session state                   |
+| `messages`            | Conversation turns                                  | Stores user, assistant, and system messages with timestamps and token usage |
+| `diagnostics`         | Store available and used diagnostics                | diagnostic name has to be unique                                            |
+| `session_diagnostics` | Store relationship between sessions and diagnostics | Used to store used diagnostics                                              |
+| `evaluations`         | Automated feedback for completed sessions           | One record per session                                                      |
 
 ## 🔐 Authentication
 
