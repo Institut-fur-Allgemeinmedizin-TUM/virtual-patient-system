@@ -26,31 +26,6 @@ from app.model.models import (
 utilRouter = APIRouter()
 
 
-@utilRouter.post("/api/transcribe")
-async def transcribe_audio(
-    audio: UploadFile = File(...),
-) -> JSONResponse:
-    """Transcribe audio to text using OpenAI Whisper."""
-    try:
-        # Read audio file
-        audio_data = await audio.read()
-
-        # Get OpenAI client
-        client = chat_functions.get_openai_client()
-
-        # Transcribe using Whisper
-        transcript = client.audio.transcriptions.create(
-            model="whisper-1",
-            file=("audio.webm", audio_data, "audio/webm"),
-            language="de",  # German language hint for better accuracy
-        )
-
-        return JSONResponse(content={"text": transcript.text})
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
-
-
 # Analytics and Export endpoints
 @utilRouter.get("/api/export", response_model=ExportResponse)
 async def export_sessions(

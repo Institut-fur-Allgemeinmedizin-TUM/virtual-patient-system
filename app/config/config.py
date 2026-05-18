@@ -9,8 +9,6 @@ class Settings:
         # Minimal settings for MVP; load from environment
         self.environment: str = os.getenv("ENVIRONMENT", "development")
         self.port: int = int(os.getenv("PORT", "8000"))
-        self.openai_api_key: Optional[str] = os.getenv("OPENAI_API_KEY")
-        self.openai_model: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         self.gemini_api_key: Optional[str] = os.getenv("GEMINI_API_KEY")
         self.gemini_live_model: str = os.getenv(
             "GEMINI_LIVE_MODEL", "gemini-2.0-flash-live-001"

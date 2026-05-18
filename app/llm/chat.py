@@ -90,11 +90,3 @@ def load_case_prompt(case_id: str) -> str:
         return case_data["persona"]["prompt"]
     except (HTTPException, KeyError):
         return "Du bist ein Simulationspatient. Antworte kurz auf Deutsch."
-
-
-def get_openai_client():
-    from openai import OpenAI
-
-    if not settings.openai_api_key:
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY not set")
-    return OpenAI(api_key=settings.openai_api_key)
