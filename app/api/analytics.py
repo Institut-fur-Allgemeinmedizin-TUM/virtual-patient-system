@@ -33,9 +33,6 @@ analyticRouter = APIRouter()
 
 
 @analyticRouter.post(
-    "/api/analytics/sessions/stats", response_model=GetSessionsHistoryResponse
-)
-@analyticRouter.post(
     "/api/analytics/sessions/stats", 
     response_model=GetSessionsHistoryResponse
 )
@@ -194,7 +191,7 @@ async def get_sessions_stats(
         
         for row in rows:
             if req.include_messages and row.get("messages"):
-                row["messages"] = json.dumps(row["messages"])
+                row["messages"] = json.dumps(row["messages"], indent=2, ensure_ascii=False)
             writer.writerow(row)
             
         # Returns FastAPI Response (bypasses response_model serialization)
