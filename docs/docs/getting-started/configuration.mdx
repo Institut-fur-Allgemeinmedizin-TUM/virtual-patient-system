@@ -20,7 +20,7 @@ The backend reads configuration from environment variables. The most important o
 | Variable | Purpose |
 | --- | --- |
 | `REQUIRE_AUTH` | Enables or disables authentication checks |
-| `OIDC_ISSUER` | OIDC issuer for TUM login |
+| `OIDC_ISSUER` | OIDC issuer for login |
 | `OIDC_CLIENT_ID` | OIDC client id |
 | `OIDC_CLIENT_SECRET` | OIDC client secret |
 | `OIDC_AUTH_URL` | Authorization endpoint |
@@ -33,12 +33,10 @@ The backend reads configuration from environment variables. The most important o
 
 | Variable | Purpose |
 | --- | --- |
-| `OPENAI_API_KEY` | Legacy chat and reasoning integration |
-| `OPENAI_MODEL` | OpenAI chat model name |
-| `GEMINI_API_KEY` | Required for live audio mode |
+| `GEMINI_API_KEY` | Required for all gemini models |
 | `GEMINI_LIVE_MODEL` | Gemini Live model name |
-| `GEMINI_MODEL` | Gemini text model name |
-| `GEMINI_REASONING_MODEL` | Gemini reasoning model name |
+| `GEMINI_MODEL` | Gemini chat model name |
+| `GEMINI_REASONING_MODEL` | Gemini reasoning model name (used for evaluation) |
 
 ## Runtime behavior
 

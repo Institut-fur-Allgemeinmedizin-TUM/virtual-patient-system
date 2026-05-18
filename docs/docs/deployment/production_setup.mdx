@@ -8,39 +8,13 @@ This page covers the production-specific runtime checks that matter most after d
 
 ## Deployment target
 
-The backend is designed to run in Cloud Run with PostgreSQL on Cloud SQL. The docs site is served from the backend when the Docusaurus build has been generated into `docs/build`.
+The backend is designed to run in Cloud Run with PostgreSQL on Cloud SQL. The docs site is served from the backend
+when the Docusaurus build has been generated into `docs/build`.
 
 ## Authentication check
 
-If you see `user_id = "anon"` in the database, authentication is not enabled in the running environment. Set `REQUIRE_AUTH=true` for production deployments.
-
-## Fixing "anon" user_id in Database
-
-If you're seeing `user_id = "anon"` in your database, it means authentication is not properly enabled.
-
-### Solution:
-
-1. **Go to Google Cloud Console:**
-   ```
-   https://console.cloud.google.com/run?project=virtual-patient-system
-   ```
-
-2. **Click on your Cloud Run service** (`virtual-patient-system-eu`)
-
-3. **Click "EDIT & DEPLOY NEW REVISION"**
-
-4. **Go to "Variables & Secrets" tab**
-
-5. **Add/Update the environment variable:**
-   - **Name:** `REQUIRE_AUTH`
-   - **Value:** `true`
-   - Click "ADD VARIABLE" if it doesn't exist, or update if it does
-
-6. **Click "DEPLOY"**
-
-7. **After deployment:**
-   - All NEW sessions will have proper TUM user IDs
-   - Old sessions with "anon" will remain (you can delete them if needed)
+If you see `user_id = "anon"` in the database, authentication is not enabled in the running environment.
+Set `REQUIRE_AUTH=true` for production deployments.
 
 ### Verifying It Works:
 
@@ -48,14 +22,3 @@ If you're seeing `user_id = "anon"` in your database, it means authentication is
 2. **Log in with TUM credentials**
 3. **Create a new session**
 4. **Check database:** The new session should have your TUM ID (e.g., `ge38qap`) instead of "anon"
-
-### Alternative: Check Current Environment Variables
-
-Run this in Cloud Shell to check:
-```bash
-gcloud run services describe virtual-patient-system-eu \
-  --region=europe-west1 \
-  --format="value(spec.template.spec.containers[0].env)" \
-  --project=virtual-patient-system
-```
-

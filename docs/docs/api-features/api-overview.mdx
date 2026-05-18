@@ -6,14 +6,14 @@ sidebar_position: 1
 
 The backend API is a FastAPI service that exposes both HTTP endpoints and a websocket endpoint.
 
-This page focuses on the shared rules that apply to the API as a whole. The individual HTTP endpoints are already described in Swagger UI.
+This page focuses on the shared rules that apply to the API as a whole. The individual HTTP endpoints are already described in the [Swagger UI](https://virtual-patients-tum.com/api/docs).
 
 ## API groups
 
 - Authentication and login
-- Session creation and message history
-- Evaluation and analytics
-- Live websocket relay for audio conversations
+- Session creation and message history (including live API)
+- Medical Diagnostics (for the different cases)
+- Healthchecks of the System
 
 ## Authentication model
 
@@ -29,15 +29,16 @@ The websocket endpoint uses the same cookie-based session identity as the HTTP A
 
 The backend treats a session as the unit of work for a patient case.
 
-- A session belongs to one case.
-- A session belongs to one authenticated user unless auth is disabled.
-- Messages are appended in order and reused as conversation history.
-- Live audio uses the same session id as text chat.
+- A session belongs to one case and authenticated user (unless auth is disabled).
+- Messages are appended in order and reused as conversation history (also for evaluation).
 
 ## Response style
 
-The API uses normal HTTP status codes and JSON error bodies for regular endpoints. The websocket sends JSON event objects with a `type` field and sometimes an `error` field.
+Each response is handled with a ResponseModel of FastAPI and thus always has the same format for answering requests.
 
-## Live feature in one sentence
+Errors are handled via raise HTTPException (with corresponding status_codes)
 
-The live feature opens a websocket, forwards microphone audio to Gemini Live, and streams transcript and audio events back to the client while tracking the remaining live time for the session.
+## [Live feature](/api-features/live_api)
+
+The live feature opens a websocket, forwards microphone audio or user text input to Gemini Live, and streams transcript
+and audio events back to the client while tracking the remaining live time for the session.

@@ -4,17 +4,21 @@ sidebar_position: 2
 
 # Live Websocket API
 
-The live feature is the most important non-HTTP API in the system. It connects the client to the backend over a websocket and lets the backend relay the conversation to Gemini Live.
+The live feature is the most important non-HTTP API in the system. It connects the client to the backend over a
+websocket and forwards all relevant information to Gemini Live API.
+
+While all the other chat messages are sent to an LLM via the Langchain Project (for easy interchangability of backend
+models), this fully relies on the google-genai python library.
 
 ## Endpoint
 
 `/api/live/{session_id}/ws`
 
-The client opens this websocket using the same session cookie that is used for the HTTP API. The mobile and web clients both build the websocket URL from the configured API base URL.
+The client opens this websocket using the same session cookie that is used for the HTTP API.
 
 ## What the websocket does
 
-The websocket is a relay. It does not implement the model itself. Instead, it:
+The websocket is a relay:
 
 1. authenticates the user
 2. checks that the session exists and belongs to that user
@@ -45,11 +49,12 @@ Binary websocket frames are also accepted by the backend and forwarded as raw PC
 ```json
 {
   "type": "text",
-  "text": "Patient asks a question or the client sends a manual turn"
+  "text": "Some text message by the user"
 }
 ```
 
-Text is stored as a user message and forwarded to Gemini Live as realtime text input.
+Text is stored as a user message and forwarded to Gemini Live as realtime text input (this is needed that the model
+still answers with audio rather than only answering by text).
 
 ### End turn signal
 
@@ -59,7 +64,7 @@ Text is stored as a user message and forwarded to Gemini Live as realtime text i
 }
 ```
 
-This tells the backend to finalize the current turn.
+Finalizes the current turn.
 
 ## Server to client messages
 
@@ -74,7 +79,7 @@ The backend sends JSON event objects back to the client.
 }
 ```
 
-The client uses these events to update the transcript display while live mode is active.
+This sends the transcript of the LiveAPI directly to the user (realtime).
 
 ### Assistant audio
 
@@ -86,7 +91,7 @@ The client uses these events to update the transcript display while live mode is
 }
 ```
 
-The client buffers these chunks and plays them back as speech.
+Contains the audio chunks for the client.
 
 ### User transcript
 
@@ -97,7 +102,7 @@ The client buffers these chunks and plays them back as speech.
 }
 ```
 
-These events are emitted when the Gemini Live transcription pipeline recognizes user speech.
+To also display the user voice input the user transcript is also relayed to the client.
 
 ### Errors
 
@@ -107,7 +112,7 @@ These events are emitted when the Gemini Live transcription pipeline recognizes 
 }
 ```
 
-Error payloads are usually followed by a websocket close with code `1011`.
+Errors are also sent as JSON with the error message included.
 
 ## Connection requirements
 
@@ -123,18 +128,24 @@ The backend rejects or closes the websocket when one of the following is true:
 
 ## Session history and resume support
 
-Before opening the Gemini Live stream, the backend loads previous messages from the session and seeds them into the live context.
+Before opening the Gemini Live stream, the backend loads previous messages from the session and seeds
+them into the live context.
 
 If Gemini returns a resumable handle, the backend stores that handle in `sessions.live_api_handle` for later use.
+This for example could be used for evaluating the conversation even better (requires a multimodal output model from
+google which is not yet available)
 
 ## Time accounting
 
 Live mode is limited by two checks:
 
-- per-session remaining live time
-- total daily usage for the user
+- per-session remaining live time (max 10 minutes)
+- total daily usage for the user (max 30 minutes)
 
-The session starts with the default live budget from the model layer. When the websocket session ends, the elapsed time is subtracted from the session budget.
+The session starts with the default live budget from the model layer.
+When the websocket session ends, the elapsed time is subtracted from the session budget.
+
+This e.g. enables for higher defaults for specific users.
 
 ## Notes for client implementers
 
@@ -142,9 +153,3 @@ The session starts with the default live budget from the model layer. When the w
 - Send `end_turn` before closing if you want the model to finish the current response cleanly.
 - Treat `model_text` and `user_text` as transcript events, not as authoritative conversation history.
 - Buffer audio playback on the client side; Gemini Live sends small chunks.
-
-## Implementation references
-
-- Websocket route: `app/api/session.py`
-- Client hook: `mobile/hooks/useLiveAudioSession.ts`
-- Session auth for websockets: `app/auth/auth.py`

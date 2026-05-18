@@ -4,7 +4,8 @@ sidebar_position: 1
 
 # System Overview
 
-The Virtual Patient System is a medical training platform for anamnesis practice. It combines a FastAPI backend, a web frontend, and a mobile app that can talk to the patient in text or live audio mode.
+The Virtual Patient System is a medical training platform for anamnesis practice.
+It combines a FastAPI backend, a web frontend, and a mobile app that allows the student to talk to a virtual patient.
 
 ## Main parts
 
@@ -14,9 +15,9 @@ The Virtual Patient System is a medical training platform for anamnesis practice
 
 ## Runtime responsibilities
 
-The backend owns the conversation state, session persistence, authentication, and integration with the LLM providers. The frontend and mobile app are responsible for user interaction only.
+The backend owns the conversation state, session persistence, authentication, and integration with the LLM providers.
 
-The live feature is the most stateful part of the system. It opens a websocket from the client to the backend, then the backend relays audio and transcript events between the browser and the Gemini Live API.
+The frontend and mobile app are responsible for user interaction only.
 
 ## Request flow
 
@@ -28,15 +29,8 @@ The live feature is the most stateful part of the system. It opens a websocket f
 
 ## Important backend concepts
 
-- Sessions belong to a single case.
+- Sessions belong to a single case and user.
 - Messages are stored in the database for normal TUM sessions.
 - VHB sessions are stored in memory only.
 - Live sessions consume a per-session time budget.
 - Evaluation is available only for persisted TUM sessions.
-
-## Where the behavior lives
-
-- API routes and websocket relay: `app/api/session.py`
-- Authentication helpers: `app/auth/auth.py`
-- Session and message models: `app/model/models.py`
-- Configuration values: `app/config/config.py`

@@ -13,6 +13,8 @@ The database schema is intentionally small. Most of the application state is der
 | `cases` | Medical case definitions | Stores case id, title, and language |
 | `sessions` | One conversation session per case run | Stores user ownership, timestamps, and live session state |
 | `messages` | Conversation turns | Stores user, assistant, and system messages with timestamps and token usage |
+| `diagnostics` | Store available and used diagnostics | diagnostic name has to be unique |
+| `session_diagnostics` | Store relationship between sessions and diagnostics | Used to store used diagnostics |
 | `evaluations` | Automated feedback for completed sessions | One record per session |
 
 ## Session record
@@ -25,6 +27,7 @@ Important fields:
 - `case_id`: the selected case
 - `user_id`: TUM user id or `anon` if authentication is disabled
 - `started_at` / `ended_at`: lifecycle timestamps
+- `sutdent_diagnosis`: Stores the student's diagnosis (later used for evaluation)
 - `live_api_handle`: resumable Gemini Live handle, if one was returned
 - `live_time_remaining`: per-session live usage budget
 
