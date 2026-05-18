@@ -5,6 +5,9 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { router } from 'expo-router';
 
+import { appVersion } from "@/lib/util";
+import {grey600, grey50} from "react-native-paper/src/styles/themes/v2/colors";
+
 export function AppHeader() {
   const { width } = useWindowDimensions();
   const { colors } = useTheme();
@@ -29,7 +32,20 @@ export function AppHeader() {
           }}
           accessibilityLabel="App logo"
         />
-        <Appbar.Content title="TUM Virtual Patient System" />
+        <Appbar.Content title={
+          <View style={{ flexDirection: 'column', justifyContent: 'center',}}>
+            <Text
+              style={[{ fontSize: 18, fontWeight: '600', color: themeMode === 'dark' || themeMode === 'system' ? grey50 : grey600 }]}
+            >
+              TUM Virtual Patient System
+            </Text>
+            <Text
+              style={[{ fontSize: 12, marginTop: 2, fontWeight: 'normal',color: themeMode === 'dark' || themeMode === 'system' ? grey50 : grey600  }]}
+            >
+              Version: {appVersion}
+            </Text>
+          </View>
+        }/>
 
         <Appbar.Action
           icon={

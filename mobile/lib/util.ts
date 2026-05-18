@@ -1,0 +1,1 @@
+export const appVersion = process.env.EXPO_PUBLIC_VERSION || 'dev';
