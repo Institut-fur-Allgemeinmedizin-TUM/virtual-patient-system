@@ -84,6 +84,7 @@ export function useLiveAudioSession(
   const currentSoundRef = useRef<Audio.Sound | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const isStoppingRef = useRef(false);
 
   const stopAndUnloadCurrentSound = async () => {
     const sound = currentSoundRef.current;
@@ -166,9 +167,20 @@ export function useLiveAudioSession(
         streamRef.current = null;
       }
 
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        await audioContextRef.current.close();
-        audioContextRef.current = null;
+      const audioContext = audioContextRef.current;
+      audioContextRef.current = null;
+
+      if (audioContext && audioContext.close && audioContext.state !== 'closed') {
+        try {
+          await audioContext.close();
+        } catch (e: any) {
+          const msg = e?.message || '';
+          const name = e?.name || '';
+          const alreadyClosed = audioContext.state !== 'running' || name === 'InvalidStateError' || /closed|already closed/i.test(msg);
+          if (!alreadyClosed) {
+            throw e; //Rethrow - React should handle that error!
+          }
+        }
       }
 
       playingSourcesRef.current = [];
@@ -301,7 +313,6 @@ export function useLiveAudioSession(
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('WebSocket connected');
         setIsActive(true);
         setIsConnecting(false);
         // Start recording immediately when WS opens
@@ -350,7 +361,7 @@ export function useLiveAudioSession(
       };
 
       ws.onerror = () => {
-        setError('Live-Verbindung fehlgeschlagen');
+        setError('Live-Verbindung fehlgeschlagen: Live-Verbindung nur verfügbar für TUM user!');
         void stopLiveAudio();
       };
 
@@ -397,17 +408,34 @@ export function useLiveAudioSession(
   };
 
   const stopLiveAudio = async () => {
+    if (isStoppingRef.current) {
+      return;
+    }
+    isStoppingRef.current = true;
+
     if (wsRef.current) {
-      if (wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({ type: 'end_turn' }));
-      }
-      wsRef.current.close();
+      const ws = wsRef.current;
       wsRef.current = null;
+
+      // Prevent recursive stop calls triggered by ws.close() events.
+      ws.onopen = null;
+      ws.onmessage = null;
+      ws.onerror = null;
+      ws.onclose = null;
+
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'end_turn' }));
+      }
+      ws.close();
     }
 
-    await cleanup();
-    setIsActive(false);
-    setIsConnecting(false);
+    try {
+      await cleanup();
+      setIsActive(false);
+      setIsConnecting(false);
+    } finally {
+      isStoppingRef.current = false;
+    }
   };
 
   const sendMessage = (text: string) => {
