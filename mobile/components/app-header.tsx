@@ -15,6 +15,7 @@ export function AppHeader() {
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
   const tumId = useAuthStore((state) => state.user?.tum_id);
   const themeMode = useThemeStore((state) => state.mode);
+  const theme = useTheme();
   const logout = async () => {
     await useAuthStore.getState().logout();
   };
@@ -24,7 +25,7 @@ export function AppHeader() {
 
   return (
     <>
-      <Appbar.Header elevated>
+      <Appbar.Header elevated style={{backgroundColor: theme.colors.surfaceVariant}}>
         <Appbar.Action
           icon="hospital-box-outline"
           onPress={() => {
@@ -140,6 +141,7 @@ const styles = StyleSheet.create({
   sidebarModalContainer: {
     flex: 1,
     margin: 0,
+    opacity: 100,
   },
   sidebarLayout: {
     flex: 1,

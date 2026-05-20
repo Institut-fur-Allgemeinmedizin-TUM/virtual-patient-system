@@ -33,8 +33,8 @@ const lightPalette = {
 };
 
 const darkPalette = {
-  primary: '#8BC4FF',
-  onPrimary: '#003258',
+  primary: '#0653a5',
+  onPrimary: '#c7deee',
   primaryContainer: '#00497D',
   onPrimaryContainer: '#D7EAFE',
   secondary: '#7CD7C2',
@@ -45,11 +45,11 @@ const darkPalette = {
   onTertiary: '#272B60',
   tertiaryContainer: '#3D4279',
   onTertiaryContainer: '#E2E0FF',
-  background: '#111418',
+  background: '#11161d',
   onBackground: '#E5EAF0',
-  surface: '#171B20',
+  surface: '#1e283a',
   onSurface: '#E5EAF0',
-  surfaceVariant: '#2A313A',
+  surfaceVariant: '#0e396e',
   onSurfaceVariant: '#C1CBD6',
   outline: '#6E7B89',
   outlineVariant: '#394451',
@@ -82,6 +82,7 @@ export const navigationLightTheme = {
     text: lightPalette.onSurface,
     border: lightPalette.outlineVariant,
     notification: lightPalette.error,
+    //elevation: lightPalette.elevation,
   },
 };
 
@@ -95,6 +96,7 @@ export const navigationDarkTheme = {
     text: darkPalette.onSurface,
     border: darkPalette.outlineVariant,
     notification: darkPalette.error,
+    //elevation: darkPalette.elevation,
   },
 };
 

@@ -181,6 +181,7 @@ export default function SessionScreen() {
               {
                 width: sessionWidth,
                 borderRadius: isMobile ? 0 : 12,
+                backgroundColor: theme.colors.surface,
               },
             ]}
           >
