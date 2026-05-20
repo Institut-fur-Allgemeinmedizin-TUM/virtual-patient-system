@@ -82,7 +82,6 @@ export const navigationLightTheme = {
     text: lightPalette.onSurface,
     border: lightPalette.outlineVariant,
     notification: lightPalette.error,
-    //elevation: lightPalette.elevation,
   },
 };
 
@@ -96,7 +95,6 @@ export const navigationDarkTheme = {
     text: darkPalette.onSurface,
     border: darkPalette.outlineVariant,
     notification: darkPalette.error,
-    //elevation: darkPalette.elevation,
   },
 };
 
