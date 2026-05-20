@@ -5,8 +5,8 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { router } from 'expo-router';
 
-import { appVersion } from "@/lib/util";
 import {grey600, grey50} from "react-native-paper/src/styles/themes/v2/colors";
+import {appVersion} from "@/lib/util";
 
 export function AppHeader() {
   const { width } = useWindowDimensions();
@@ -35,14 +35,9 @@ export function AppHeader() {
         <Appbar.Content title={
           <View style={{ flexDirection: 'column', justifyContent: 'center',}}>
             <Text
-              style={[{ fontSize: 18, fontWeight: '600', color: themeMode === 'dark' || themeMode === 'system' ? grey50 : grey600 }]}
+              style={[{ fontSize: 20, fontWeight: '600', color: themeMode === 'dark' || themeMode === 'system' ? grey50 : grey600 }]}
             >
               TUM Virtual Patient System
-            </Text>
-            <Text
-              style={[{ fontSize: 12, marginTop: 2, fontWeight: 'normal',color: themeMode === 'dark' || themeMode === 'system' ? grey50 : grey600  }]}
-            >
-              Version: {appVersion}
             </Text>
           </View>
         }/>
@@ -123,6 +118,16 @@ export function AppHeader() {
                   }}
                 />
               </Drawer.Section>
+
+              <View style={{ flex: 1 }} />
+
+              <View style={styles.versionContainer}>
+                <Divider />
+                <View style={styles.versionRow}>
+                  <Appbar.Action icon="github" color={colors.onSurfaceVariant} size={18} />
+                  <Text style={[styles.versionText, { color: colors.onSurfaceVariant }]}>{`Version ${appVersion}`}</Text>
+                </View>
+              </View>
             </Surface>
           </View>
         </Modal>
@@ -153,5 +158,19 @@ const styles = StyleSheet.create({
   },
   profileTumId: {
     fontSize: 12,
+  },
+  versionContainer: {
+    paddingHorizontal: 8,
+    paddingBottom: 12,
+  },
+  versionText: {
+    fontSize: 12,
+    marginLeft: 8,
+  },
+  versionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 10,
   },
 });
