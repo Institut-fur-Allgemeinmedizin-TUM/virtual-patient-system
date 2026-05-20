@@ -25,7 +25,7 @@ export function AppHeader() {
 
   return (
     <>
-      <Appbar.Header elevated style={{backgroundColor: theme.colors.surfaceVariant}}>
+      <Appbar.Header elevated style={{backgroundColor: '#0e396e' }}>
         <Appbar.Action
           icon="hospital-box-outline"
           onPress={() => {
@@ -36,7 +36,7 @@ export function AppHeader() {
         <Appbar.Content title={
           <View style={{ flexDirection: 'column', justifyContent: 'center',}}>
             <Text
-              style={[{ fontSize: 20, fontWeight: '600', color: themeMode === 'dark' || themeMode === 'system' ? grey50 : grey600 }]}
+              style={[{ fontSize: 20, fontWeight: '600', color: '#C1CBD6' }]}
             >
               TUM Virtual Patient System
             </Text>

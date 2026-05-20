@@ -189,7 +189,7 @@ export default function SessionScreen() {
               <Avatar.Image size={40} source={getCaseImage(session.case!.imageName)} />
               <View style={styles.chatHeaderTitle}>
                 <Text variant="titleMedium">Chat: {session.case?.title}</Text>
-                <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                <Text variant="bodySmall" style={{ color: theme.colors.secondary }}>
                   {session.case?.patientName}, {session.case?.patientAge} Jahre,{' '}
                   {session.case?.patientOccupation}
                 </Text>
