@@ -3,11 +3,14 @@ from typing import Optional
 
 import httpx
 from fastapi import HTTPException, Request
-from fastapi.responses import JSONResponse, RedirectResponse, FileResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from sqlalchemy.sql import roles
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from app.auth import oidc
 from app.config.config import settings
+from app.db.db import SessionLocal
+from app.model.models import User
 
 
 async def fetch_jwks() -> dict:
@@ -61,12 +64,28 @@ def create_mobile_session_token(claims: dict) -> str:
     return oidc.sign(session_claims)
 
 
+def find_user_roles(oidc_id: Optional[str]) -> list[str]:
+    """Find all roles assigned to a user by their OIDC ID."""
+    if not oidc_id:
+        return []
+
+    with SessionLocal() as db:
+        user = db.query(User).filter(User.oidc_id == oidc_id).first()
+        if not user:
+            return []
+        return [role.name for role in user.roles]
+
+
 def get_current_user(request: Request) -> Optional[dict]:
     token = request.cookies.get("session")
     if not token:
         return None
     try:
-        return oidc.verify(token)
+        user = oidc.verify(token)
+        # Determine user roles from the database
+        oidc_id = user.get("tum_id") or user.get("sub")
+        user["roles"] = find_user_roles(oidc_id)
+        return user
     except HTTPException:
         return None
 
@@ -76,7 +95,11 @@ def get_current_user_websocket(websocket: WebSocket):
     if not token:
         return None
     try:
-        return oidc.verify(token)
+        user = oidc.verify(token)
+        # Determine user roles from the database
+        oidc_id = user.get("tum_id") or user.get("sub")
+        user["roles"] = find_user_roles(oidc_id)
+        return user
     except HTTPException:
         return None
 
@@ -84,7 +107,7 @@ def get_current_user_websocket(websocket: WebSocket):
 def require_user(request: Request) -> dict:
     if not settings.require_auth:
         # auth disabled; provide anonymous user
-        return {"sub": "anon", "name": "Anonymous"}
+        return {"sub": "anon", "name": "Anonymous", roles: []}
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")

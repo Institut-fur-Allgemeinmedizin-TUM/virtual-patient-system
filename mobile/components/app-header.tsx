@@ -24,6 +24,7 @@ export function AppHeader() {
   const sidebarWidth = Math.min(Math.max(width * 0.78, 260), 340);
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
   const tumId = useAuthStore((state) => state.user?.tum_id);
+  const roles = useAuthStore((state) => state.user?.roles);
   const themeMode = useThemeStore((state) => state.mode);
   const requestScroll = useUIStore((state) => state.requestScroll);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -172,6 +173,18 @@ export function AppHeader() {
                   >
                     TUM ID: {tumId}
                   </Text>
+                  {roles && roles.length > 0 && (
+                    <Text
+                      style={[
+                        styles.profileRoles,
+                        {
+                          color: colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Roles: {roles.join(', ')}
+                    </Text>
+                  )}
                 </View>
               ) : null}
 
@@ -250,6 +263,10 @@ const styles = StyleSheet.create({
   },
   profileTumId: {
     fontSize: 12,
+  },
+  profileRoles: {
+    fontSize: 12,
+    marginTop: 2,
   },
   versionContainer: {
     paddingHorizontal: 8,

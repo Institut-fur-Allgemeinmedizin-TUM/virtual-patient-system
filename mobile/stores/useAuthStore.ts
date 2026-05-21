@@ -11,6 +11,7 @@ interface User {
   tum_id?: string;
   email?: string;
   name?: string;
+  roles?: string[];
 }
 
 interface AuthState {
