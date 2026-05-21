@@ -1,21 +1,22 @@
 import uuid
-from pydantic import BaseModel
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import (
-    String,
-    Text,
-    ForeignKey,
-    DateTime,
-    func,
-    Integer,
-    JSON,
-    Boolean,
-    UUID,
-    Table,
-    Column,
-)
-from typing import List, Optional
 from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel
+from sqlalchemy import (
+    JSON,
+    UUID,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Table,
+    Text,
+    func,
+)
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 SessionLiveDefaultTime = 600
 UserMaxDailyUsage = 1800
@@ -32,6 +33,7 @@ user_roles = Table(
     Column("user_id", ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
     Column("role_id", ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
 )
+
 
 class Role(Base):
     __tablename__ = "roles"
@@ -51,13 +53,19 @@ class User(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    oidc_id: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
-    pronouns: Mapped[str] = mapped_column(String(50), nullable=False)
+    oidc_id: Mapped[Optional[str]] = mapped_column(
+        String(255), unique=True, nullable=True
+    )
+    pronouns: Mapped[str] = mapped_column(
+        String(50), nullable=False, default="not_specified"
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
 
-    roles: Mapped[List[Role]] = relationship(secondary=user_roles, back_populates="users")
+    roles: Mapped[List[Role]] = relationship(
+        secondary=user_roles, back_populates="users"
+    )
     sessions: Mapped[List["Session"]] = relationship(back_populates="user")
 
 

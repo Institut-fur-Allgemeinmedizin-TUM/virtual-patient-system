@@ -5,6 +5,7 @@ from urllib.parse import urlencode
 
 import httpx
 from fastapi import (
+    APIRouter,
     HTTPException,
     Request,
     Response,
@@ -13,7 +14,7 @@ from fastapi import (
 from fastapi.responses import JSONResponse, RedirectResponse
 from jose import jwt, JWTError
 
-from app.auth import oidc, auth
+from app.auth import auth, oidc
 from app.config.config import settings
 from app.model.auth import VHBLoginRequest, VHBLoginResponse
 
@@ -133,6 +134,9 @@ async def auth_callback(
     # Basic nonce check
     if claims.get("nonce") != st.get("nonce"):
         raise HTTPException(status_code=401, detail="Invalid nonce")
+
+    # Sync user to database
+    auth.sync_user_to_db(claims)
 
     # Redirect back to frontend after successful authentication
     frontend_path = st.get("redirect_to") or "/"

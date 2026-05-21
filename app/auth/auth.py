@@ -10,7 +10,28 @@ from starlette.websockets import WebSocket, WebSocketDisconnect
 from app.auth import oidc
 from app.config.config import settings
 from app.db.db import SessionLocal
-from app.model.models import User
+from app.model.models import User, Role
+
+
+def sync_user_to_db(claims: dict) -> None:
+    """Ensure user exists in the database and has default roles."""
+    oidc_id = oidc.extract_tum_id_from_claims(claims) or claims.get("sub")
+    if not oidc_id:
+        return
+
+    with SessionLocal() as db:
+        user = db.query(User).filter(User.oidc_id == oidc_id).first()
+        if not user:
+            # Create new user
+            user = User(oidc_id=oidc_id)
+            db.add(user)
+
+            # Assign default role if it exists
+            default_role = db.query(Role).filter(Role.name == "Default").first()
+            if default_role:
+                user.roles.append(default_role)
+
+            db.commit()
 
 
 async def fetch_jwks() -> dict:
