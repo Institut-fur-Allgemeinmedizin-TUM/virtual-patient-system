@@ -23,6 +23,9 @@ export enum SessionHistoryColumn {
   StartedAt = "started_at",
   EndedAt = "ended_at",
   UserId = "user_id",
+  DurationMinutes = "duration_minutes",
+  LiveTimeUsed = "live_time_used",
+  UserWordCount = "user_word_count",
   Criterion1Score = "criterion1_score",
   Criterion1Explanation = "criterion1_explanation",
   Criterion2Score = "criterion2_score",
@@ -263,6 +266,12 @@ export interface SessionMessagesResponse {
   started_at: string;
   /** Ended At */
   ended_at: string | null;
+  /** Duration Minutes */
+  duration_minutes?: number | null;
+  /** Live Time Used */
+  live_time_used?: number | null;
+  /** User Word Count */
+  user_word_count?: number | null;
   /** Messages */
   messages: SessionMessageItem[];
 }
@@ -288,6 +297,12 @@ export interface SessionSummary {
   total_tokens_in: number | null;
   /** Total Tokens Out */
   total_tokens_out: number | null;
+  /** Duration Minutes */
+  duration_minutes?: number | null;
+  /** Live Time Used */
+  live_time_used?: number | null;
+  /** User Word Count */
+  user_word_count?: number | null;
 }
 
 /** SessionSummaryData */

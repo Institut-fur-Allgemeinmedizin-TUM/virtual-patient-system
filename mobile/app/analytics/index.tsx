@@ -185,30 +185,10 @@ const WaveScoreCard: React.FC<WaveScoreCardProps> = ({ score, maxScore, label })
 // 2. DYNAMIC TABLE TYPES & DATA
 // ==========================================
 
-type ColumnId =
-  |'id'
-  | 'case'
-  | 'ended_at'
-  | 'started_at'
-  | 'criterion1_score'
-  | 'criterion1_explanation'
-  | 'criterion2_score'
-  | 'criterion2_explanation'
-  | 'criterion3_score'
-  | 'criterion3_explanation'
-  | 'criterion4_score'
-  | 'criterion4_explanation'
-  | 'criterion5_score'
-  | 'criterion5_explanation'
-  | 'criterion6_score'
-  | 'criterion6_explanation'
-  | 'criterion7_score'
-  | 'criterion7_explanation'
-  | 'criterion8_score'
-  | 'criterion8_explanation';
+type ColumnId = SessionHistoryColumn;
 
 interface ColumnDef {
-  id: ColumnId;
+  id: ColumnId
   label: string;
 }
 
@@ -220,26 +200,29 @@ interface CaseOption {
 const ALL_CASES_VALUE = '__all__';
 
 const PREDEFINED_COLUMNS: ColumnDef[] = [
-  { id: 'id', label: 'Session ID' },
-  { id: 'case', label: 'Case' },
-  { id: 'ended_at', label: 'End Date' },
-  { id: 'started_at', label: 'Start Date' },
-  { id: 'criterion1_score', label: 'Criterion 1 Score' },
-  { id: 'criterion1_explanation', label: 'Criterion 1 Explanation' },
-  { id: 'criterion2_score', label: 'Criterion 2 Score' },
-  { id: 'criterion2_explanation', label: 'Criterion 2 Explanation' },
-  { id: 'criterion3_score', label: 'Criterion 3 Score' },
-  { id: 'criterion3_explanation', label: 'Criterion 3 Explanation' },
-  { id: 'criterion4_score', label: 'Criterion 4 Score' },
-  { id: 'criterion4_explanation', label: 'Criterion 4 Explanation' },
-  { id: 'criterion5_score', label: 'Criterion 5 Score' },
-  { id: 'criterion5_explanation', label: 'Criterion 5 Explanation' },
-  { id: 'criterion6_score', label: 'Criterion 6 Score' },
-  { id: 'criterion6_explanation', label: 'Criterion 6 Explanation' },
-  { id: 'criterion7_score', label: 'Criterion 7 Score' },
-  { id: 'criterion7_explanation', label: 'Criterion 7 Explanation' },
-  { id: 'criterion8_score', label: 'Criterion 8 Score' },
-  { id: 'criterion8_explanation', label: 'Criterion 8 Explanation' },
+  { id: SessionHistoryColumn.Id, label: 'Session ID' },
+  { id: SessionHistoryColumn.Case, label: 'Case' },
+  { id: SessionHistoryColumn.EndedAt, label: 'End Date' },
+  { id: SessionHistoryColumn.StartedAt, label: 'Start Date' },
+  { id: SessionHistoryColumn.Criterion1Score, label: 'Criterion 1 Score' },
+  { id: SessionHistoryColumn.Criterion1Explanation, label: 'Criterion 1 Explanation' },
+  { id: SessionHistoryColumn.Criterion2Score, label: 'Criterion 2 Score' },
+  { id: SessionHistoryColumn.Criterion2Explanation, label: 'Criterion 2 Explanation' },
+  { id: SessionHistoryColumn.Criterion3Score, label: 'Criterion 3 Score' },
+  { id: SessionHistoryColumn.Criterion3Explanation, label: 'Criterion 3 Explanation' },
+  { id: SessionHistoryColumn.Criterion4Score, label: 'Criterion 4 Score' },
+  { id: SessionHistoryColumn.Criterion4Explanation, label: 'Criterion 4 Explanation' },
+  { id: SessionHistoryColumn.Criterion5Score, label: 'Criterion 5 Score' },
+  { id: SessionHistoryColumn.Criterion5Explanation, label: 'Criterion 5 Explanation' },
+  { id: SessionHistoryColumn.Criterion6Score, label: 'Criterion 6 Score' },
+  { id: SessionHistoryColumn.Criterion6Explanation, label: 'Criterion 6 Explanation' },
+  { id: SessionHistoryColumn.Criterion7Score, label: 'Criterion 7 Score' },
+  { id: SessionHistoryColumn.Criterion7Explanation, label: 'Criterion 7 Explanation' },
+  { id: SessionHistoryColumn.Criterion8Score , label: 'Criterion 8 Score' },
+  { id: SessionHistoryColumn.Criterion8Explanation, label: 'Criterion 8 Explanation' },
+  { id: SessionHistoryColumn.LiveTimeUsed, label: 'Live Time Used (s)'},
+  { id: SessionHistoryColumn.UserWordCount, label: 'User Word Count'},
+  { id: SessionHistoryColumn.DurationMinutes, label: 'Duration (min)'},
 ];
 
 // ==========================================
@@ -255,18 +238,16 @@ const AnalyticsDashboard = () => {
   const [sortColumn, setSortColumn] = useState<ColumnId | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.Desc);
   const [visibleColumns, setVisibleColumns] = useState<ColumnId[]>([
-    'case',
-    'ended_at',
-    'criterion1_score',
-
-    'criterion2_score',
-
-    'criterion3_score',
-    'criterion4_score',
-    'criterion5_score',
-    'criterion6_score',
-    'criterion7_score',
-    'criterion8_score',
+    SessionHistoryColumn.Case,
+    SessionHistoryColumn.EndedAt,
+    SessionHistoryColumn.Criterion1Score,
+    SessionHistoryColumn.Criterion2Score,
+    SessionHistoryColumn.Criterion3Score,
+    SessionHistoryColumn.Criterion4Score,
+    SessionHistoryColumn.Criterion5Score,
+    SessionHistoryColumn.Criterion6Score,
+    SessionHistoryColumn.Criterion7Score,
+    SessionHistoryColumn.Criterion8Score,
   ]);
   const [expandedText, setExpandedText] = useState<{ title: string; content: string } | null>(null);
 
@@ -275,7 +256,7 @@ const AnalyticsDashboard = () => {
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchColumn, setSearchColumn] = useState<ColumnId>('id');
+  const [searchColumn, setSearchColumn] = useState<ColumnId>(SessionHistoryColumn.Id);
 
   const dashboardOverview = useAnalyticsStore((state) => state.dashboardOverview);
   const loadDashboardOverview = useAnalyticsStore((state) => state.loadDashboardOverview);
@@ -579,9 +560,9 @@ const AnalyticsDashboard = () => {
         elevation={1}
       >
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {/* 
-             CRITICAL FIX: 
-             We now use flexDirection: 'row' to line up COLUMNS side-by-side, 
+          {/*
+             CRITICAL FIX:
+             We now use flexDirection: 'row' to line up COLUMNS side-by-side,
              instead of rows.
           */}
           <View style={[styles.tableWrapper, { minWidth: Dimensions.get('window').width - 40 }]}>

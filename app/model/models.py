@@ -230,6 +230,9 @@ class SessionSummary(BaseModel):
     message_count: int
     total_tokens_in: Optional[int]
     total_tokens_out: Optional[int]
+    duration_minutes: Optional[float] = None
+    live_time_used: Optional[int] = None
+    user_word_count: Optional[int] = None
 
 
 class ExportResponse(BaseModel):
@@ -252,6 +255,9 @@ class SessionMessagesResponse(BaseModel):
     case_id: str
     started_at: datetime
     ended_at: Optional[datetime]
+    duration_minutes: Optional[float] = None
+    live_time_used: Optional[int] = None
+    user_word_count: Optional[int] = None
     messages: List[SessionMessageItem]
 
 

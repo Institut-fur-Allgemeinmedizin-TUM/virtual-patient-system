@@ -2,8 +2,9 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 from typing import Any, Dict, List, Union
+from sqlalchemy import func, extract, select
 
-from app.model.models import Evaluation, Session
+from app.model.models import Evaluation, Session, Message, SessionLiveDefaultTime
 
 
 class SessionHistoryColumn(str, Enum):
@@ -12,6 +13,9 @@ class SessionHistoryColumn(str, Enum):
     started_at = "started_at"
     ended_at = "ended_at"
     user_id = "user_id"
+    duration_minutes = "duration_minutes"
+    live_time_used = "live_time_used"
+    user_word_count = "user_word_count"
     criterion1_score = "criterion1_score"
     criterion1_explanation = "criterion1_explanation"
     criterion2_score = "criterion2_score"
@@ -66,6 +70,25 @@ column_db_map = {
     SessionHistoryColumn.started_at: Session.started_at,
     SessionHistoryColumn.ended_at: Session.ended_at,
     SessionHistoryColumn.user_id: Session.user_id,
+    SessionHistoryColumn.duration_minutes: (
+        extract("epoch", func.coalesce(Session.ended_at, func.now()) - Session.started_at)
+        / 60
+    ),
+    SessionHistoryColumn.live_time_used: (
+        SessionLiveDefaultTime - Session.live_time_remaining
+    ),
+    SessionHistoryColumn.user_word_count: (
+        select(
+            func.sum(
+                func.cardinality(
+                    func.regexp_split_to_array(func.trim(Message.content), r"\s+")
+                )
+            )
+        )
+        .where(Message.session_id == Session.id)
+        .where(Message.role == "user")
+        .scalar_subquery()
+    ),
     SessionHistoryColumn.criterion1_score: Evaluation.criterion1_score,
     SessionHistoryColumn.criterion2_score: Evaluation.criterion2_score,
     SessionHistoryColumn.criterion3_score: Evaluation.criterion3_score,
