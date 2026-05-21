@@ -185,8 +185,6 @@ async def auth_me(request: Request) -> JSONResponse:
         content={
             "sub": user.get("sub"),
             "tum_id": tum_id,
-            "email": user.get("email"),
-            "name": user.get("name"),
             "roles": user.get("roles", []),
         }
     )

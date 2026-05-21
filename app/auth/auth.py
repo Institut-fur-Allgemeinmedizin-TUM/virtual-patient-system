@@ -51,8 +51,6 @@ def set_session(response: RedirectResponse, claims: dict) -> None:
 
     session_claims = {
         "sub": claims.get("sub"),
-        "email": claims.get("email"),
-        "name": claims.get("name"),
         "iat": int(time.time()),
         "exp": int(time.time()) + 60 * 60 * 24,  # 24h
     }
@@ -72,8 +70,6 @@ def create_mobile_session_token(claims: dict) -> str:
 
     session_claims = {
         "sub": claims.get("sub"),
-        "email": claims.get("email"),
-        "name": claims.get("name"),
         "iat": int(time.time()),
         "exp": int(time.time()) + 60 * 60 * 24,  # 24h
     }
