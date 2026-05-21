@@ -1,4 +1,4 @@
-export function mapEvalauationKeyToLabel(key: string): string {
+export function mapEvaluationKeyToLabel(key: string): string {
   const mapping: Record<string, string> = {
     criterion1: 'Gesprächsführung',
     criterion2: 'Erkennung relevanter Informationen',

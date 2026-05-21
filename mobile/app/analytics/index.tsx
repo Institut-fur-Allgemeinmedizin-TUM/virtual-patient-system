@@ -12,6 +12,7 @@ import {
   Dialog,
   Button,
   Searchbar,
+  Snackbar,
 } from 'react-native-paper';
 import Svg, { Path } from 'react-native-svg';
 import Animated, {
@@ -25,7 +26,7 @@ import Animated, {
 import { useAnalyticsStore } from '@/stores/useAnalyticsStore';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
-import { mapEvalauationKeyToLabel } from '@/lib/evaluations';
+import { mapEvaluationKeyToLabel } from '@/lib/evaluations';
 import EvaluationModal from '@/app/components/EvaluationModal';
 import { SortDirection, SessionHistoryOrderBy, SessionHistoryFilter, SessionHistoryColumn } from '@/services/api';
 
@@ -265,8 +266,12 @@ const AnalyticsDashboard = () => {
   const totalSessionRecords = useAnalyticsStore((state) => state.totalSessionRecords);
   const downloadCSV = useAnalyticsStore((state) => state.downloadCSV);
   const isDownloadingCSV = useAnalyticsStore((state) => state.isDownloadingCSV);
+  const analyticsError = useAnalyticsStore((state) => state.analyticsError);
+  const clearAnalyticsError = useAnalyticsStore((state) => state.clearAnalyticsError);
   const cases = useCasesStore((state) => state.cases);
   const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
     loadAndGetCases();
@@ -296,6 +301,13 @@ const AnalyticsDashboard = () => {
     const caseId = selectedCase === ALL_CASES_VALUE ? undefined : selectedCase;
     loadDashboardOverview(caseId);
   }, [selectedCase, loadDashboardOverview]);
+
+  useEffect(() => {
+    if (analyticsError) {
+      setSnackbarMessage(analyticsError.message);
+      setSnackbarVisible(true);
+    }
+  }, [analyticsError]);
 
   const caseOptions = useMemo<CaseOption[]>(() => {
     const dynamicOptions = cases.map((item) => ({
@@ -422,42 +434,42 @@ const AnalyticsDashboard = () => {
         <WaveScoreCard
           score={dashboardOverview?.avg_scores?.avg_criterion1_score ?? 0}
           maxScore={5}
-          label={mapEvalauationKeyToLabel('criterion1')}
+          label={mapEvaluationKeyToLabel('criterion1')}
         />
         <WaveScoreCard
           score={dashboardOverview?.avg_scores?.avg_criterion2_score ?? 0}
           maxScore={5}
-          label={mapEvalauationKeyToLabel('criterion2')}
+          label={mapEvaluationKeyToLabel('criterion2')}
         />
         <WaveScoreCard
           score={dashboardOverview?.avg_scores?.avg_criterion3_score ?? 0}
           maxScore={5}
-          label={mapEvalauationKeyToLabel('criterion3')}
+          label={mapEvaluationKeyToLabel('criterion3')}
         />
         <WaveScoreCard
           score={dashboardOverview?.avg_scores?.avg_criterion4_score ?? 0}
           maxScore={5}
-          label={mapEvalauationKeyToLabel('criterion4')}
+          label={mapEvaluationKeyToLabel('criterion4')}
         />
         <WaveScoreCard
           score={dashboardOverview?.avg_scores?.avg_criterion5_score ?? 0}
           maxScore={5}
-          label={mapEvalauationKeyToLabel('criterion5')}
+          label={mapEvaluationKeyToLabel('criterion5')}
         />
         <WaveScoreCard
           score={dashboardOverview?.avg_scores?.avg_criterion6_score ?? 0}
           maxScore={5}
-          label={mapEvalauationKeyToLabel('criterion6')}
+          label={mapEvaluationKeyToLabel('criterion6')}
         />
         <WaveScoreCard
           score={dashboardOverview?.avg_scores?.avg_criterion7_score ?? 0}
           maxScore={5}
-          label={mapEvalauationKeyToLabel('criterion7')}
+          label={mapEvaluationKeyToLabel('criterion7')}
         />
         <WaveScoreCard
           score={dashboardOverview?.avg_scores?.avg_criterion8_score ?? 0}
           maxScore={5}
-          label={mapEvalauationKeyToLabel('criterion8')}
+          label={mapEvaluationKeyToLabel('criterion8')}
         />
       </View>
 
@@ -753,6 +765,24 @@ const AnalyticsDashboard = () => {
             <Button onPress={() => setExpandedText(null)}>Close</Button>
           </Dialog.Actions>
         </Dialog>
+
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={() => {
+            setSnackbarVisible(false);
+            clearAnalyticsError();
+          }}
+          duration={Snackbar.DURATION_LONG}
+          action={{
+            label: 'Dismiss',
+            onPress: () => {
+              setSnackbarVisible(false);
+              clearAnalyticsError();
+            },
+          }}
+        >
+          {snackbarMessage}
+        </Snackbar>
       </Portal>
 
       <EvaluationModal />
