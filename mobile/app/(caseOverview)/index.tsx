@@ -1,258 +1,264 @@
-import { useEffect } from 'react';
-import { FlatList, StyleSheet, View, useWindowDimensions } from 'react-native';
-import { Image } from 'expo-image';
-import { Button, Text, Avatar, useTheme, Surface, TouchableRipple, Icon } from 'react-native-paper';
-import { useCasesStore } from '@/stores/useCasesStore';
-import { useSessionStore } from '@/stores/useSessionStore';
-import { router } from 'expo-router';
-import { getCaseImage } from '@/lib/cases/case';
-import EvaluationModal from '../components/EvaluationModal';
 import React from 'react';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
+import {
+  Button,
+  Card,
+  Text,
+  useTheme,
+  List,
+  Divider,
+  Surface,
+  Avatar,
+} from 'react-native-paper';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Linking from 'expo-linking';
 
-export default function HomeScreen() {
+export default function LandingPage() {
   const theme = useTheme();
+  const router = useRouter();
   const { width } = useWindowDimensions();
-  const cases = useCasesStore((state) => state.cases);
-  const loaded = useCasesStore((state) => state.loaded);
-  const sessionScores = useCasesStore((state) => state.sessionScores);
-  const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
-  const loadSessionSummaries = useCasesStore((state) => state.loadSessionSummaries);
-  const startCase = useSessionStore((state) => state.startSession);
 
-  useEffect(() => {
-    void loadAndGetCases();
-  }, [loadAndGetCases]);
+  const isWeb = width > 768;
+  const isSmallMobile = width < 400;
+  const containerPadding = isWeb ? 40 : 16;
+  const maxWidth = 1000;
 
-  useEffect(() => {
-    if (loaded) {
-      void loadSessionSummaries();
-    }
-  }, [loaded, loadSessionSummaries]);
+  const changelog = [
+    {
+      version: 'v1.2.0',
+      date: '20. Mai 2026',
+      changes: 'Verbesserung der KI-Antwortzeit und neue Diagnose-Features.',
+    },
+    {
+      version: 'v1.1.0',
+      date: '05. April 2026',
+      changes: 'Einführung der Live-Audio-Funktion für natürlichere Gespräche.',
+    },
+    {
+      version: 'v1.0.0',
+      date: '01. März 2026',
+      changes: 'Launch des Virtuellen Patientensystems mit Basisfällen.',
+    },
+  ];
 
-  const horizontalPadding = 16;
-  const columnGap = 16;
-  const columns = width >= 1100 ? 4 : width >= 780 ? 3 : width >= 520 ? 2 : 1;
-  const cardWidth =
-    columns === 1
-      ? width - horizontalPadding * 2
-      : (width - horizontalPadding * 2 - columnGap * (columns - 1)) / columns;
-
-  const getDifficultyStyle = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Leicht':
-        return { bg: '#e8f7ef', text: '#0b7f5a' };
-      case 'Schwer':
-        return { bg: '#fcebea', text: '#d93025' };
-      default:
-        return { bg: '#fef3e5', text: '#d67e00' };
-    }
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score <= 2.5) return '#d93025'; // red
-    if (score <= 4) return '#d67e00'; // orange
-    return '#0b7f5a'; // green
-  };
+  const steps = [
+    {
+      title: 'Fall auswählen',
+      description: 'Wählen Sie aus einer Liste von verschiedenen medizinischen Fällen einen Patienten aus.',
+      icon: 'format-list-bulleted',
+    },
+    {
+      title: 'Anamnese führen',
+      description: 'Stellen Sie dem Patienten Fragen zu seinen Beschwerden und der Krankengeschichte.',
+      icon: 'chat-processing-outline',
+    },
+    {
+      title: 'Diagnose & Untersuchungen',
+      description: 'Fordern Sie Untersuchungen an und stellen Sie eine Verdachtsdiagnose.',
+      icon: 'stethoscope',
+    },
+    {
+      title: 'Feedback erhalten',
+      description: 'Erhalten Sie eine detaillierte Auswertung Ihrer Leistung nach Abschluss des Falls.',
+      icon: 'chart-check',
+    },
+  ];
 
   return (
-    <>
-      <FlatList
-        contentContainerStyle={styles.container}
-        data={cases}
-        key={columns}
-        numColumns={columns}
-        keyExtractor={(item) => item.id}
-        columnWrapperStyle={columns > 1 ? styles.columnWrapper : undefined}
-        renderItem={({ item, index }) => {
-          const mockDifficulty = index % 3 === 0 ? 'Leicht' : index % 3 === 1 ? 'Mittel' : 'Schwer';
-          const sessionInfo: { sessionId: string; score: number } = sessionScores[item.id];
-          const score = sessionInfo ? sessionInfo.score : null;
-          const hasScore = typeof score === 'number';
-          const diffStyle = getDifficultyStyle(mockDifficulty);
-
-          return (
-            <View
-              style={[
-                styles.cardShell,
-                { width: cardWidth },
-                columns === 1 ? styles.fullWidthCard : null,
-              ]}
-            >
-              <Surface
-                elevation={2}
-                style={[styles.card, { backgroundColor: theme.colors.surface }]}
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.content, { padding: containerPadding, maxWidth: maxWidth, alignSelf: 'center' }]}>
+        
+        {/* Hero Section */}
+        <Surface style={styles.heroSurface} elevation={1}>
+          <LinearGradient
+            colors={theme.dark 
+              ? [theme.colors.primaryContainer, theme.colors.surface] 
+              : [theme.colors.primary, theme.colors.primaryContainer]}
+            style={[styles.heroGradient, !isWeb && { padding: 24 }]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={styles.heroContent}>
+              <Avatar.Icon 
+                size={isWeb ? 80 : 64} 
+                icon="doctor" 
+                style={{ backgroundColor: 'transparent' }} 
+                color={theme.dark ? theme.colors.primary : '#fff'} 
+              />
+              <Text 
+                variant={isWeb ? "headlineMedium" : "headlineSmall"} 
+                style={[styles.heroTitle, { color: theme.dark ? theme.colors.onSurface : '#fff' }]}
               >
-                <TouchableRipple
-                  style={{ flex: 1 }}
-                  onPress={async () => {
-                    const sessionId = await startCase(item.id, item);
-                    if (sessionId) router.push(`/session/${sessionId}`);
-                  }}
-                >
-                  <View style={styles.cardInnerFlex}>
-                    {/* --- TOP HALF (Image) --- */}
-                    <View style={styles.imageContainer}>
-                      <Image
-                        source={getCaseImage(item.imageName)}
-                        style={styles.cardImage}
-                        contentFit="cover"
-                      />
-                      <View style={[styles.difficultyBadge, { backgroundColor: diffStyle.bg }]}>
-                        <Text style={{ color: diffStyle.text, fontSize: 12, fontWeight: '700' }}>
-                          {mockDifficulty}
-                        </Text>
-                      </View>
-                    </View>
-
-                    {/* --- MIDDLE HALF (Text) --- */}
-                    <View style={styles.textContainer}>
-                      <Text variant="titleLarge" style={styles.cardTitle} numberOfLines={2}>
-                        {item.title}
-                      </Text>
-                      <Text
-                        variant="bodyMedium"
-                        style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}
-                      >
-                        {item.patientName}, {item.patientAge} Jahre
-                      </Text>
-                      <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                        {item.patientOccupation}
-                      </Text>
-                    </View>
-
-                    {/* --- BOTTOM HALF (Status + Action Buttons) --- */}
-                    <View>
-                      {hasScore && (
-                        <View
-                          style={[
-                            styles.statusRow,
-                            { borderTopColor: theme.colors.outlineVariant },
-                          ]}
-                        >
-                          <Icon source="check-circle" color={getScoreColor(score)} size={14} />
-                          <Text
-                            variant="bodySmall"
-                            style={{
-                              color: getScoreColor(score),
-                              marginLeft: 6,
-                              fontWeight: '600',
-                              marginTop: 4,
-                            }}
-                          >
-                            Absolviert • Letzter Score: {score.toFixed(2)}
-                          </Text>
-                        </View>
-                      )}
-
-                      {hasScore ? (
-                        <View style={styles.buttonRow}>
-                          <Button
-                            mode="contained-tonal"
-                            onPress={() => {
-                              const sessionInfo = sessionScores[item.id];
-                              if (!sessionInfo || !sessionInfo.sessionId) return;
-                              useSessionStore.setState({
-                                sessionId: sessionInfo.sessionId,
-                                evaluationResponse: undefined,
-                                waitingForEvaluationResponse: false,
-                              });
-                              useSessionStore.getState().evaluate();
-                            }}
-                            icon="chart-box-outline"
-                            style={styles.halfWidthButton}
-                            contentStyle={styles.buttonHeight}
-                            labelStyle={styles.splitButtonLabel}
-                          >
-                            Ergebnis
-                          </Button>
-                          <Button
-                            mode="contained"
-                            onPress={async () => {
-                              const sessionId = await startCase(item.id, item);
-                              if (sessionId) router.push(`/session/${sessionId}`);
-                            }}
-                            icon="refresh"
-                            style={styles.halfWidthButton}
-                            contentStyle={styles.buttonHeight}
-                            labelStyle={styles.splitButtonLabel}
-                          >
-                            Wiederholen
-                          </Button>
-                        </View>
-                      ) : (
-                        <Button
-                          mode="contained"
-                          onPress={async () => {
-                            const sessionId = await startCase(item.id, item);
-                            if (sessionId) router.push(`/session/${sessionId}`);
-                          }}
-                          icon="play"
-                          style={styles.fullWidthButton}
-                          contentStyle={styles.buttonHeight}
-                          labelStyle={styles.fullButtonLabel}
-                        >
-                          Fall starten
-                        </Button>
-                      )}
-                    </View>
-                  </View>
-                </TouchableRipple>
-              </Surface>
+                Willkommen beim Virtuellen Patientensystem
+              </Text>
+              <Text 
+                variant="bodyLarge" 
+                style={[styles.heroSubtitle, { color: theme.dark ? theme.colors.onSurfaceVariant : '#fff' }]}
+              >
+                Trainieren Sie Ihre diagnostischen Fähigkeiten mit KI-gestützten Patientensimulationen.
+              </Text>
+              <Button
+                mode="contained"
+                onPress={() => router.push('/(caseOverview)/cases')}
+                style={styles.ctaButton}
+                contentStyle={styles.ctaButtonContent}
+                buttonColor={theme.dark ? theme.colors.primary : theme.colors.surface}
+                textColor={theme.dark ? theme.colors.onPrimary : theme.colors.primary}
+              >
+                Zu den Fällen
+              </Button>
             </View>
-          );
-        }}
-      />
-      <EvaluationModal />
-    </>
+          </LinearGradient>
+        </Surface>
+
+        {/* Project Description */}
+        <Card style={styles.sectionCard}>
+          <Card.Content>
+            <Text variant="titleLarge" style={styles.sectionTitle}>Über das Projekt</Text>
+            <Text variant="bodyMedium" style={styles.paragraph}>
+              Dieses System wurde entwickelt, um Medizinstudierenden eine praxisnahe und sichere Umgebung für das Training von Anamnesegesprächen zu bieten. Unsere virtuellen Patienten nutzen modernste Sprachmodelle, um individuell und medizinisch fundiert auf Ihre Fragen zu reagieren.
+            </Text>
+          </Card.Content>
+        </Card>
+
+        {/* How to use */}
+        <Text variant="titleLarge" style={[styles.sectionTitle, { marginTop: 32, marginBottom: 16 }]}>So funktioniert es</Text>
+        <View style={isWeb ? styles.stepsContainerWeb : styles.stepsContainerMobile}>
+          {steps.map((step, index) => (
+            <Card key={index} style={[styles.stepCard, isWeb && { flex: 1, marginHorizontal: 8 }]}>
+              <Card.Title 
+                title={step.title} 
+                titleNumberOfLines={2}
+                titleStyle={isSmallMobile ? { fontSize: 16, lineHeight: 20 } : undefined}
+                left={(props) => <Avatar.Icon {...props} icon={step.icon} size={isSmallMobile ? 32 : 40} />}
+              />
+              <Card.Content>
+                <Text variant="bodyMedium" style={isSmallMobile && { fontSize: 13 }}>{step.description}</Text>
+              </Card.Content>
+            </Card>
+          ))}
+        </View>
+
+        {/* Feedback & Questions */}
+        <Card style={[styles.sectionCard, { marginTop: 32, backgroundColor: theme.colors.secondaryContainer }]}>
+          <Card.Content>
+            <View style={styles.feedbackRow}>
+              <View style={{ flex: 1 }}>
+                <Text variant="titleLarge" style={[{ color: theme.colors.onSecondaryContainer }, isSmallMobile && { fontSize: 18 }]}>Fragen oder Feedback?</Text>
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSecondaryContainer, marginTop: 8 }}>
+                  Wir arbeiten ständig an der Verbesserung des Systems. Kontaktieren Sie uns gerne bei Problemen oder Anregungen.
+                </Text>
+                <Text 
+                  variant="labelLarge" 
+                  style={{ color: theme.colors.primary, marginTop: 16, fontWeight: 'bold' }}
+                  onPress={() => Linking.openURL('mailto:support@virtual-patient.edu')}
+                >
+                  support@virtual-patient.edu
+                </Text>
+              </View>
+              {isWeb && <Avatar.Icon size={48} icon="email-outline" style={{ backgroundColor: 'transparent' }} />}
+            </View>
+          </Card.Content>
+        </Card>
+
+        {/* Changelog */}
+        <List.Section style={styles.changelogSection}>
+          <List.Subheader>Changelog</List.Subheader>
+          {changelog.map((entry, index) => (
+            <React.Fragment key={index}>
+              <List.Item
+                title={entry.version}
+                titleStyle={isSmallMobile && { fontSize: 14 }}
+                description={entry.changes}
+                descriptionStyle={isSmallMobile && { fontSize: 12 }}
+                right={() => <Text variant="labelSmall" style={styles.changelogDate}>{entry.date}</Text>}
+              />
+              {index < changelog.length - 1 && <Divider />}
+            </React.Fragment>
+          ))}
+        </List.Section>
+
+        <View style={{ height: 40 }} />
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, gap: 16 },
-  columnWrapper: { gap: 16, alignItems: 'stretch' },
-  cardShell: { display: 'flex' },
-  fullWidthCard: { flexBasis: '100%' },
-  card: { flex: 1, overflow: 'hidden', borderRadius: 16 },
-  cardInnerFlex: { flex: 1, display: 'flex', flexDirection: 'column' },
-  imageContainer: { position: 'relative' },
-  cardImage: { width: '100%', aspectRatio: 1.5, backgroundColor: '#E8E8E8' },
-  difficultyBadge: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+  container: {
+    flex: 1,
   },
-  textContainer: { flex: 1, padding: 16, paddingBottom: 24 },
-  cardTitle: { fontWeight: '700', fontSize: 20, lineHeight: 26 },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-  },
-  buttonRow: {
-    flexDirection: 'row', // Places the two buttons side-by-side
+  content: {
     width: '100%',
   },
-  halfWidthButton: {
-    flex: 1, // Ensures both buttons take exactly 50% of the row
-    borderRadius: 0,
-    margin: 0,
+  heroSurface: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    marginBottom: 32,
   },
-  fullWidthButton: { width: '100%', borderRadius: 0, margin: 0 },
-  buttonHeight: { height: 48, flexDirection: 'row-reverse' },
-  fullButtonLabel: { fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
-  splitButtonLabel: {
-    fontSize: 14, // Slightly smaller to ensure German words don't clip on small phones
-    fontWeight: '700',
-    letterSpacing: 0.2,
+  heroGradient: {
+    padding: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroContent: {
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  heroTitle: {
+    textAlign: 'center',
+    fontWeight: '800',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  heroSubtitle: {
+    textAlign: 'center',
+    marginBottom: 24,
+    opacity: 0.9,
+  },
+  ctaButton: {
+    borderRadius: 28,
+    elevation: 4,
+  },
+  ctaButtonContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  sectionCard: {
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  paragraph: {
+    lineHeight: 24,
+    opacity: 0.8,
+  },
+  stepsContainerWeb: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  stepsContainerMobile: {
+    flexDirection: 'column',
+    gap: 16,
+  },
+  stepCard: {
+    borderRadius: 16,
+    elevation: 1,
+  },
+  feedbackRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  changelogSection: {
+    marginTop: 32,
+  },
+  changelogDate: {
+    alignSelf: 'center',
+    opacity: 0.5,
   },
 });
