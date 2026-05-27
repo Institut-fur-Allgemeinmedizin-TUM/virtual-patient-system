@@ -34,13 +34,15 @@ export function AppHeader() {
           accessibilityLabel="App logo"
         />
         <Appbar.Content title={
-          <View style={{ flexDirection: 'column', justifyContent: 'center',}}>
-            <Text
-              style={[{ fontSize: 20, fontWeight: '600', color: '#C1CBD6' }]}
-            >
-              TUM Virtual Patient System
-            </Text>
-          </View>
+          <Pressable onPress={() => router.push('/')}>
+            <View style={{ flexDirection: 'column', justifyContent: 'center',}}>
+              <Text
+                style={[{ fontSize: 20, fontWeight: '600', color: '#C1CBD6' }]}
+              >
+                TUM Virtual Patient System
+              </Text>
+            </View>
+          </Pressable>
         }/>
 
         <Appbar.Action
