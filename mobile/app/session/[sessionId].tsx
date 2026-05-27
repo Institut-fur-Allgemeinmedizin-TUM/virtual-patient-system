@@ -11,6 +11,7 @@ import {
 import { useLocalSearchParams } from 'expo-router';
 import { Avatar, Button, IconButton, Surface, Text, TextInput, useTheme } from 'react-native-paper';
 import EvaluationModal from '../components/EvaluationModal';
+import DiagnosticsPanel from '../components/DiagnosticsPanel';
 import { useLiveAudioSession } from '@/hooks/useLiveAudioSession';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSessionStore } from '@/stores/useSessionStore';
@@ -57,6 +58,7 @@ export default function SessionScreen() {
   const isBotTyping = session.waitingForBotresponse ?? false;
 
   const [draft, setDraft] = useState('');
+  const [isDiagnosticsVisible, setIsDiagnosticsVisible] = useState(false);
   const messageScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -71,7 +73,11 @@ export default function SessionScreen() {
 
   // Layout Calculations
   const isMobile = width <= 768;
-  const sessionWidth = isMobile ? '100%' : Math.min(width - 24, 980);
+  const sidebarWidth = 300;
+  const gap = 16;
+  const sessionWidth = isMobile
+    ? '100%'
+    : Math.min(width - 40 - (isMobile ? 0 : sidebarWidth + gap), 980);
   const canSend = draft.trim().length > 0 && !isBotTyping;
 
   const sendMessage = () => {
@@ -172,18 +178,22 @@ export default function SessionScreen() {
           style={[
             styles.page,
             {
+              flexDirection: isMobile ? 'column' : 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
               paddingVertical: isMobile ? 0 : 12,
               paddingHorizontal: isMobile ? 0 : 12,
+              gap: isMobile ? 0 : 16,
             },
           ]}
         >
-          {/* Replaced Card with Surface to enforce strict Flexbox stretching */}
           <Surface
             elevation={1}
             style={[
               styles.chatSurface,
               {
                 width: sessionWidth,
+                height: isMobile ? '100%' : '100%',
                 borderRadius: isMobile ? 0 : 12,
                 backgroundColor: theme.colors.surface,
               },
@@ -198,6 +208,16 @@ export default function SessionScreen() {
                   {session.case?.patientOccupation}
                 </Text>
               </View>
+              {isMobile && (
+                <IconButton
+                  icon="medical-bag"
+                  mode="outlined"
+                  size={20}
+                  onPress={() => setIsDiagnosticsVisible(true)}
+                  style={{ marginRight: 8 }}
+                  accessibilityLabel="Diagnostik"
+                />
+              )}
               <Button
                 icon="chart-box-outline"
                 style={styles.evaluateButton}
@@ -424,8 +444,15 @@ export default function SessionScreen() {
               Antworten sind KI generiert!
             </Button>
           </Surface>
+
+          {!isMobile && <DiagnosticsPanel isMobile={false} />}
         </View>
       </KeyboardAvoidingView>
+      <DiagnosticsPanel
+        isMobile={true}
+        visible={isDiagnosticsVisible}
+        onClose={() => setIsDiagnosticsVisible(false)}
+      />
       <EvaluationModal />
     </SafeAreaView>
   );
@@ -447,8 +474,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   chatSurface: {
-    flex: 1, // Forces Surface to expand into page height
-    alignSelf: 'center',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
