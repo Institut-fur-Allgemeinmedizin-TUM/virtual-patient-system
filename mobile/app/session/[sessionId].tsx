@@ -34,7 +34,8 @@ function getSessionProfile(sessionId: string): SessionProfile {
     guidance: [
       'Nutzen Sie allgemeine, offene Fragen als Einstieg.',
       'Halten Sie das Gespräch strukturiert und verständlich.',
-      'Die echten Inhalte werden später vom Backend geladen.',
+      'Vermeiden Sie medizinischen Fachjargon und erklären Sie Begriffe bei Bedarf.',
+      'Nehmen Sie sich Zeit, um die Antworten des Patienten zu verstehen und darauf einzugehen.',
     ],
   };
 }
