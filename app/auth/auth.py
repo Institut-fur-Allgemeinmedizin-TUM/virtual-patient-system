@@ -92,9 +92,7 @@ def find_user_roles(oidc_id: Optional[str]) -> list[str]:
             return []
         return [role.name for role in user.roles]
 
-
-def get_current_user(request: Request) -> Optional[dict]:
-    token = request.cookies.get("session")
+def get_current_user_by_token(token: Optional[str]) -> Optional[dict]:
     if not token:
         return None
     try:
@@ -105,26 +103,21 @@ def get_current_user(request: Request) -> Optional[dict]:
         return user
     except HTTPException:
         return None
+
+def get_current_user(request: Request) -> Optional[dict]:
+    token = request.cookies.get("session")
+    return get_current_user_by_token(token)
 
 
 def get_current_user_websocket(websocket: WebSocket):
     token = websocket.cookies.get("session")
-    if not token:
-        return None
-    try:
-        user = oidc.verify(token)
-        # Determine user roles from the database
-        oidc_id = user.get("tum_id") or user.get("sub")
-        user["roles"] = find_user_roles(oidc_id)
-        return user
-    except HTTPException:
-        return None
+    return get_current_user_by_token(token)
 
 
 def require_user(request: Request) -> dict:
     if not settings.require_auth:
         # auth disabled; provide anonymous user
-        return {"sub": "anon", "name": "Anonymous", roles: []}
+        return {"sub": "anon", "name": "Anonymous", "roles": ["Default"]}
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
