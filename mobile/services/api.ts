@@ -45,23 +45,10 @@ export enum SessionHistoryColumn {
   ImprovementSuggestions = "improvement_suggestions",
 }
 
-/** FeedBackMarkerType */
-export enum FeedBackMarkerType {
-  None = "none",
-  Read = "read",
-  Important = "important",
-  LookAgain = "look_again",
-}
-
-/** DataType */
-export enum DataType {
-  Integer = "integer",
-  String = "string",
-  Float = "float",
-  ImagePng = "image/png",
-  ImageJpeg = "image/jpeg",
-  Video = "video",
-  Audio = "audio",
+/** MedicalBackgroundResponseType */
+export enum MedicalBackgroundResponseType {
+  Value1 = 1,
+  Value2 = 2,
 }
 
 /** AggregationFunction */
@@ -130,29 +117,6 @@ export interface CreateSessionResponse {
 export interface DiagnosisUpdate {
   /** Diagnosis */
   diagnosis: string;
-}
-
-/** DiagnosticGroup */
-export interface DiagnosticGroup {
-  /** Name */
-  name: string;
-  /** Display Name */
-  display_name: string;
-  /** Data */
-  data?: DiagnosticValue[] | null;
-}
-
-/** DiagnosticValue */
-export interface DiagnosticValue {
-  /** Name */
-  name: string;
-  /** Display Name */
-  display_name: string;
-  /** Unit */
-  unit: string;
-  data_type: DataType;
-  /** Data */
-  data: any;
 }
 
 /** EvaluationCriterion */
@@ -256,48 +220,13 @@ export interface HTTPValidationError {
   detail?: ValidationError[];
 }
 
-/** LeaderboardEntry */
-export interface LeaderboardEntry {
-  /** Rank */
-  rank: number;
-  /** Username */
-  username: string;
-  /** Average Points */
-  average_points: number;
-}
-
-/** LeaderboardResponse */
-export interface LeaderboardResponse {
-  /** Case Id */
-  case_id: string;
-  /** Top Entries */
-  top_entries: LeaderboardEntry[];
-}
-
-/** MedicalBackgroundsAvailableResponse */
-export interface MedicalBackgroundsAvailableResponse {
+/** MedicalBackgroundResponse */
+export interface MedicalBackgroundResponse {
+  type: MedicalBackgroundResponseType;
   /** Diagnostics Available */
-  diagnostics_available: DiagnosticGroup[];
-}
-
-/** PaginatedFeedbacksResponse */
-export interface PaginatedFeedbacksResponse {
-  /** Feedbacks */
-  feedbacks: UserSessionFeedBack[];
-  /** Total */
-  total: number;
-}
-
-/** RankingResponse */
-export interface RankingResponse {
-  /** Session Id */
-  session_id: string;
-  /** Rank */
-  rank: number;
-  /** Top Percentage */
-  top_percentage: number;
-  /** Total Participants */
-  total_participants: number;
+  diagnostics_available?: string[] | null;
+  /** Diagnostic Data */
+  diagnostic_data?: null;
 }
 
 /** SessionHistoryFilter */
@@ -451,8 +380,6 @@ export interface UserSessionFeedBack {
   feedback_score: number;
   /** Feedback Comment */
   feedback_comment: string;
-  /** @default "none" */
-  marker?: FeedBackMarkerType;
 }
 
 /** VHBLoginRequest */
@@ -477,6 +404,10 @@ export interface ValidationError {
   msg: string;
   /** Error Type */
   type: string;
+  /** Input */
+  input?: any;
+  /** Context */
+  ctx?: object;
   /** Input */
   input?: any;
   /** Context */
@@ -897,13 +828,19 @@ export class Api<
     setDiagnosisApiSessionsSessionIdDiagnosisPost: (
       sessionId: string,
       data: DiagnosisUpdate,
+     * @description Get all messages for a specific session.
+     *
+     * @name GetSessionMessagesApiSessionsSessionIdMessagesGet
+     * @summary Get Session Messages
+     * @request GET:/api/sessions/{session_id}/messages
+     */
+    getSessionMessagesApiSessionsSessionIdMessagesGet: (
+      sessionId: string,
       params: RequestParams = {},
     ) =>
-      this.request<any, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/diagnosis`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
+      this.request<SessionMessagesResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/messages`,
+        method: "GET",
         format: "json",
         ...params,
       }),
@@ -941,37 +878,53 @@ export class Api<
       }),
 
     /**
-     * @description Get feedback for a session.
+     * @description Evaluate anamnesis performance for a session.
      *
-     * @name GetFeedbackApiSessionsSessionIdFeedbackGet
-     * @summary Get Feedback
-     * @request GET:/api/sessions/{session_id}/feedback
+     * @name EvaluateSessionApiSessionsSessionIdEvaluatePost
+     * @summary Evaluate Session
+     * @request POST:/api/sessions/{session_id}/evaluate
      */
-    getFeedbackApiSessionsSessionIdFeedbackGet: (
+    evaluateSessionApiSessionsSessionIdEvaluatePost: (
       sessionId: string,
       params: RequestParams = {},
     ) =>
-      this.request<UserSessionFeedBack, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/feedback`,
+      this.request<EvaluationResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/evaluate`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get a summary of the last sessions the user did per case.
+     *
+     * @name GetLastSessionSummaryApiSessionsSummaryGet
+     * @summary Get Last Session Summary
+     * @request GET:/api/sessions/summary
+     */
+    getLastSessionSummaryApiSessionsSummaryGet: (params: RequestParams = {}) =>
+      this.request<SessionsSummaryResponse, any>({
+        path: `/api/sessions/summary`,
         method: "GET",
         format: "json",
         ...params,
       }),
 
     /**
-     * @description Create feedback for a session.
+     * @description Set current diagnosis of student
      *
-     * @name CreateFeedbackApiSessionsSessionIdFeedbackPost
-     * @summary Create Feedback
-     * @request POST:/api/sessions/{session_id}/feedback
+     * @name SetDiagnosisApiSessionsSessionIdDiagnosisPost
+     * @summary Set Diagnosis
+     * @request POST:/api/sessions/{session_id}/diagnosis
      */
-    createFeedbackApiSessionsSessionIdFeedbackPost: (
+    setDiagnosisApiSessionsSessionIdDiagnosisPost: (
       sessionId: string,
-      data: UserSessionFeedBack,
+      data: DiagnosisUpdate,
       params: RequestParams = {},
     ) =>
       this.request<any, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/feedback`,
+        path: `/api/sessions/${sessionId}/diagnosis`,
+        path: `/api/sessions/${sessionId}/diagnosis`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -1086,34 +1039,6 @@ export class Api<
         path: `/api/analytics/summary`,
         method: "GET",
         query: query,
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @name GetSessionsStatsApiAnalyticsSessionsStatsPost
-     * @summary Get Sessions Stats
-     * @request POST:/api/analytics/sessions/stats
-     */
-    getSessionsStatsApiAnalyticsSessionsStatsPost: (
-      data: GetSessionsHistoryRequest,
-      query?: {
-        /**
-         * As Csv
-         * @default false
-         */
-        as_csv?: boolean;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<GetSessionsHistoryResponse, HTTPValidationError>({
-        path: `/api/analytics/sessions/stats`,
-        method: "POST",
-        query: query,
-        body: data,
-        type: ContentType.Json,
         format: "json",
         ...params,
       }),
