@@ -87,6 +87,16 @@ def create_mobile_session_token(claims: dict) -> str:
     return oidc.sign(session_claims)
 
 
+class AuthenticatedUser(dict):
+    """A dictionary-like object representing the current user session with convenience methods for role checking."""
+
+    def is_admin(self) -> bool:
+        return DefaultRoles.admin.value in self.get("roles", [])
+
+    def is_tumuser(self) -> bool:
+        return DefaultRoles.tum_user.value in self.get("roles", [])
+
+
 def find_user_roles(oidc_id: Optional[str]) -> list[str]:
     """Find all roles assigned to a user by their OIDC ID."""
     if not oidc_id:
@@ -102,11 +112,11 @@ def get_current_user_by_token(token: Optional[str]) -> Optional[dict]:
     if not token:
         return None
     try:
-        user = oidc.verify(token)
+        user_dict = oidc.verify(token)
         # Determine user roles from the database
-        oidc_id = user.get("tum_id") or user.get("sub")
-        user["roles"] = find_user_roles(oidc_id)
-        return user
+        oidc_id = user_dict.get("tum_id") or user_dict.get("sub")
+        user_dict["roles"] = find_user_roles(oidc_id)
+        return AuthenticatedUser(user_dict)
     except HTTPException:
         return None
 
@@ -115,24 +125,28 @@ def get_current_user(request: Request) -> Optional[dict]:
     return get_current_user_by_token(token)
 
 
-def get_current_user_websocket(websocket: WebSocket):
+def get_current_user_websocket(websocket: WebSocket) -> Optional[AuthenticatedUser]:
     token = websocket.cookies.get("session")
     return get_current_user_by_token(token)
 
 
-def require_user(request: Request) -> dict:
+def require_user(request: Request) -> AuthenticatedUser:
     if not settings.require_auth:
         # auth disabled; provide anonymous user
-        return {"sub": "anon", "name": "Anonymous", "roles": [DefaultRoles.default]}
+        return AuthenticatedUser(
+            {"sub": "anon", "name": "Anonymous", "roles": [DefaultRoles.default]}
+        )
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
 
 
-def require_user_websocket(websocket: WebSocket):
+def require_user_websocket(websocket: WebSocket) -> AuthenticatedUser:
     if not settings.require_auth:
-        return {"sub": "anon", "name": "Anonymous", "roles": [DefaultRoles.default]}
+        return AuthenticatedUser(
+            {"sub": "anon", "name": "Anonymous", "roles": [DefaultRoles.default]}
+        )
     user = get_current_user_websocket(websocket)
     if not user:
         raise WebSocketDisconnect(reason="Not authenticated")

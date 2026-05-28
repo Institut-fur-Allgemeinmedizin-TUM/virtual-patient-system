@@ -76,6 +76,12 @@ class User(Base):
     )
     sessions: Mapped[List["Session"]] = relationship(back_populates="user")
 
+    def is_admin(self) -> bool:
+        return any(role.name == DefaultRoles.admin.value for role in self.roles)
+
+    def is_tumuser(self) -> bool:
+        return any(role.name == DefaultRoles.tum_user.value for role in self.roles)
+
 
 class Case(Base):
     __tablename__ = "cases"
