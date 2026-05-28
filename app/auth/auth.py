@@ -4,18 +4,18 @@ from typing import Optional
 import httpx
 from fastapi import HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
-from sqlalchemy.sql import roles
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from app.auth import oidc
 from app.config.config import settings
 from app.db.db import SessionLocal
-from app.model.models import User, Role
+from app.model.models import User, Role, DefaultRoles
 
 
 def sync_user_to_db(claims: dict) -> None:
     """Ensure user exists in the database and has default roles."""
-    oidc_id = oidc.extract_tum_id_from_claims(claims) or claims.get("sub")
+    tum_id = oidc.extract_tum_id_from_claims(claims)
+    oidc_id = tum_id or claims.get("sub")
     if not oidc_id:
         return
 
@@ -27,9 +27,15 @@ def sync_user_to_db(claims: dict) -> None:
             db.add(user)
 
             # Assign default role if it exists
-            default_role = db.query(Role).filter(Role.name == "Default").first()
+            default_role = db.query(Role).filter(Role.name == DefaultRoles.default).first()
             if default_role:
                 user.roles.append(default_role)
+
+            # Assign TUMUser role if it's a TUM user
+            if tum_id:
+                tum_role = db.query(Role).filter(Role.name == DefaultRoles.tum_user).first()
+                if tum_role:
+                    user.roles.append(tum_role)
 
             db.commit()
 
@@ -117,7 +123,7 @@ def get_current_user_websocket(websocket: WebSocket):
 def require_user(request: Request) -> dict:
     if not settings.require_auth:
         # auth disabled; provide anonymous user
-        return {"sub": "anon", "name": "Anonymous", "roles": ["Default"]}
+        return {"sub": "anon", "name": "Anonymous", "roles": [DefaultRoles.default]}
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -126,7 +132,7 @@ def require_user(request: Request) -> dict:
 
 def require_user_websocket(websocket: WebSocket):
     if not settings.require_auth:
-        return {"sub": "anon", "name": "Anonymous"}
+        return {"sub": "anon", "name": "Anonymous", "roles": [DefaultRoles.default]}
     user = get_current_user_websocket(websocket)
     if not user:
         raise WebSocketDisconnect(reason="Not authenticated")

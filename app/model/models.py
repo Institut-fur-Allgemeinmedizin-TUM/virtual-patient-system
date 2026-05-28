@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -17,6 +18,13 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+class DefaultRoles(str, Enum):
+    admin = "Admin"
+    default = "Default"
+    tum_user = "TUMUser"
+    tester = "Tester"
+
 
 SessionLiveDefaultTime = 600
 UserMaxDailyUsage = 1800

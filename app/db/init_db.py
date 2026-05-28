@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
-from app.model.models import Role
+from app.model.models import Role, DefaultRoles
 
 def init_roles(db: Session) -> None:
     default_roles = [
-        {"name": "Admin", "description": "Administrator with full access"},
-        {"name": "Default", "description": "Default user role"},
-        {"name": "Tester", "description": "Role for testing purposes"},
+        {"name": DefaultRoles.admin, "description": "Administrator with full access"},
+        {"name": DefaultRoles.default, "description": "Default user role"},
+        {"name": DefaultRoles.tum_user, "description": "Authenticated TUM user"},
+        {"name": DefaultRoles.tester, "description": "Role for testing purposes"},
     ]
     
     for role_data in default_roles:
