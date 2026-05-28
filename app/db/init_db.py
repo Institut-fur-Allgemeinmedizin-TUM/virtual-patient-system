@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.model.models import Role, DefaultRoles
+from app.model.models import Role, DefaultRoles, User
 
 def init_roles(db: Session) -> None:
     default_roles = [
@@ -16,3 +16,17 @@ def init_roles(db: Session) -> None:
             db.add(new_role)
     
     db.commit()
+
+def init_anon_user(db: Session) -> None:
+    """Ensure the anonymous user exists in the database if authentication is disabled."""
+    anon_user = db.query(User).filter(User.oidc_id == "anon").first()
+    if not anon_user:
+        anon_user = User(oidc_id="anon")
+        db.add(anon_user)
+        
+        # Assign default role
+        default_role = db.query(Role).filter(Role.name == DefaultRoles.default).first()
+        if default_role:
+            anon_user.roles.append(default_role)
+            
+        db.commit()

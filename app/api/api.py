@@ -11,7 +11,7 @@ from starlette.responses import RedirectResponse
 from app.api import auth, session, util, health, user, medical_background
 from app.config.config import settings
 from app.db.db import SessionLocal
-from app.db.init_db import init_roles
+from app.db.init_db import init_roles, init_anon_user
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,6 +19,8 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         init_roles(db)
+        if not settings.require_auth:
+            init_anon_user(db)
     finally:
         db.close()
     yield
