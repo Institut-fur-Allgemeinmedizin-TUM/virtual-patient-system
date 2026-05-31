@@ -27,6 +27,7 @@ const TUM_LIGHT = '#E6F0FA';
 
 export default function LandingPage() {
   const theme = useTheme();
+  const styles = createStyles(theme);
   const router = useRouter();
   const { width } = useWindowDimensions();
   const cases = useCasesStore((state) => state.cases);
@@ -59,6 +60,16 @@ export default function LandingPage() {
   const maxWidth = 1100;
 
   const getDifficultyStyle = (difficulty: string) => {
+    if (theme.dark) {
+      switch (difficulty) {
+        case 'Leicht':
+          return { bg: '#1b2e1d', text: '#81c784' };
+        case 'Schwer':
+          return { bg: '#2c1515', text: '#e57373' };
+        default:
+          return { bg: '#2b261b', text: '#ffd54f' };
+      }
+    }
     switch (difficulty) {
       case 'Leicht':
         return { bg: '#e8f5e9', text: '#2e7d32' };
@@ -431,9 +442,10 @@ export default function LandingPage() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
   },
   contentWrapper: {
     width: '100%',
@@ -514,11 +526,11 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 56,
   },
   sectionTitle: {
     fontWeight: '800',
-    color: TUM_DARK,
+    color: theme.colors.onSurface,
     textAlign: 'center',
   },
   titleDivider: {
@@ -527,12 +539,14 @@ const styles = StyleSheet.create({
     backgroundColor: TUM_BLUE,
     borderRadius: 3,
     marginTop: 10,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   sectionSub: {
-    color: '#6b7280',
+    color: theme.colors.onSurfaceVariant,
     textAlign: 'center',
-    maxWidth: 600,
+    maxWidth: 700,
+    lineHeight: 24,
+    marginTop: 4,
   },
   stepsGridWeb: {
     flexDirection: 'row',
@@ -545,7 +559,7 @@ const styles = StyleSheet.create({
   },
   stepCard: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
@@ -568,7 +582,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: theme.colors.surface,
   },
   stepNumText: {
     color: '#fff',
@@ -577,11 +591,11 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     fontWeight: '700',
-    color: TUM_DARK,
+    color: theme.colors.onSurface,
     marginBottom: 8,
   },
   stepDesc: {
-    color: '#6b7280',
+    color: theme.colors.onSurfaceVariant,
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -592,18 +606,18 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   featureCard: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 20,
     flexDirection: 'row',
     gap: 16,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: theme.colors.outlineVariant,
   },
   featureIconBox: {
     width: 48,
     height: 48,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: theme.dark ? theme.colors.surfaceVariant : '#f3f4f6',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -613,7 +627,7 @@ const styles = StyleSheet.create({
   },
   featureTitle: {
     fontWeight: '700',
-    color: TUM_DARK,
+    color: theme.colors.onSurface,
   },
   betaBadge: {
     backgroundColor: TUM_BLUE,
@@ -628,7 +642,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   featureDesc: {
-    color: '#6b7280',
+    color: theme.colors.onSurfaceVariant,
     marginTop: 4,
     lineHeight: 18,
   },
@@ -640,24 +654,24 @@ const styles = StyleSheet.create({
   evalCard: {
     padding: 20,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: theme.colors.outlineVariant,
   },
   evalDim: {
     fontSize: 10,
     fontWeight: '800',
-    color: TUM_BLUE,
+    color: theme.colors.primary,
     textTransform: 'uppercase',
     marginBottom: 6,
   },
   evalTitle: {
     fontWeight: '700',
-    color: TUM_DARK,
+    color: theme.colors.onSurface,
     marginBottom: 6,
   },
   evalDesc: {
-    color: '#6b7280',
+    color: theme.colors.onSurfaceVariant,
     lineHeight: 16,
   },
   evalStars: {
@@ -668,15 +682,15 @@ const styles = StyleSheet.create({
   starBar: {
     height: 4,
     flex: 1,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: theme.colors.outlineVariant,
     borderRadius: 2,
   },
   starBarFilled: {
-    backgroundColor: TUM_BLUE,
+    backgroundColor: theme.colors.primary,
   },
   scaleInfo: {
     marginTop: 32,
-    backgroundColor: TUM_LIGHT,
+    backgroundColor: theme.colors.primaryContainer,
     borderRadius: 12,
     padding: 20,
     alignItems: 'center',
@@ -684,7 +698,7 @@ const styles = StyleSheet.create({
   scaleInfoTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: TUM_DARK,
+    color: theme.colors.onPrimaryContainer,
     marginBottom: 10,
   },
   scaleRow: {
@@ -705,7 +719,7 @@ const styles = StyleSheet.create({
   },
   scaleItemText: {
     fontSize: 12,
-    color: '#4b5563',
+    color: theme.colors.onPrimaryContainer,
   },
   casesGrid: {
     flexDirection: 'row',
@@ -714,7 +728,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   caseCard: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     overflow: 'hidden',
   },
@@ -740,15 +754,15 @@ const styles = StyleSheet.create({
   },
   caseTitle: {
     fontWeight: '800',
-    color: TUM_DARK,
+    color: theme.colors.onSurface,
   },
   caseSubtext: {
-    color: '#6b7280',
+    color: theme.colors.onSurfaceVariant,
     marginTop: 4,
   },
   disclaimer: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: theme.colors.outline,
     textAlign: 'center',
     maxWidth: 500,
   },
