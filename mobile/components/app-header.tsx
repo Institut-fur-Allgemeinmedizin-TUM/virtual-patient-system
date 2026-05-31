@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { Appbar, Divider, Drawer, Modal, Portal, Surface, useTheme } from 'react-native-paper';
+import { Appbar, Button, Divider, Drawer, Modal, Portal, Surface, useTheme } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useThemeStore } from '@/stores/useThemeStore';
-import { router } from 'expo-router';
+import { useUIStore } from '@/stores/useUIStore';
+import { router, usePathname } from 'expo-router';
 
-import {grey600, grey50} from "react-native-paper/src/styles/themes/v2/colors";
 import {appVersion} from "@/lib/util";
 
 export function AppHeader() {
   const { width } = useWindowDimensions();
   const { colors } = useTheme();
+  const pathname = usePathname();
   const sidebarWidth = Math.min(Math.max(width * 0.78, 260), 340);
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
   const tumId = useAuthStore((state) => state.user?.tum_id);
   const themeMode = useThemeStore((state) => state.mode);
-  const theme = useTheme();
+  const requestScroll = useUIStore((state) => state.requestScroll);
+
   const logout = async () => {
     await useAuthStore.getState().logout();
   };
   const switchTheme = () => {
     useThemeStore.getState().toggleMode();
   };
+
+  const isLandingPage = pathname === '/' || pathname === '/(caseOverview)' || pathname === '/(caseOverview)/';
+  const showDesktopNav = width > 900 && isLandingPage;
 
   return (
     <>
@@ -35,13 +40,50 @@ export function AppHeader() {
         />
         <Appbar.Content title={
           <Pressable onPress={() => router.push('/')}>
-            <View style={{ flexDirection: 'column', justifyContent: 'center',}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text
                 style={[{ fontSize: 20, fontWeight: '600', color: '#C1CBD6' }]}
               >
                 TUM Virtual Patient System
               </Text>
-            </View>
+              
+            {showDesktopNav && (
+              <View style={styles.desktopNav}>
+                <Button 
+                  mode="text" 
+                  textColor="#C1CBD6" 
+                  onPress={() => requestScroll('howto')}
+                  labelStyle={styles.navLabel}
+                >
+                  Anleitung
+                </Button>
+                <Button 
+                  mode="text" 
+                  textColor="#C1CBD6" 
+                  onPress={() => requestScroll('functions')}
+                  labelStyle={styles.navLabel}
+                >
+                  Funktionen
+                </Button>
+                <Button 
+                  mode="text" 
+                  textColor="#C1CBD6" 
+                  onPress={() => requestScroll('evaluation')}
+                  labelStyle={styles.navLabel}
+                >
+                  Bewertung
+                </Button>
+                <Button 
+                  mode="text" 
+                  textColor="#C1CBD6" 
+                  onPress={() => requestScroll('cases')}
+                  labelStyle={styles.navLabel}
+                >
+                  Fälle
+                </Button>
+              </View>
+            )}
+          </View>
           </Pressable>
         }/>
 
@@ -140,6 +182,16 @@ export function AppHeader() {
 }
 
 const styles = StyleSheet.create({
+  desktopNav: {
+    flexDirection: 'row',
+    marginLeft: 30,
+    gap: 10,
+  },
+  navLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    textTransform: 'none',
+  },
   sidebarModalContainer: {
     flex: 1,
     margin: 0,
