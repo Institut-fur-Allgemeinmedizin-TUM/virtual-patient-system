@@ -12,6 +12,7 @@ import {
   Surface,
   TouchableRipple,
   Button,
+  Icon,
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,10 +22,10 @@ import { useSessionStore } from '@/stores/useSessionStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { getCaseImage } from '@/lib/cases/case';
 import { Image } from 'expo-image';
+import EvaluationModal from '../components/EvaluationModal';
 
 const TUM_BLUE = '#0065BD';
 const TUM_DARK = '#003359';
-const TUM_LIGHT = '#E6F0FA';
 
 export default function LandingPage() {
   const theme = useTheme();
@@ -32,7 +33,10 @@ export default function LandingPage() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const cases = useCasesStore((state) => state.cases);
+  const loaded = useCasesStore((state) => state.loaded);
+  const sessionScores = useCasesStore((state) => state.sessionScores);
   const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
+  const loadSessionSummaries = useCasesStore((state) => state.loadSessionSummaries);
   const startCase = useSessionStore((state) => state.startSession);
   
   const scrollRef = useRef<ScrollView>(null);
@@ -45,10 +49,17 @@ export default function LandingPage() {
   }, [loadAndGetCases]);
 
   useEffect(() => {
+    if (loaded) {
+      void loadSessionSummaries();
+    }
+  }, [loaded, loadSessionSummaries]);
+
+  useEffect(() => {
     if (scrollRequest) {
       const y = sectionPositions.current[scrollRequest.section];
       if (y !== undefined) {
         scrollRef.current?.scrollTo({ y, animated: true });
+        useUIStore.setState({ scrollRequest: null });
       }
     }
   }, [scrollRequest]);
@@ -58,7 +69,6 @@ export default function LandingPage() {
   };
 
   const isWeb = width > 768;
-  const maxWidth = 1100;
 
   const getDifficultyStyle = (difficulty: string) => {
     if (theme.dark) {
@@ -79,6 +89,12 @@ export default function LandingPage() {
       default:
         return { bg: '#fffbeb', text: '#92400e' };
     }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score <= 2.5) return '#d93025'; // red
+    if (score <= 4) return '#d67e00'; // orange
+    return '#0b7f5a'; // green
   };
 
   const sections = {
@@ -120,7 +136,7 @@ export default function LandingPage() {
 
               <View style={styles.heroStats}>
                 {[
-                  { label: 'Fallszenarien', value: '7' },
+                  { label: 'Fallszenarien', value: String(cases.length) },
                   { label: 'Bewertungsdimensionen', value: '8' },
                   { label: 'Wiederholungen', value: '∞' },
                   { label: 'Verfügbar', value: '24/7' },
@@ -219,7 +235,7 @@ export default function LandingPage() {
                 icon: '🎙️',
                 title: 'Spracheingabe',
                 beta: true,
-                desc: 'Spreche deine Fragen direkt ins Mikrofon. Die Live-Funktion transkribiert in Echtzeit. (Beta: Einzelne Fehler möglich)',
+                desc: 'Sprich deine Fragen direkt ins Mikrofon. Die Live-Funktion transkribiert in Echtzeit. (Beta: Einzelne Fehler möglich)',
               },
               {
                 icon: '🤖',
@@ -369,7 +385,7 @@ export default function LandingPage() {
             </Text>
             <View style={styles.titleDivider} />
             <Text variant="bodyMedium" style={styles.sectionSub}>
-              Sieben Fallszenarien zu typischen allgemeinmedizinischen Beratungsanlässen
+              Fallszenarien zu typischen allgemeinmedizinischen Beratungsanlässen
             </Text>
           </View>
 
@@ -378,6 +394,11 @@ export default function LandingPage() {
               const mockDifficulty =
                 index % 3 === 0 ? 'Leicht' : index % 3 === 1 ? 'Mittel' : 'Schwer';
               const diffStyle = getDifficultyStyle(mockDifficulty);
+
+              const sessionInfo: { sessionId: string; score: number } = sessionScores[item.id];
+              const score = sessionInfo ? sessionInfo.score : null;
+              const hasScore = typeof score === 'number';
+
               return (
                 <Surface
                   key={item.id}
@@ -391,7 +412,7 @@ export default function LandingPage() {
                     }}
                     style={{ flex: 1 }}
                   >
-                    <View>
+                    <View style={{ flex: 1 }}>
                       <View style={styles.caseImageContainer}>
                         <Image
                           source={getCaseImage(item.imageName)}
@@ -413,6 +434,81 @@ export default function LandingPage() {
                           {item.patientOccupation}
                         </Text>
                       </View>
+
+                      <View>
+                        {hasScore && (
+                          <View
+                            style={[
+                              styles.statusRow,
+                              { borderTopColor: theme.colors.outlineVariant },
+                            ]}
+                          >
+                            <Icon source="check-circle" color={getScoreColor(score)} size={14} />
+                            <Text
+                              variant="bodySmall"
+                              style={{
+                                color: getScoreColor(score),
+                                marginLeft: 6,
+                                fontWeight: '600',
+                                marginTop: Platform.OS === 'web' ? 0 : 4,
+                              }}
+                            >
+                              Absolviert • Letzter Score: {score.toFixed(2)}
+                            </Text>
+                          </View>
+                        )}
+
+                        {hasScore ? (
+                          <View style={styles.buttonRow}>
+                            <Button
+                              mode="contained-tonal"
+                              onPress={() => {
+                                const sessionInfo = sessionScores[item.id];
+                                if (!sessionInfo || !sessionInfo.sessionId) return;
+                                useSessionStore.setState({
+                                  sessionId: sessionInfo.sessionId,
+                                  evaluationResponse: undefined,
+                                  waitingForEvaluationResponse: false,
+                                });
+                                useSessionStore.getState().evaluate();
+                              }}
+                              icon="chart-box-outline"
+                              style={styles.halfWidthButton}
+                              contentStyle={styles.buttonHeight}
+                              labelStyle={styles.splitButtonLabel}
+                            >
+                              Ergebnis
+                            </Button>
+                            <Button
+                              mode="contained"
+                              onPress={async () => {
+                                const sessionId = await startCase(item.id, item);
+                                if (sessionId) router.push(`/session/${sessionId}`);
+                              }}
+                              icon="refresh"
+                              style={styles.halfWidthButton}
+                              contentStyle={styles.buttonHeight}
+                              labelStyle={styles.splitButtonLabel}
+                            >
+                              Wiederholen
+                            </Button>
+                          </View>
+                        ) : (
+                          <Button
+                            mode="contained"
+                            onPress={async () => {
+                              const sessionId = await startCase(item.id, item);
+                              if (sessionId) router.push(`/session/${sessionId}`);
+                            }}
+                            icon="play"
+                            style={styles.fullWidthButton}
+                            contentStyle={styles.buttonHeight}
+                            labelStyle={styles.fullButtonLabel}
+                          >
+                            Fall starten
+                          </Button>
+                        )}
+                      </View>
                     </View>
                   </TouchableRipple>
                 </Surface>
@@ -432,39 +528,42 @@ export default function LandingPage() {
   };
 
   return (
-    <ScrollView style={styles.container} ref={scrollRef}>
-      <Animated.View 
-        entering={FadeInUp.duration(800).delay(0).springify()}
-        onLayout={onLayout('hero')}
-      >
-        {sections.hero}
-      </Animated.View>
-      <Animated.View 
-        entering={FadeInUp.duration(800).delay(200).springify()}
-        onLayout={onLayout('howto')}
-      >
-        {sections.howto}
-      </Animated.View>
-      <Animated.View 
-        entering={FadeInUp.duration(800).delay(400).springify()}
-        onLayout={onLayout('functions')}
-      >
-        {sections.functions}
-      </Animated.View>
-      <Animated.View 
-        entering={FadeInUp.duration(800).delay(600).springify()}
-        onLayout={onLayout('evaluation')}
-      >
-        {sections.evaluation}
-      </Animated.View>
-      <Animated.View 
-        entering={FadeInUp.duration(800).delay(800).springify()}
-        onLayout={onLayout('cases')}
-      >
-        {sections.cases}
-      </Animated.View>
-      <View style={{ height: 60 }} />
-    </ScrollView>
+    <>
+      <ScrollView style={styles.container} ref={scrollRef}>
+        <Animated.View 
+          entering={FadeInUp.duration(800).delay(0).springify()}
+          onLayout={onLayout('hero')}
+        >
+          {sections.hero}
+        </Animated.View>
+        <Animated.View 
+          entering={FadeInUp.duration(800).delay(200).springify()}
+          onLayout={onLayout('howto')}
+        >
+          {sections.howto}
+        </Animated.View>
+        <Animated.View 
+          entering={FadeInUp.duration(800).delay(400).springify()}
+          onLayout={onLayout('functions')}
+        >
+          {sections.functions}
+        </Animated.View>
+        <Animated.View 
+          entering={FadeInUp.duration(800).delay(600).springify()}
+          onLayout={onLayout('evaluation')}
+        >
+          {sections.evaluation}
+        </Animated.View>
+        <Animated.View 
+          entering={FadeInUp.duration(800).delay(800).springify()}
+          onLayout={onLayout('cases')}
+        >
+          {sections.cases}
+        </Animated.View>
+        <View style={{ height: 60 }} />
+      </ScrollView>
+      <EvaluationModal />
+    </>
   );
 }
 
@@ -777,6 +876,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   caseTextContainer: {
     padding: 16,
+    flex: 1,
   },
   caseTitle: {
     fontWeight: '800',
@@ -785,6 +885,30 @@ const createStyles = (theme: any) => StyleSheet.create({
   caseSubtext: {
     color: theme.colors.onSurfaceVariant,
     marginTop: 4,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    width: '100%',
+  },
+  halfWidthButton: {
+    flex: 1,
+    borderRadius: 0,
+    margin: 0,
+  },
+  fullWidthButton: { width: '100%', borderRadius: 0, margin: 0 },
+  buttonHeight: { height: 48, flexDirection: 'row-reverse' },
+  fullButtonLabel: { fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
+  splitButtonLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
   disclaimer: {
     fontSize: 12,

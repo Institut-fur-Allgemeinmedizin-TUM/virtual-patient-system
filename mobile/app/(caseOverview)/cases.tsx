@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { FlatList, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { Button, Text, Avatar, useTheme, Surface, TouchableRipple, Icon } from 'react-native-paper';
+import { Button, Text, useTheme, Surface, TouchableRipple, Icon } from 'react-native-paper';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { router } from 'expo-router';
