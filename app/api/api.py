@@ -33,6 +33,7 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
     docs_url="/api/docs",
+    openapi_url="/api/openapi.json",
 )
 app.include_router(auth.authRouter)
 app.include_router(session.sessionRouter)

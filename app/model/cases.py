@@ -16,13 +16,17 @@ class CaseItemModel(BaseModel):
 class GetCasesResponse(BaseModel):
     cases: list[CaseItemModel]
 
+class DiagnosticValue(BaseModel):
+    name: str
+    display_name: str
+    unit: str
+    data_type: str
+    data: Any
 
-class MedicalBackgroundResponseType(Enum):
-    LIST_AVAILABLE = 1
-    DIAGNOSTIC_RESPONSE = 2
+class DiagnosticGroup(BaseModel):
+    name: str
+    display_name: str
+    data: Optional[list[DiagnosticValue]] = None
 
-
-class MedicalBackgroundResponse(BaseModel):  #
-    type: MedicalBackgroundResponseType
-    diagnostics_available: Optional[list[str]] = None
-    diagnostic_data: Optional[Any] = None
+class MedicalBackgroundsAvailableResponse(BaseModel):
+    diagnostics_available: list[DiagnosticGroup]

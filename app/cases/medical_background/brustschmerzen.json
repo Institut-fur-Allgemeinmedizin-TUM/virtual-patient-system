@@ -1,10 +1,54 @@
 {
   "vital_params": {
-    "heart_rate": 78,
-    "blood_pressure_right": "128/82",
-    "blood_pressure_left": "126/80",
-    "oxygen_saturation": 98,
-    "respiratory_rate": 16,
-    "temperature": 36.7
+    "display_name": "Vitalparameter",
+    "data": {
+      "heart_rate": {
+        "display_name": "Herzfrequenz",
+        "unit": "bpm",
+        "data_type": "integer",
+        "data": 78
+      },
+      "blood_pressure_right": {
+        "display_name": "Blutdruck rechts",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "128/82"
+      },
+      "blood_pressure_left": {
+        "display_name": "Blutdruck links",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "126/80"
+      },
+      "oxygen_saturation": {
+        "display_name": "Sauerstoffsättigung",
+        "unit": "%",
+        "data_type": "integer",
+        "data": 98
+      },
+      "respiratory_rate": {
+        "display_name": "Atemfrequenz",
+        "unit": "Atemzüge pro Minute",
+        "data_type": "integer",
+        "data": 16
+      },
+      "temperature": {
+        "display_name": "Körpertemperatur",
+        "unit": "°C",
+        "data_type": "float",
+        "data": 36.7
+      }
+    }
+  },
+  "image_sample": {
+    "display_name": "Image Sample",
+    "data": {
+      "ekg": {
+        "display_name": "EKG",
+        "unit": "",
+        "data_type": "image/png",
+        "data": "path:app/cases/medical_background/sample_image.png"
+      }
+    }
   }
 }
