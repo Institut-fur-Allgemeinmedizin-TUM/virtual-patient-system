@@ -15,6 +15,7 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { useUIStore } from '@/stores/useUIStore';
@@ -82,7 +83,7 @@ export default function LandingPage() {
 
   const sections = {
     hero: (
-      <View style={styles.heroContainer} onLayout={onLayout('hero')}>
+      <View style={styles.heroContainer}>
         <LinearGradient
           colors={[TUM_DARK, TUM_BLUE]}
           style={styles.heroGradient}
@@ -136,7 +137,7 @@ export default function LandingPage() {
       </View>
     ),
     howto: (
-      <View style={[styles.section, { backgroundColor: theme.colors.background }]} onLayout={onLayout('howto')}>
+      <View style={[styles.section, { backgroundColor: theme.colors.background }]}>
         <View style={styles.contentWrapper}>
           <View style={styles.sectionHeader}>
             <Text variant="headlineSmall" style={styles.sectionTitle}>
@@ -195,7 +196,7 @@ export default function LandingPage() {
       </View>
     ),
     functions: (
-      <View style={[styles.section, { backgroundColor: theme.colors.surface }]} onLayout={onLayout('functions')}>
+      <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.contentWrapper}>
           <View style={styles.sectionHeader}>
             <Text variant="headlineSmall" style={styles.sectionTitle}>
@@ -267,7 +268,7 @@ export default function LandingPage() {
       </View>
     ),
     evaluation: (
-      <View style={[styles.section, { backgroundColor: theme.colors.background }]} onLayout={onLayout('evaluation')}>
+      <View style={[styles.section, { backgroundColor: theme.colors.background }]}>
         <View style={styles.contentWrapper}>
           <View style={styles.sectionHeader}>
             <Text variant="headlineSmall" style={styles.sectionTitle}>
@@ -360,7 +361,7 @@ export default function LandingPage() {
       </View>
     ),
     cases: (
-      <View style={[styles.section, { backgroundColor: theme.colors.surface }]} onLayout={onLayout('cases')}>
+      <View style={[styles.section, { backgroundColor: theme.colors.surface }]}>
         <View style={styles.contentWrapper}>
           <View style={styles.sectionHeader}>
             <Text variant="headlineSmall" style={styles.sectionTitle}>
@@ -432,11 +433,36 @@ export default function LandingPage() {
 
   return (
     <ScrollView style={styles.container} ref={scrollRef}>
-      {sections.hero}
-      {sections.howto}
-      {sections.functions}
-      {sections.evaluation}
-      {sections.cases}
+      <Animated.View 
+        entering={FadeInUp.duration(800).delay(0).springify()}
+        onLayout={onLayout('hero')}
+      >
+        {sections.hero}
+      </Animated.View>
+      <Animated.View 
+        entering={FadeInUp.duration(800).delay(200).springify()}
+        onLayout={onLayout('howto')}
+      >
+        {sections.howto}
+      </Animated.View>
+      <Animated.View 
+        entering={FadeInUp.duration(800).delay(400).springify()}
+        onLayout={onLayout('functions')}
+      >
+        {sections.functions}
+      </Animated.View>
+      <Animated.View 
+        entering={FadeInUp.duration(800).delay(600).springify()}
+        onLayout={onLayout('evaluation')}
+      >
+        {sections.evaluation}
+      </Animated.View>
+      <Animated.View 
+        entering={FadeInUp.duration(800).delay(800).springify()}
+        onLayout={onLayout('cases')}
+      >
+        {sections.cases}
+      </Animated.View>
       <View style={{ height: 60 }} />
     </ScrollView>
   );
