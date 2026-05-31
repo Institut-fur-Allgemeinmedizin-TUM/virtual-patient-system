@@ -1,19 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-  Platform,
-} from 'react-native';
-import {
-  Text,
-  useTheme,
-  Surface,
-  TouchableRipple,
-  Button,
-  Icon,
-} from 'react-native-paper';
+import { ScrollView, StyleSheet, View, useWindowDimensions, Platform } from 'react-native';
+import { Text, useTheme, Surface, TouchableRipple, Button, Icon } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp } from 'react-native-reanimated';
@@ -38,7 +25,7 @@ export default function LandingPage() {
   const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
   const loadSessionSummaries = useCasesStore((state) => state.loadSessionSummaries);
   const startCase = useSessionStore((state) => state.startSession);
-  
+
   const scrollRef = useRef<ScrollView>(null);
   const sectionPositions = useRef<Record<string, number>>({});
   const scrollRequest = useUIStore((state) => state.scrollRequest);
@@ -111,7 +98,7 @@ export default function LandingPage() {
               <Surface style={styles.heroBadge} elevation={0}>
                 <Text style={styles.heroBadgeText}>Institut für Allgemeinmedizin · TU München</Text>
               </Surface>
-              <Text variant={isWeb ? "displayMedium" : "displaySmall"} style={styles.heroTitle}>
+              <Text variant={isWeb ? 'displayMedium' : 'displaySmall'} style={styles.heroTitle}>
                 KI-gestütztes{'\n'}
                 <Text style={{ color: '#7ec8ff' }}>Anamnesetraining</Text>
               </Text>
@@ -258,7 +245,10 @@ export default function LandingPage() {
                 desc: 'Es werden keine personenbezogenen Daten erhoben. Die Nutzung erfolgt über anonyme IDs.',
               },
             ].map((feature, i) => (
-              <View key={i} style={[styles.featureCard, isWeb ? { width: '31.5%' } : { width: '100%' }]}>
+              <View
+                key={i}
+                style={[styles.featureCard, isWeb ? { width: '31.5%' } : { width: '100%' }]}
+              >
                 <View style={styles.featureIconBox}>
                   <Text style={styles.featureEmoji}>{feature.icon}</Text>
                 </View>
@@ -292,7 +282,11 @@ export default function LandingPage() {
             </Text>
             <View style={styles.titleDivider} />
             <Text variant="bodyMedium" style={styles.sectionSub}>
-              Die Bewertung basiert auf dem <Text style={{ fontWeight: '700' }}>Clinical Reasoning Interview – History Taking Scale (CRI-HTS)</Text> mit 8 Kompetenzdimensionen.
+              Die Bewertung basiert auf dem{' '}
+              <Text style={{ fontWeight: '700' }}>
+                Clinical Reasoning Interview – History Taking Scale (CRI-HTS)
+              </Text>{' '}
+              mit 8 Kompetenzdimensionen.
             </Text>
           </View>
 
@@ -339,7 +333,11 @@ export default function LandingPage() {
                 p: 'Reflexion: Wurden gefährliche Diagnosen priorisiert?',
               },
             ].map((dim, i) => (
-              <Surface key={i} style={[styles.evalCard, isWeb ? { width: '23%' } : { width: '100%' }]} elevation={1}>
+              <Surface
+                key={i}
+                style={[styles.evalCard, isWeb ? { width: '23%' } : { width: '100%' }]}
+                elevation={1}
+              >
                 <Text style={styles.evalDim}>Dimension {dim.d}</Text>
                 <Text variant="titleSmall" style={styles.evalTitle}>
                   {dim.t}
@@ -530,31 +528,31 @@ export default function LandingPage() {
   return (
     <>
       <ScrollView style={styles.container} ref={scrollRef}>
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.duration(800).delay(0).springify()}
           onLayout={onLayout('hero')}
         >
           {sections.hero}
         </Animated.View>
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.duration(800).delay(200).springify()}
           onLayout={onLayout('howto')}
         >
           {sections.howto}
         </Animated.View>
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.duration(800).delay(400).springify()}
           onLayout={onLayout('functions')}
         >
           {sections.functions}
         </Animated.View>
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.duration(800).delay(600).springify()}
           onLayout={onLayout('evaluation')}
         >
           {sections.evaluation}
         </Animated.View>
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.duration(800).delay(800).springify()}
           onLayout={onLayout('cases')}
         >
@@ -567,353 +565,354 @@ export default function LandingPage() {
   );
 }
 
-const createStyles = (theme: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  contentWrapper: {
-    width: '100%',
-    maxWidth: 1100,
-    alignSelf: 'center',
-    paddingHorizontal: 20,
-  },
-  heroContainer: {
-    overflow: 'hidden',
-  },
-  heroGradient: {
-    paddingVertical: 80,
-    alignItems: 'center',
-  },
-  heroContent: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  heroBadge: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  heroBadgeText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
-  heroMobileCta: {
-    marginBottom: 24,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-  },
-  heroTitle: {
-    color: '#fff',
-    fontWeight: '800',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: Platform.OS === 'web' ? undefined : 42,
-  },
-  heroSubtitle: {
-    color: 'rgba(255,255,255,0.85)',
-    textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 24,
-    maxWidth: 800,
-    alignSelf: 'center',
-  },
-  heroStats: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 30,
-    marginTop: 20,
-  },
-  heroStat: {
-    alignItems: 'center',
-  },
-  statValue: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '800',
-  },
-  statLabel: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 10,
-    textTransform: 'uppercase',
-    fontWeight: '700',
-    marginTop: 4,
-  },
-  section: {
-    paddingVertical: 80,
-  },
-  sectionHeader: {
-    alignItems: 'center',
-    marginBottom: 56,
-  },
-  sectionTitle: {
-    fontWeight: '800',
-    color: theme.colors.onSurface,
-    textAlign: 'center',
-  },
-  titleDivider: {
-    width: 60,
-    height: 3,
-    backgroundColor: TUM_BLUE,
-    borderRadius: 3,
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  sectionSub: {
-    color: theme.colors.onSurfaceVariant,
-    textAlign: 'center',
-    maxWidth: 700,
-    lineHeight: 24,
-    marginTop: 4,
-  },
-  stepsGridWeb: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
-  },
-  stepsGridMobile: {
-    flexDirection: 'column',
-    gap: 16,
-  },
-  stepCard: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 24,
-    alignItems: 'center',
-  },
-  stepIconContainer: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  stepEmoji: {
-    fontSize: 40,
-  },
-  stepNumBadge: {
-    position: 'absolute',
-    bottom: -4,
-    right: -4,
-    backgroundColor: TUM_BLUE,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.surface,
-  },
-  stepNumText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  stepTitle: {
-    fontWeight: '700',
-    color: theme.colors.onSurface,
-    marginBottom: 8,
-  },
-  stepDesc: {
-    color: theme.colors.onSurfaceVariant,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  featuresGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    justifyContent: 'flex-start',
-  },
-  featureCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    padding: 20,
-    flexDirection: 'row',
-    gap: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.outlineVariant,
-  },
-  featureIconBox: {
-    width: 48,
-    height: 48,
-    backgroundColor: theme.dark ? theme.colors.surfaceVariant : '#f3f4f6',
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  featureEmoji: {
-    fontSize: 24,
-  },
-  featureTitle: {
-    fontWeight: '700',
-    color: theme.colors.onSurface,
-  },
-  betaBadge: {
-    backgroundColor: TUM_BLUE,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 4,
-    marginLeft: 8,
-  },
-  betaBadgeText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  featureDesc: {
-    color: theme.colors.onSurfaceVariant,
-    marginTop: 4,
-    lineHeight: 18,
-  },
-  evalGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  evalCard: {
-    padding: 20,
-    borderRadius: 12,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.outlineVariant,
-  },
-  evalDim: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: theme.colors.primary,
-    textTransform: 'uppercase',
-    marginBottom: 6,
-  },
-  evalTitle: {
-    fontWeight: '700',
-    color: theme.colors.onSurface,
-    marginBottom: 6,
-  },
-  evalDesc: {
-    color: theme.colors.onSurfaceVariant,
-    lineHeight: 16,
-  },
-  evalStars: {
-    flexDirection: 'row',
-    gap: 3,
-    marginTop: 12,
-  },
-  starBar: {
-    height: 4,
-    flex: 1,
-    backgroundColor: theme.colors.outlineVariant,
-    borderRadius: 2,
-  },
-  starBarFilled: {
-    backgroundColor: theme.colors.primary,
-  },
-  scaleInfo: {
-    marginTop: 32,
-    backgroundColor: theme.colors.primaryContainer,
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center',
-  },
-  scaleInfoTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.colors.onPrimaryContainer,
-    marginBottom: 10,
-  },
-  scaleRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  scaleItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  scaleDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  scaleItemText: {
-    fontSize: 12,
-    color: theme.colors.onPrimaryContainer,
-  },
-  casesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    justifyContent: 'flex-start',
-  },
-  caseCard: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  caseImageContainer: {
-    position: 'relative',
-    width: '100%',
-    aspectRatio: 1.5,
-  },
-  caseImage: {
-    width: '100%',
-    height: '100%',
-  },
-  diffBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  caseTextContainer: {
-    padding: 16,
-    flex: 1,
-  },
-  caseTitle: {
-    fontWeight: '800',
-    color: theme.colors.onSurface,
-  },
-  caseSubtext: {
-    color: theme.colors.onSurfaceVariant,
-    marginTop: 4,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    width: '100%',
-  },
-  halfWidthButton: {
-    flex: 1,
-    borderRadius: 0,
-    margin: 0,
-  },
-  fullWidthButton: { width: '100%', borderRadius: 0, margin: 0 },
-  buttonHeight: { height: 48, flexDirection: 'row-reverse' },
-  fullButtonLabel: { fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
-  splitButtonLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 0.2,
-  },
-  disclaimer: {
-    fontSize: 12,
-    color: theme.colors.outline,
-    textAlign: 'center',
-    maxWidth: 500,
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    contentWrapper: {
+      width: '100%',
+      maxWidth: 1100,
+      alignSelf: 'center',
+      paddingHorizontal: 20,
+    },
+    heroContainer: {
+      overflow: 'hidden',
+    },
+    heroGradient: {
+      paddingVertical: 80,
+      alignItems: 'center',
+    },
+    heroContent: {
+      width: '100%',
+      alignItems: 'center',
+    },
+    heroBadge: {
+      backgroundColor: 'rgba(255,255,255,0.15)',
+      borderRadius: 20,
+      paddingHorizontal: 16,
+      paddingVertical: 6,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.3)',
+    },
+    heroBadgeText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: '600',
+      letterSpacing: 0.5,
+    },
+    heroMobileCta: {
+      marginBottom: 24,
+      borderRadius: 8,
+      paddingHorizontal: 8,
+    },
+    heroTitle: {
+      color: '#fff',
+      fontWeight: '800',
+      textAlign: 'center',
+      marginBottom: 16,
+      lineHeight: Platform.OS === 'web' ? undefined : 42,
+    },
+    heroSubtitle: {
+      color: 'rgba(255,255,255,0.85)',
+      textAlign: 'center',
+      marginBottom: 32,
+      lineHeight: 24,
+      maxWidth: 800,
+      alignSelf: 'center',
+    },
+    heroStats: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 30,
+      marginTop: 20,
+    },
+    heroStat: {
+      alignItems: 'center',
+    },
+    statValue: {
+      color: '#fff',
+      fontSize: 28,
+      fontWeight: '800',
+    },
+    statLabel: {
+      color: 'rgba(255,255,255,0.7)',
+      fontSize: 10,
+      textTransform: 'uppercase',
+      fontWeight: '700',
+      marginTop: 4,
+    },
+    section: {
+      paddingVertical: 80,
+    },
+    sectionHeader: {
+      alignItems: 'center',
+      marginBottom: 56,
+    },
+    sectionTitle: {
+      fontWeight: '800',
+      color: theme.colors.onSurface,
+      textAlign: 'center',
+    },
+    titleDivider: {
+      width: 60,
+      height: 3,
+      backgroundColor: TUM_BLUE,
+      borderRadius: 3,
+      marginTop: 10,
+      marginBottom: 20,
+    },
+    sectionSub: {
+      color: theme.colors.onSurfaceVariant,
+      textAlign: 'center',
+      maxWidth: 700,
+      lineHeight: 24,
+      marginTop: 4,
+    },
+    stepsGridWeb: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 16,
+    },
+    stepsGridMobile: {
+      flexDirection: 'column',
+      gap: 16,
+    },
+    stepCard: {
+      flex: 1,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      padding: 24,
+      alignItems: 'center',
+    },
+    stepIconContainer: {
+      position: 'relative',
+      marginBottom: 16,
+    },
+    stepEmoji: {
+      fontSize: 40,
+    },
+    stepNumBadge: {
+      position: 'absolute',
+      bottom: -4,
+      right: -4,
+      backgroundColor: TUM_BLUE,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: theme.colors.surface,
+    },
+    stepNumText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: '800',
+    },
+    stepTitle: {
+      fontWeight: '700',
+      color: theme.colors.onSurface,
+      marginBottom: 8,
+    },
+    stepDesc: {
+      color: theme.colors.onSurfaceVariant,
+      textAlign: 'center',
+      lineHeight: 18,
+    },
+    featuresGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 16,
+      justifyContent: 'flex-start',
+    },
+    featureCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 12,
+      padding: 20,
+      flexDirection: 'row',
+      gap: 16,
+      borderWidth: 1,
+      borderColor: theme.colors.outlineVariant,
+    },
+    featureIconBox: {
+      width: 48,
+      height: 48,
+      backgroundColor: theme.dark ? theme.colors.surfaceVariant : '#f3f4f6',
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    featureEmoji: {
+      fontSize: 24,
+    },
+    featureTitle: {
+      fontWeight: '700',
+      color: theme.colors.onSurface,
+    },
+    betaBadge: {
+      backgroundColor: TUM_BLUE,
+      paddingHorizontal: 6,
+      paddingVertical: 1,
+      borderRadius: 4,
+      marginLeft: 8,
+    },
+    betaBadgeText: {
+      color: '#fff',
+      fontSize: 10,
+      fontWeight: '800',
+    },
+    featureDesc: {
+      color: theme.colors.onSurfaceVariant,
+      marginTop: 4,
+      lineHeight: 18,
+    },
+    evalGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12,
+    },
+    evalCard: {
+      padding: 20,
+      borderRadius: 12,
+      backgroundColor: theme.colors.surface,
+      borderWidth: 1,
+      borderColor: theme.colors.outlineVariant,
+    },
+    evalDim: {
+      fontSize: 10,
+      fontWeight: '800',
+      color: theme.colors.primary,
+      textTransform: 'uppercase',
+      marginBottom: 6,
+    },
+    evalTitle: {
+      fontWeight: '700',
+      color: theme.colors.onSurface,
+      marginBottom: 6,
+    },
+    evalDesc: {
+      color: theme.colors.onSurfaceVariant,
+      lineHeight: 16,
+    },
+    evalStars: {
+      flexDirection: 'row',
+      gap: 3,
+      marginTop: 12,
+    },
+    starBar: {
+      height: 4,
+      flex: 1,
+      backgroundColor: theme.colors.outlineVariant,
+      borderRadius: 2,
+    },
+    starBarFilled: {
+      backgroundColor: theme.colors.primary,
+    },
+    scaleInfo: {
+      marginTop: 32,
+      backgroundColor: theme.colors.primaryContainer,
+      borderRadius: 12,
+      padding: 20,
+      alignItems: 'center',
+    },
+    scaleInfoTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: theme.colors.onPrimaryContainer,
+      marginBottom: 10,
+    },
+    scaleRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 12,
+    },
+    scaleItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    scaleDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+    },
+    scaleItemText: {
+      fontSize: 12,
+      color: theme.colors.onPrimaryContainer,
+    },
+    casesGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 16,
+      justifyContent: 'flex-start',
+    },
+    caseCard: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      overflow: 'hidden',
+    },
+    caseImageContainer: {
+      position: 'relative',
+      width: '100%',
+      aspectRatio: 1.5,
+    },
+    caseImage: {
+      width: '100%',
+      height: '100%',
+    },
+    diffBadge: {
+      position: 'absolute',
+      top: 10,
+      right: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    caseTextContainer: {
+      padding: 16,
+      flex: 1,
+    },
+    caseTitle: {
+      fontWeight: '800',
+      color: theme.colors.onSurface,
+    },
+    caseSubtext: {
+      color: theme.colors.onSurfaceVariant,
+      marginTop: 4,
+    },
+    statusRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderTopWidth: 1,
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      width: '100%',
+    },
+    halfWidthButton: {
+      flex: 1,
+      borderRadius: 0,
+      margin: 0,
+    },
+    fullWidthButton: { width: '100%', borderRadius: 0, margin: 0 },
+    buttonHeight: { height: 48, flexDirection: 'row-reverse' },
+    fullButtonLabel: { fontSize: 16, fontWeight: '700', letterSpacing: 0.5 },
+    splitButtonLabel: {
+      fontSize: 14,
+      fontWeight: '700',
+      letterSpacing: 0.2,
+    },
+    disclaimer: {
+      fontSize: 12,
+      color: theme.colors.outline,
+      textAlign: 'center',
+      maxWidth: 500,
+    },
+  });

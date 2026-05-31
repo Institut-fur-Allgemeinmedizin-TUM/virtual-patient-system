@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { Appbar, Button, Divider, Drawer, Modal, Portal, Surface, useTheme } from 'react-native-paper';
+import {
+  Appbar,
+  Button,
+  Divider,
+  Drawer,
+  Modal,
+  Portal,
+  Surface,
+  useTheme,
+} from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useUIStore } from '@/stores/useUIStore';
 import { router, usePathname } from 'expo-router';
 
-import {appVersion} from "@/lib/util";
+import { appVersion } from '@/lib/util';
 
 export function AppHeader() {
   const { width } = useWindowDimensions();
@@ -25,12 +34,13 @@ export function AppHeader() {
     useThemeStore.getState().toggleMode();
   };
 
-  const isLandingPage = pathname === '/' || pathname === '/(caseOverview)' || pathname === '/(caseOverview)/';
+  const isLandingPage =
+    pathname === '/' || pathname === '/(caseOverview)' || pathname === '/(caseOverview)/';
   const showDesktopNav = width > 900 && isLandingPage;
 
   return (
     <>
-      <Appbar.Header elevated style={{backgroundColor: '#0e396e' }}>
+      <Appbar.Header elevated style={{ backgroundColor: '#0e396e' }}>
         <Appbar.Action
           icon="hospital-box-outline"
           onPress={() => {
@@ -38,54 +48,54 @@ export function AppHeader() {
           }}
           accessibilityLabel="App logo"
         />
-        <Appbar.Content title={
-          <Pressable onPress={() => router.push('/')}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text
-                style={[{ fontSize: 20, fontWeight: '600', color: '#C1CBD6' }]}
-              >
-                TUM Virtual Patient System
-              </Text>
-              
-            {showDesktopNav && (
-              <View style={styles.desktopNav}>
-                <Button 
-                  mode="text" 
-                  textColor="#C1CBD6" 
-                  onPress={() => requestScroll('howto')}
-                  labelStyle={styles.navLabel}
-                >
-                  Anleitung
-                </Button>
-                <Button 
-                  mode="text" 
-                  textColor="#C1CBD6" 
-                  onPress={() => requestScroll('functions')}
-                  labelStyle={styles.navLabel}
-                >
-                  Funktionen
-                </Button>
-                <Button 
-                  mode="text" 
-                  textColor="#C1CBD6" 
-                  onPress={() => requestScroll('evaluation')}
-                  labelStyle={styles.navLabel}
-                >
-                  Bewertung
-                </Button>
-                <Button 
-                  mode="text" 
-                  textColor="#C1CBD6" 
-                  onPress={() => requestScroll('cases')}
-                  labelStyle={styles.navLabel}
-                >
-                  Fälle
-                </Button>
+        <Appbar.Content
+          title={
+            <Pressable onPress={() => router.push('/')}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={[{ fontSize: 20, fontWeight: '600', color: '#C1CBD6' }]}>
+                  TUM Virtual Patient System
+                </Text>
+
+                {showDesktopNav && (
+                  <View style={styles.desktopNav}>
+                    <Button
+                      mode="text"
+                      textColor="#C1CBD6"
+                      onPress={() => requestScroll('howto')}
+                      labelStyle={styles.navLabel}
+                    >
+                      Anleitung
+                    </Button>
+                    <Button
+                      mode="text"
+                      textColor="#C1CBD6"
+                      onPress={() => requestScroll('functions')}
+                      labelStyle={styles.navLabel}
+                    >
+                      Funktionen
+                    </Button>
+                    <Button
+                      mode="text"
+                      textColor="#C1CBD6"
+                      onPress={() => requestScroll('evaluation')}
+                      labelStyle={styles.navLabel}
+                    >
+                      Bewertung
+                    </Button>
+                    <Button
+                      mode="text"
+                      textColor="#C1CBD6"
+                      onPress={() => requestScroll('cases')}
+                      labelStyle={styles.navLabel}
+                    >
+                      Fälle
+                    </Button>
+                  </View>
+                )}
               </View>
-            )}
-          </View>
-          </Pressable>
-        }/>
+            </Pressable>
+          }
+        />
 
         <Appbar.Action
           icon={
@@ -170,7 +180,9 @@ export function AppHeader() {
                 <Divider />
                 <View style={styles.versionRow}>
                   <Appbar.Action icon="github" color={colors.onSurfaceVariant} size={18} />
-                  <Text style={[styles.versionText, { color: colors.onSurfaceVariant }]}>{`Version ${appVersion}`}</Text>
+                  <Text
+                    style={[styles.versionText, { color: colors.onSurfaceVariant }]}
+                  >{`Version ${appVersion}`}</Text>
                 </View>
               </View>
             </Surface>
