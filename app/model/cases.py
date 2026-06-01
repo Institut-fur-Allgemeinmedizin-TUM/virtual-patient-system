@@ -16,6 +16,7 @@ class CaseItemModel(BaseModel):
 class GetCasesResponse(BaseModel):
     cases: list[CaseItemModel]
 
+
 class DiagnosticValue(BaseModel):
     name: str
     display_name: str
@@ -23,10 +24,12 @@ class DiagnosticValue(BaseModel):
     data_type: str
     data: Any
 
+
 class DiagnosticGroup(BaseModel):
     name: str
     display_name: str
     data: Optional[list[DiagnosticValue]] = None
+
 
 class MedicalBackgroundsAvailableResponse(BaseModel):
     diagnostics_available: list[DiagnosticGroup]

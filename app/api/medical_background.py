@@ -9,7 +9,11 @@ from sqlalchemy.orm import Session as OrmSession
 
 from app.api.memory import vhb_sessions
 from app.auth import auth
-from app.model.cases import MedicalBackgroundsAvailableResponse, DiagnosticValue, DiagnosticGroup
+from app.model.cases import (
+    MedicalBackgroundsAvailableResponse,
+    DiagnosticValue,
+    DiagnosticGroup,
+)
 from app.model.models import Session as ChatSession, Diagnostic
 
 from app.db.db import get_db
@@ -34,7 +38,9 @@ def _load_background_data_from_disk(case_id: str) -> dict[str, list[DiagnosticGr
 
         json_data = json.load(f)
         for key, value in json_data.items():
-            diag_group = DiagnosticGroup(name=key, display_name=value["display_name"], data=[])
+            diag_group = DiagnosticGroup(
+                name=key, display_name=value["display_name"], data=[]
+            )
             for subkey, subvalue in value["data"].items():
                 diag_data = DiagnosticValue(
                     name=subkey,
@@ -66,10 +72,11 @@ def _load_backgrounds_from_disk() -> dict[str, dict[str, DiagnosticGroup]]:
 
 BACKGROUNDS: dict[str, dict[str, DiagnosticGroup]] = _load_backgrounds_from_disk()
 
+
 @medical_background_router.get("/api/diagnostics/{case_id}/available")
 async def get_medical_background_available(
-        request: Request,
-        case_id: str = Path(description="The case to retrieve from the backend.")
+    request: Request,
+    case_id: str = Path(description="The case to retrieve from the backend."),
 ) -> MedicalBackgroundsAvailableResponse:
     if not case_id in BACKGROUNDS:
         # Return json of background
@@ -81,7 +88,7 @@ async def get_medical_background_available(
             DiagnosticGroup(
                 name=diag_name,
                 display_name=diag_group.display_name,
-                data=None  # Don't include actual data in the available endpoint
+                data=None,  # Don't include actual data in the available endpoint
             )
         )
     return MedicalBackgroundsAvailableResponse(
@@ -115,7 +122,9 @@ async def get_medical_background(
     diagnostic_ret = BACKGROUNDS[case_id][diagnostic]
     if diagnostic_ret.data is not None:
         for i in range(len(diagnostic_ret.data)):
-            if isinstance(diagnostic_ret.data[i].data, str) and diagnostic_ret.data[i].data.startswith("path:"):
+            if isinstance(diagnostic_ret.data[i].data, str) and diagnostic_ret.data[
+                i
+            ].data.startswith("path:"):
                 # Load data from disk
                 print(os.getcwd())
                 with open(diagnostic_ret.data[i].data[5:], "rb") as file:
