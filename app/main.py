@@ -58,6 +58,8 @@ if settings.environment == "production" or settings.environment == "beta":
                 full_path.startswith("api/")
                 or full_path.startswith("auth/")
                 or full_path == "health"
+                or full_path == "docs"
+                or full_path.startswith("docs/")
             ):
                 raise HTTPException(status_code=404, detail="Not found")
 

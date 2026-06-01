@@ -5,6 +5,7 @@ from fastapi import (
     FastAPI,
 )
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import RedirectResponse
 
 from app.api import auth, session, util, health, medical_background
 from app.config.config import settings
@@ -22,6 +23,10 @@ if os.path.isdir("docs/build"):
     # Serve docs from /docs
     print("Found docs, serving docs")
     from fastapi.staticfiles import StaticFiles
+
+    @app.get("/docs", include_in_schema=False)
+    async def redirect_docs():
+        return RedirectResponse(url="/docs/")
 
     app.mount("/docs", StaticFiles(directory="docs/build", html=True), name="docs")
 else:
