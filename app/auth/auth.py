@@ -27,13 +27,17 @@ def sync_user_to_db(claims: dict) -> None:
             db.add(user)
 
             # Assign default role if it exists
-            default_role = db.query(Role).filter(Role.name == DefaultRoles.default).first()
+            default_role = (
+                db.query(Role).filter(Role.name == DefaultRoles.default).first()
+            )
             if default_role:
                 user.roles.append(default_role)
 
             # Assign TUMUser role if it's a TUM user
             if tum_id:
-                tum_role = db.query(Role).filter(Role.name == DefaultRoles.tum_user).first()
+                tum_role = (
+                    db.query(Role).filter(Role.name == DefaultRoles.tum_user).first()
+                )
                 if tum_role:
                     user.roles.append(tum_role)
 
@@ -108,6 +112,7 @@ def find_user_roles(oidc_id: Optional[str]) -> list[str]:
             return []
         return [role.name for role in user.roles]
 
+
 def get_current_user_by_token(token: Optional[str]) -> Optional[dict]:
     if not token:
         return None
@@ -119,6 +124,7 @@ def get_current_user_by_token(token: Optional[str]) -> Optional[dict]:
         return AuthenticatedUser(user_dict)
     except HTTPException:
         return None
+
 
 def get_current_user(request: Request) -> Optional[dict]:
     token = request.cookies.get("session")

@@ -13,6 +13,7 @@ from app.config.config import settings
 from app.db.db import SessionLocal
 from app.db.init_db import init_roles, init_anon_user
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize roles in the database
@@ -25,8 +26,14 @@ async def lifespan(app: FastAPI):
         db.close()
     yield
 
+
 # Trigger redeployment with OIDC_AUTH_URL secret now configured
-app = FastAPI(title="Virtual Patient Backend", version="0.1.0", lifespan=lifespan, docs_url="/api/docs")
+app = FastAPI(
+    title="Virtual Patient Backend",
+    version="0.1.0",
+    lifespan=lifespan,
+    docs_url="/api/docs",
+)
 app.include_router(auth.authRouter)
 app.include_router(session.sessionRouter)
 app.include_router(util.utilRouter)

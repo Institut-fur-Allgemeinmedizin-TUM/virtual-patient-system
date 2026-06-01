@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
 
+
 class UserProfileUpdateRequest(BaseModel):
     pronouns: Optional[str] = None
+
 
 class UserProfileResponse(BaseModel):
     sub: str

@@ -49,6 +49,7 @@ def _load_backgrounds_from_disk():
 
 BACKGROUNDS = _load_backgrounds_from_disk()
 
+
 @medical_background_router.get(
     "/api/diagnostics/{case_id}",
     summary="Get medical background diagnostics",
@@ -104,7 +105,7 @@ async def get_medical_background(
     if not diagnostic:
         return MedicalBackgroundResponse(
             type=MedicalBackgroundResponseType.LIST_AVAILABLE,
-            diagnostics_available=list(BACKGROUNDS[case_id].keys())
+            diagnostics_available=list(BACKGROUNDS[case_id].keys()),
         )
 
     if not diagnostic in BACKGROUNDS[case_id]:
@@ -124,7 +125,7 @@ async def get_medical_background(
             session["used_diagnostics"].append(diagnostic)
             return MedicalBackgroundResponse(
                 type=MedicalBackgroundResponseType.DIAGNOSTIC_RESPONSE,
-                diagnostic_data={diagnostic: BACKGROUNDS[case_id][diagnostic]}
+                diagnostic_data={diagnostic: BACKGROUNDS[case_id][diagnostic]},
             )
         else:
             raise HTTPException(status_code=403, detail="Session not found")
@@ -149,5 +150,5 @@ async def get_medical_background(
         db.commit()
         return MedicalBackgroundResponse(
             type=MedicalBackgroundResponseType.DIAGNOSTIC_RESPONSE,
-            diagnostic_data={diagnostic: BACKGROUNDS[case_id][diagnostic]}
+            diagnostic_data={diagnostic: BACKGROUNDS[case_id][diagnostic]},
         )

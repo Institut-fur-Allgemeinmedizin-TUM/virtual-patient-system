@@ -19,6 +19,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
+
 class DefaultRoles(str, Enum):
     admin = "Admin"
     default = "Default"

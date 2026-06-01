@@ -8,6 +8,7 @@ from app.model.user import UserProfileUpdateRequest, UserProfileResponse
 
 userRouter = APIRouter()
 
+
 @userRouter.get("/api/user/profile", response_model=UserProfileResponse)
 async def get_user_profile(
     request: Request, db: OrmSession = Depends(get_db)
@@ -15,12 +16,12 @@ async def get_user_profile(
     """Get the current user's profile information."""
     user_dict = auth.require_user(request)
     tum_id = user_dict.get("tum_id") or user_dict.get("sub")
-    
+
     if not tum_id:
-         raise HTTPException(status_code=401, detail="User identification missing")
+        raise HTTPException(status_code=401, detail="User identification missing")
 
     db_user = db.query(User).filter(User.oidc_id == tum_id).first()
-    
+
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found in database")
 
@@ -28,8 +29,9 @@ async def get_user_profile(
         sub=user_dict.get("sub", ""),
         tum_id=tum_id,
         pronouns=db_user.pronouns,
-        roles=user_dict.get("roles", [])
+        roles=user_dict.get("roles", []),
     )
+
 
 @userRouter.put("/api/user/profile", response_model=UserProfileResponse)
 async def update_user_profile(
@@ -38,12 +40,12 @@ async def update_user_profile(
     """Update the current user's profile information."""
     user_dict = auth.require_user(request)
     tum_id = user_dict.get("tum_id") or user_dict.get("sub")
-    
+
     if not tum_id:
-         raise HTTPException(status_code=401, detail="User identification missing")
+        raise HTTPException(status_code=401, detail="User identification missing")
 
     db_user = db.query(User).filter(User.oidc_id == tum_id).first()
-    
+
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found in database")
 
@@ -57,5 +59,5 @@ async def update_user_profile(
         sub=user_dict.get("sub", ""),
         tum_id=tum_id,
         pronouns=db_user.pronouns,
-        roles=user_dict.get("roles", [])
+        roles=user_dict.get("roles", []),
     )
