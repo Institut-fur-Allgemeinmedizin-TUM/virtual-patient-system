@@ -1,18 +1,24 @@
 import os
+import tempfile
 from collections.abc import Generator
 
+# Set environment variables BEFORE any imports
 os.environ.setdefault("GEMINI_API_KEY", "test-gemini-key")
+
+# Create a temporary SQLite database for testing
+_temp_db_fd, _temp_db_path = tempfile.mkstemp(suffix=".db")
+os.close(_temp_db_fd)
+os.environ["DATABASE_URL"] = f"sqlite:///{_temp_db_path}"
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.api.api import app
 from app.api.memory import vhb_sessions
 from app.auth import auth as auth_module
 from app.config.config import settings
-from app.db.db import get_db
+from app.db.db import get_db, engine as app_engine
 from app.model.models import Base
 
 
@@ -26,18 +32,25 @@ def reset_global_state(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None,
     vhb_sessions.clear()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_db():
+    """Set up the test database schema once at the start of the test session."""
+    Base.metadata.create_all(app_engine)
+    yield
+    # Cleanup is optional as we'll recreate for next run
+
+
 @pytest.fixture
-def db_engine(tmp_path):
-    db_path = tmp_path / "backend-tests.db"
-    engine = create_engine(
-        f"sqlite:///{db_path}", connect_args={"check_same_thread": False}
-    )
-    Base.metadata.create_all(engine)
+def db_engine():
+    # Use the app engine which is already configured to use SQLite
     try:
-        yield engine
+        yield app_engine
     finally:
-        Base.metadata.drop_all(engine)
-        engine.dispose()
+        # Clear all tables after each test to isolate them
+        from sqlalchemy import text
+        with app_engine.begin() as connection:
+            for table in reversed(Base.metadata.sorted_tables):
+                connection.execute(table.delete())
 
 
 @pytest.fixture
