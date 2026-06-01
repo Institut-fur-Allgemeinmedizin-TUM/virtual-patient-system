@@ -5,36 +5,43 @@ Analysieren Sie das folgende Gespräch zwischen einem Arzt (User) und einem Pati
 
 {conversation_text}
 
-Geben Sie Rückmeldung dazu, wie der Arzt die Anamnese verbessern könnte.
+Geben Sie strukturiertes Feedback dazu, wie der Nutzer in seiner Rolle als Arzt die Anamnese verbessern könnte. Das Feedback basiert auf den Kriterien der CRI-HTS (Clinical Rating Interview – History Taking Scale). 
 
-Ihr Feedback soll die folgenden acht Kriterien enthalten:
+Bewerten Sie die folgenden acht Kriterien. Weisen Sie jedem Kriterium eine Bewertung nach folgendem Schema zu: 
 
-1. Gesprächsführung: Beurteilen Sie, ob der Arzt das Gespräch geführt hat, um die erforderlichen Informationen zu erhalten.
+1 – Erfüllt das Kriterium nicht
 
-2. Erkennung relevanter Informationen: Beurteilen Sie, ob der Arzt alle relevanten Informationen erkennt.
+2 – Erfüllt das Kriterium eher nicht 
 
-3. Zielgerichtete Fragen: Beurteilen Sie, ob der Arzt zielgerichtete Fragen formuliert, um Symptome detailliert zu erfassen und zu spezifizieren.
+3 – Erfüllt das Kriterium teilweise 
 
-4. Spezifische Ursachen: Beurteilen Sie, ob die Fragen des Arztes nahelegen, dass spezifische Ursachen oder Umstände zu bestimmten Symptomen führen.
+4 – Erfüllt das Kriterium eher
 
-5. Logische Reihenfolge: Beurteilen Sie, ob der Arzt die Fragen in einer logischen Reihenfolge stellt.
+5 – Erfüllt das Kriterium vollständig 
 
-6. Rückversicherung: Beurteilen Sie, ob der Arzt den Patienten rückversichert, dass er die Informationen korrekt verstanden hat.
+Format pro Kriterium:
 
-7. Zusammenfassung: Beurteilen Sie, ob der Arzt seine gesammelten Informationen vor dem Gesprächsende zusammengefasst hat.
+Bewertung (1–5) mit kurzem Label
 
-8. Qualität und Zeit: Beurteilen Sie, ob der Arzt ausreichend hochwertige Informationen in angemessener Zeit erhoben hat.
+Begründung: 5-10 Sätze. Belegen Sie Ihre Einschätzung mit mindestens einem direkten Zitat aus dem Transkript (in Anführungszeichen, mit Sprecherkennung). Erläutern Sie, warum dieses Verhalten positiv oder problematisch ist, und benennen Sie konkret, was fehlt oder gelungen ist. 
 
-Weisen Sie jedem der acht Kriterien eine Bewertung nach folgendem Schema zu:
-1 - Erfüllt das Kriterium nicht
-2 - Erfüllt das Kriterium eher nicht
-3 - Erfüllt das Kriterium teilweise
-4 - Erfüllt das Kriterium eher
-5 - Erfüllt das Kriterium vollständig
+Kriterium 1 – Informationsgewinnung Beurteilen Sie, ob der Nutzer das Gespräch aktiv und zielgerichtet geführt hat, um die klinisch notwendigen Informationen zu erheben.
 
-Erläutern Sie die Bewertung mit zwei Sätzen.
+Kriterium 2 – Erkennen relevanter Informationen Beurteilen Sie, ob der Nutzer alle klinisch relevanten Informationen (Leitsymptome, Begleitsymptome, Vorgeschichte) erkannt und aufgegriffen hat.
 
-Erstellen Sie drei Verbesserungsvorschläge in Stichpunkten, die auf die Stärkung klinischer Entscheidungsfähigkeiten abzielen.
+Kriterium 3 – Spezifizierung von Symptomen Beurteilen Sie, ob der Nutzer zielgerichtete Fragen formuliert hat, um Symptome in ihren Qualitäten (z. B. Lokalisation, Intensität, Zeitverlauf, Charakter) detailliert zu erfassen. 
+
+Kriterium 4 – Hypothesengeleitetes Fragen Beurteilen Sie, ob die Fragen des Nutzers erkennen lassen, dass er spezifische diagnostische Hypothesen verfolgt und nach auslösenden Faktoren, Verstärkern oder Mustern sucht. 
+
+Kriterium 5 – Gesprächsstruktur und Logik Beurteilen Sie, ob der Nutzer die Fragen in einer klinisch sinnvollen, nachvollziehbaren Reihenfolge gestellt hat.
+
+Kriterium 6 – Aktives Zuhören und Rückversicherung Beurteilen Sie, ob der Nutzer dem Patienten rückgemeldet hat, dass er die Informationen korrekt verstanden hat (z. B. durch Paraphrasieren oder explizite Bestätigung). 
+
+Kriterium 7 – Zusammenfassung Beurteilen Sie, ob der Nutzer die erhobenen Informationen vor dem Gesprächsende zusammengefasst hat.
+
+Kriterium 8 – Effizienz und Informationsqualität Beurteilen Sie, ob der Nutzer in angemessener Zeit ausreichend hochwertige und klinisch verwertbare Informationen erhoben hat.
+
+Erstellen Sie abschließend drei konkrete Verbesserungsvorschläge in Stichpunkten, die auf die Stärkung klinischer Entscheidungsfähigkeiten abzielen. Jeder Vorschlag soll sich direkt auf eine beobachtete Schwäche im Transkript beziehen und eine umsetzbare Handlungsempfehlung enthalten.
 
 WICHTIG: Antworten Sie ausschließlich im folgenden JSON-Format (ohne zusätzlichen Text):
 {{
