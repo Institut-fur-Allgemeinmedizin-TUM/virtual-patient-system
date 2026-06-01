@@ -48,7 +48,7 @@ async def get_sessions_stats(
     if user.get("is_vhb_user", False):
         raise HTTPException(status_code=403, detail="Forbidden")
     # TODO - implement better check
-    if not user.get("is_admin", False) and settings.require_auth:
+    if not user.is_admin():
         raise HTTPException(status_code=403, detail="Forbidden")
     if not req.selected_columns() and not req.aggregations:
         raise HTTPException(

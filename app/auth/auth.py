@@ -145,8 +145,6 @@ def require_user(request: Request) -> AuthenticatedUser:
     user = get_current_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    if user.get("tum_id") == "xxx" or user.get("sub") == "2QANHOKZTWS6M5SADJL7RXZEM2CSWIFR":
-        user["is_admin"] = True
     return user
 
 
