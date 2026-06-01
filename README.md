@@ -119,7 +119,7 @@ pip install -r requirements-test.txt
 #### Canonical backend test command (local + CI)
 
 ```bash
-pytest tests/backend --cov=app/api --cov-report=term-missing --cov-report=xml --cov-fail-under=60
+PYTHONPATH=. pytest tests/backend --cov=app/api --cov-report=term-missing --cov-report=xml --cov-fail-under=60
 ```
 
 #### Test-mode conventions
