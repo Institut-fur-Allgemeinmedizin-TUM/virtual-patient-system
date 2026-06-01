@@ -4,6 +4,9 @@ FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app/mobile
 
+ARG EXPO_PUBLIC_VERSION=dev
+ENV EXPO_PUBLIC_VERSION=${EXPO_PUBLIC_VERSION}
+
 # Copy mobile package files
 COPY mobile/package*.json ./
 RUN npm ci
@@ -62,4 +65,3 @@ EXPOSE 8080
 
 # Run migrations and start the application
 CMD ["./start.sh"]
-
