@@ -86,7 +86,7 @@ export default function LandingPage() {
     return '#0b7f5a'; // green
   };
 
-    const sC = async (item: Case) => {
+  const sC = async (item: Case) => {
     if (!isAuthenticated) {
       router.push('/login');
       return;

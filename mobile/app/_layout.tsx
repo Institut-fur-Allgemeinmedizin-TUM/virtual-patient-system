@@ -42,7 +42,7 @@ export default function RootLayout() {
     }
 
     const inLoginScreen = segments[0] === 'login';
-    const isPublicSegment = segments[0] === '(caseOverview)' ;
+    const isPublicSegment = segments[0] === '(caseOverview)';
 
     if (!isAuthenticated && !inLoginScreen && !isPublicSegment) {
       router.replace('/login');
