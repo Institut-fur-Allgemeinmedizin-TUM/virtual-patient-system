@@ -15,6 +15,7 @@ import {
 
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useThemeStore } from '@/stores/useThemeStore';
+import React from 'react';
 
 export const unstable_settings = {
   initialRouteName: 'login',
@@ -41,8 +42,9 @@ export default function RootLayout() {
     }
 
     const inLoginScreen = segments[0] === 'login';
+    const isPublicSegment = segments[0] === '(caseOverview)' ;
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !inLoginScreen && !isPublicSegment) {
       router.replace('/login');
       return;
     }

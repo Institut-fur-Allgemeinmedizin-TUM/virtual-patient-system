@@ -176,7 +176,10 @@ export function useLiveAudioSession(
         } catch (e: any) {
           const msg = e?.message || '';
           const name = e?.name || '';
-          const alreadyClosed = audioContext.state !== 'running' || name === 'InvalidStateError' || /closed|already closed/i.test(msg);
+          const alreadyClosed =
+            audioContext.state !== 'running' ||
+            name === 'InvalidStateError' ||
+            /closed|already closed/i.test(msg);
           if (!alreadyClosed) {
             throw e; //Rethrow - React should handle that error!
           }
@@ -440,7 +443,7 @@ export function useLiveAudioSession(
 
   const sendMessage = (text: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-       onTranscript?.('user', text);
+      onTranscript?.('user', text);
       wsRef.current.send(
         JSON.stringify({
           type: 'text',
@@ -450,7 +453,7 @@ export function useLiveAudioSession(
     } else {
       console.warn('WebSocket is not open. Cannot send message:', text);
     }
-  }
+  };
 
   useEffect(() => {
     return () => {
@@ -458,5 +461,12 @@ export function useLiveAudioSession(
     };
   }, []);
 
-  return { isActive, isConnecting, error, start: startLiveAudio, stop: stopLiveAudio, sendMessage: sendMessage } as const;
+  return {
+    isActive,
+    isConnecting,
+    error,
+    start: startLiveAudio,
+    stop: stopLiveAudio,
+    sendMessage: sendMessage,
+  } as const;
 }

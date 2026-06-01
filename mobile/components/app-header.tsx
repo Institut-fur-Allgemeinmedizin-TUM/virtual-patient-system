@@ -26,6 +26,7 @@ export function AppHeader() {
   const tumId = useAuthStore((state) => state.user?.tum_id);
   const themeMode = useThemeStore((state) => state.mode);
   const requestScroll = useUIStore((state) => state.requestScroll);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const logout = async () => {
     await useAuthStore.getState().logout();
@@ -107,15 +108,28 @@ export function AppHeader() {
           }
           onPress={switchTheme}
           accessibilityLabel="Toggle theme"
+          color="#C1CBD6"
         />
 
-        <Appbar.Action
-          icon="account-circle-outline"
-          onPress={() => {
-            setProfileSidebarOpen(true);
-          }}
-          accessibilityLabel="Open profile"
-        />
+        {isAuthenticated ? (
+          <Appbar.Action
+            icon="account-circle-outline"
+            onPress={() => {
+              setProfileSidebarOpen(true);
+            }}
+            accessibilityLabel="Open profile"
+            color="#C1CBD6"
+          />
+        ) : (
+          <Button
+            mode="contained"
+            onPress={() => router.push('/login')}
+            style={styles.loginButton}
+            labelStyle={styles.loginButtonLabel}
+          >
+            Anmelden
+          </Button>
+        )}
       </Appbar.Header>
 
       <Portal>
@@ -203,6 +217,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     textTransform: 'none',
+  },
+  loginButton: {
+    marginRight: 8,
+    backgroundColor: '#C1CBD6',
+    borderRadius: 4,
+  },
+  loginButtonLabel: {
+    color: '#0e396e',
+    fontWeight: '700',
+    fontSize: 13,
   },
   sidebarModalContainer: {
     flex: 1,

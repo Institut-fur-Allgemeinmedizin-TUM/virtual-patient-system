@@ -4,8 +4,9 @@ import { Image } from 'expo-image';
 import { Button, Text, useTheme, Surface, TouchableRipple, Icon } from 'react-native-paper';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { router } from 'expo-router';
-import { getCaseImage } from '@/lib/cases/case';
+import { Case, getCaseImage } from '@/lib/cases/case';
 import EvaluationModal from '../components/EvaluationModal';
 import React from 'react';
 
@@ -18,6 +19,7 @@ export default function CasesScreen() {
   const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
   const loadSessionSummaries = useCasesStore((state) => state.loadSessionSummaries);
   const startCase = useSessionStore((state) => state.startSession);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
     void loadAndGetCases();
@@ -54,6 +56,15 @@ export default function CasesScreen() {
     return '#0b7f5a'; // green
   };
 
+  const sC = async (item: Case) => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    const sessionId = await startCase(item.id, item);
+    if (sessionId) router.push(`/session/${sessionId}`);
+  };
+
   return (
     <>
       <FlatList
@@ -85,8 +96,7 @@ export default function CasesScreen() {
                 <TouchableRipple
                   style={{ flex: 1 }}
                   onPress={async () => {
-                    const sessionId = await startCase(item.id, item);
-                    if (sessionId) router.push(`/session/${sessionId}`);
+                    sC(item);
                   }}
                 >
                   <View style={styles.cardInnerFlex}>
@@ -168,8 +178,7 @@ export default function CasesScreen() {
                           <Button
                             mode="contained"
                             onPress={async () => {
-                              const sessionId = await startCase(item.id, item);
-                              if (sessionId) router.push(`/session/${sessionId}`);
+                              sC(item);
                             }}
                             icon="refresh"
                             style={styles.halfWidthButton}
@@ -183,8 +192,7 @@ export default function CasesScreen() {
                         <Button
                           mode="contained"
                           onPress={async () => {
-                            const sessionId = await startCase(item.id, item);
-                            if (sessionId) router.push(`/session/${sessionId}`);
+                            sC(item);
                           }}
                           icon="play"
                           style={styles.fullWidthButton}

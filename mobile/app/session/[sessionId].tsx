@@ -76,8 +76,8 @@ export default function SessionScreen() {
 
   const sendMessage = () => {
     if (!canSend) return;
-    
-    if (liveAudio.isActive)  {
+
+    if (liveAudio.isActive) {
       liveAudio.sendMessage(draft.trim());
     } else {
       session.chat(draft);
@@ -85,7 +85,10 @@ export default function SessionScreen() {
     setDraft('');
   };
 
-  const handleComposerKeyPress = (event: { nativeEvent: { key: string; shiftKey?: boolean }; preventDefault?: () => void }) => {
+  const handleComposerKeyPress = (event: {
+    nativeEvent: { key: string; shiftKey?: boolean };
+    preventDefault?: () => void;
+  }) => {
     if (Platform.OS !== 'web') {
       return;
     }

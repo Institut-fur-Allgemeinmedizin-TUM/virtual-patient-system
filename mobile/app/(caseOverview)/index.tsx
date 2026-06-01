@@ -7,7 +7,8 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { useUIStore } from '@/stores/useUIStore';
-import { getCaseImage } from '@/lib/cases/case';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { Case, getCaseImage } from '@/lib/cases/case';
 import { Image } from 'expo-image';
 import EvaluationModal from '../components/EvaluationModal';
 
@@ -25,6 +26,7 @@ export default function LandingPage() {
   const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
   const loadSessionSummaries = useCasesStore((state) => state.loadSessionSummaries);
   const startCase = useSessionStore((state) => state.startSession);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const scrollRef = useRef<ScrollView>(null);
   const sectionPositions = useRef<Record<string, number>>({});
@@ -82,6 +84,15 @@ export default function LandingPage() {
     if (score <= 2.5) return '#d93025'; // red
     if (score <= 4) return '#d67e00'; // orange
     return '#0b7f5a'; // green
+  };
+
+    const sC = async (item: Case) => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    const sessionId = await startCase(item.id, item);
+    if (sessionId) router.push(`/session/${sessionId}`);
   };
 
   const sections = {
@@ -405,8 +416,7 @@ export default function LandingPage() {
                 >
                   <TouchableRipple
                     onPress={async () => {
-                      const sessionId = await startCase(item.id, item);
-                      if (sessionId) router.push(`/session/${sessionId}`);
+                      sC(item);
                     }}
                     style={{ flex: 1 }}
                   >
@@ -480,8 +490,7 @@ export default function LandingPage() {
                             <Button
                               mode="contained"
                               onPress={async () => {
-                                const sessionId = await startCase(item.id, item);
-                                if (sessionId) router.push(`/session/${sessionId}`);
+                                sC(item);
                               }}
                               icon="refresh"
                               style={styles.halfWidthButton}
@@ -495,8 +504,7 @@ export default function LandingPage() {
                           <Button
                             mode="contained"
                             onPress={async () => {
-                              const sessionId = await startCase(item.id, item);
-                              if (sessionId) router.push(`/session/${sessionId}`);
+                              sC(item);
                             }}
                             icon="play"
                             style={styles.fullWidthButton}
