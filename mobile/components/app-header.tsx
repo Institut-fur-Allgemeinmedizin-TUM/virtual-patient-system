@@ -16,6 +16,9 @@ import { useUIStore } from '@/stores/useUIStore';
 import { router, usePathname } from 'expo-router';
 
 import { appVersion } from '@/lib/util';
+import { MarkdownModal } from './markdown-modal';
+import { getMarkdownContent } from '@/lib/markdown';
+import {Icon} from "react-native-paper/src";
 
 export function AppHeader() {
   const { width } = useWindowDimensions();
@@ -23,6 +26,8 @@ export function AppHeader() {
   const pathname = usePathname();
   const sidebarWidth = Math.min(Math.max(width * 0.78, 260), 340);
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
+  const [imprintModalOpen, setImprintModalOpen] = useState(false);
+  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
   const tumId = useAuthStore((state) => state.user?.tum_id);
   const roles = useAuthStore((state) => state.user?.roles);
   const themeMode = useThemeStore((state) => state.mode);
@@ -35,6 +40,13 @@ export function AppHeader() {
   const switchTheme = () => {
     useThemeStore.getState().toggleMode();
   };
+  const showPrivacyPolicy = async () => {
+    setPrivacyModalOpen(true);
+  }
+
+  const showImprint = async () => {
+    setImprintModalOpen(true);
+  }
 
   const isLandingPage =
     pathname === '/' || pathname === '/(caseOverview)' || pathname === '/(caseOverview)/';
@@ -213,6 +225,40 @@ export function AppHeader() {
 
               <View style={{ flex: 1 }} />
 
+              <Divider/>
+
+              <Drawer.Item
+                icon={({ color }) => (<Icon source={"text-box-search"} size={20} color={color}/>)}
+                label="Impressum"
+                onPress={() => {
+                  showImprint()
+                }}
+                style={{ height: 40 }}
+                theme={{
+                  fonts: {
+                    labelLarge: {
+                      fontWeight: "normal"
+                    },
+                  },
+                }}
+              />
+
+              <Drawer.Item
+                icon={({ color }) => (<Icon source={"gavel"} size={20} color={color}/>)}
+                label="Datenschutz"
+                onPress={() => {
+                  showPrivacyPolicy()
+                }}
+                style={{ height: 40 }}
+                theme={{
+                  fonts: {
+                    labelLarge: {
+                      fontWeight: "normal"
+                    },
+                  },
+                }}
+              />
+
               <View style={styles.versionContainer}>
                 <Divider />
                 <View style={styles.versionRow}>
@@ -225,6 +271,20 @@ export function AppHeader() {
             </Surface>
           </View>
         </Modal>
+
+        <MarkdownModal
+          visible={imprintModalOpen}
+          onDismiss={() => setImprintModalOpen(false)}
+          title="Impressum"
+          content={getMarkdownContent('impressum')}
+        />
+
+        <MarkdownModal
+          visible={privacyModalOpen}
+          onDismiss={() => setPrivacyModalOpen(false)}
+          title="Datenschutzerklärung"
+          content={getMarkdownContent('datenschutz')}
+        />
       </Portal>
     </>
   );

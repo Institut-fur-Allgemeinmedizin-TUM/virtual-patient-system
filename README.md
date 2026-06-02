@@ -249,6 +249,8 @@ Developed by the Medical Education team at TUM.
 
 This is an internal TUM project. For questions or suggestions, please contact the maintainers.
 
+For changing the legal documents have a look at ```mobile/assets/legal```
+
 ---
 
 **Note**: Use `localhost` (not `127.0.0.1`) for local development to ensure proper cookie handling between frontend and backend.
