@@ -26,13 +26,16 @@ export function AppHeader() {
   const pathname = usePathname();
   const sidebarWidth = Math.min(Math.max(width * 0.78, 260), 340);
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
-  const [imprintModalOpen, setImprintModalOpen] = useState(false);
-  const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
   const tumId = useAuthStore((state) => state.user?.tum_id);
   const roles = useAuthStore((state) => state.user?.roles);
   const themeMode = useThemeStore((state) => state.mode);
   const requestScroll = useUIStore((state) => state.requestScroll);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  const imprintModalOpen = useUIStore((state) => state.imprintModalOpen);
+  const privacyModalOpen = useUIStore((state) => state.privacyModalOpen);
+  const setImprintModalOpen = useUIStore((state) => state.setImprintModalOpen);
+  const setPrivacyModalOpen = useUIStore((state) => state.setPrivacyModalOpen);
 
   const logout = async () => {
     await useAuthStore.getState().logout();
