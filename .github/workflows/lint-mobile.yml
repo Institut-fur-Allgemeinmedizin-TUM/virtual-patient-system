@@ -1,0 +1,20 @@
+name: "Eslint"
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main, dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Install modules
+        working-directory: ./mobile
+        run: npm ci
+      - name: Run ESLint
+        working-directory: ./mobile
+        run: npx expo lint
