@@ -29,7 +29,12 @@ import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { mapEvaluationKeyToLabel } from '@/lib/evaluations';
 import EvaluationModal from '@/app/components/EvaluationModal';
-import { SortDirection, SessionHistoryOrderBy, SessionHistoryFilter, SessionHistoryColumn } from '@/services/api';
+import {
+  SortDirection,
+  SessionHistoryOrderBy,
+  SessionHistoryFilter,
+  SessionHistoryColumn,
+} from '@/services/api';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -191,7 +196,7 @@ const WaveScoreCard: React.FC<WaveScoreCardProps> = ({ score, maxScore, label })
 type ColumnId = SessionHistoryColumn;
 
 interface ColumnDef {
-  id: ColumnId
+  id: ColumnId;
   label: string;
 }
 
@@ -221,11 +226,11 @@ const PREDEFINED_COLUMNS: ColumnDef[] = [
   { id: SessionHistoryColumn.Criterion6Explanation, label: 'Criterion 6 Explanation' },
   { id: SessionHistoryColumn.Criterion7Score, label: 'Criterion 7 Score' },
   { id: SessionHistoryColumn.Criterion7Explanation, label: 'Criterion 7 Explanation' },
-  { id: SessionHistoryColumn.Criterion8Score , label: 'Criterion 8 Score' },
+  { id: SessionHistoryColumn.Criterion8Score, label: 'Criterion 8 Score' },
   { id: SessionHistoryColumn.Criterion8Explanation, label: 'Criterion 8 Explanation' },
-  { id: SessionHistoryColumn.LiveTimeUsed, label: 'Live Time Used (s)'},
-  { id: SessionHistoryColumn.UserWordCount, label: 'User Word Count'},
-  { id: SessionHistoryColumn.DurationMinutes, label: 'Duration (min)'},
+  { id: SessionHistoryColumn.LiveTimeUsed, label: 'Live Time Used (s)' },
+  { id: SessionHistoryColumn.UserWordCount, label: 'User Word Count' },
+  { id: SessionHistoryColumn.DurationMinutes, label: 'Duration (min)' },
 ];
 
 // ==========================================
@@ -277,7 +282,7 @@ const AnalyticsDashboard = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const router = useRouter();
 
-  if (!user?.roles?.includes("Admin")) {
+  if (!user?.roles?.includes('Admin')) {
     //Redirect
     router.replace('/unauthorized');
   }
@@ -304,7 +309,15 @@ const AnalyticsDashboard = () => {
     }
 
     loadSessionRecords(itemsPerPage, page * itemsPerPage, orderBy, filters);
-  }, [page, sortColumn, sortDirection, loadSessionRecords, selectedCase, searchQuery, searchColumn]);
+  }, [
+    page,
+    sortColumn,
+    sortDirection,
+    loadSessionRecords,
+    selectedCase,
+    searchQuery,
+    searchColumn,
+  ]);
 
   useEffect(() => {
     const caseId = selectedCase === ALL_CASES_VALUE ? undefined : selectedCase;
@@ -516,7 +529,11 @@ const AnalyticsDashboard = () => {
               });
             }
 
-            downloadCSV(selectedCase === ALL_CASES_VALUE ? undefined : selectedCase, orderBy, filters);
+            downloadCSV(
+              selectedCase === ALL_CASES_VALUE ? undefined : selectedCase,
+              orderBy,
+              filters,
+            );
           }}
         >
           Export CSV

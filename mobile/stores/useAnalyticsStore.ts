@@ -11,8 +11,6 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 
-
-
 type DashboardOverview = {
   avg_scores: Record<string, any> | null;
 };
@@ -288,7 +286,7 @@ export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
         sessionRecords: records,
         totalSessionRecords: resp.data.total,
         isLoadingSessions: false,
-         analyticsError: null,
+        analyticsError: null,
       });
     } catch (error) {
       console.error('Failed to load session records:', error);

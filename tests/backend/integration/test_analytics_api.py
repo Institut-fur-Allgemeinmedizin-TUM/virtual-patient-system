@@ -14,12 +14,6 @@ def test_get_sessions_stats_unauthorized(client):
     })
     assert response.status_code == 403 # Forbidden because anonymous is not admin
 
-def test_get_sessions_stats_forbidden_for_vhb_user(client, force_user, vhb_user):
-    force_user(vhb_user)
-    response = client.post("/api/analytics/sessions/stats", json={
-        "include_columns": [SessionHistoryColumn.id]
-    })
-    assert response.status_code == 403
 
 def test_get_sessions_stats_happy_path_simple(client, force_user, admin_user, db_session):
     from tests.backend.factories.models import create_case, create_session

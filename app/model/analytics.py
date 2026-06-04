@@ -34,6 +34,7 @@ class SessionHistoryColumn(str, Enum):
     criterion8_explanation = "criterion8_explanation"
     improvement_suggestions = "improvement_suggestions"
 
+
 class AggregationFunction(str, Enum):
     avg = "avg"
     sum = "sum"
@@ -41,9 +42,11 @@ class AggregationFunction(str, Enum):
     max = "max"
     count = "count"
 
+
 class SortDirection(str, Enum):
     asc = "asc"
     desc = "desc"
+
 
 class AggregationParam(BaseModel):
     column: SessionHistoryColumn
@@ -53,6 +56,7 @@ class AggregationParam(BaseModel):
     def alias(self) -> str:
         """Generates a dynamic column name, e.g., 'avg_criterion1_score'"""
         return f"{self.function.value}_{self.column.value}"
+
 
 class SessionHistoryOrderBy(BaseModel):
     column: Union[SessionHistoryColumn, str]
@@ -71,7 +75,9 @@ column_db_map = {
     SessionHistoryColumn.ended_at: Session.ended_at,
     SessionHistoryColumn.user_id: Session.user_id,
     SessionHistoryColumn.duration_minutes: (
-        extract("epoch", func.coalesce(Session.ended_at, func.now()) - Session.started_at)
+        extract(
+            "epoch", func.coalesce(Session.ended_at, func.now()) - Session.started_at
+        )
         / 60
     ),
     SessionHistoryColumn.live_time_used: (

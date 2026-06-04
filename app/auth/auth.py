@@ -99,8 +99,9 @@ class AuthenticatedUser(dict):
 
     def is_tumuser(self) -> bool:
         return DefaultRoles.tum_user.value in self.get("roles", [])
+
     def is_vhb(self) -> bool:
-        return self.get("is_vhb_user", False);
+        return self.get("is_vhb_user", False)
 
 
 def find_user_roles(oidc_id: Optional[str]) -> list[str]:

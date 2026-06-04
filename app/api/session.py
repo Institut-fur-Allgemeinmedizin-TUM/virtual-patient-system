@@ -588,7 +588,8 @@ async def evaluate_session(
         # Check if this is a VHB user - they cannot use evaluation feature
         if user.get("is_vhb_user", False):
             raise HTTPException(
-                status_code=403, detail="Evaluation feature is only available for TUM users"
+                status_code=403,
+                detail="Evaluation feature is only available for TUM users",
             )
 
         # Check if session is in VHB sessions (shouldn't happen, but double-check)
@@ -632,7 +633,6 @@ async def evaluate_session(
         return formatting.format_evaluation_response(existing_evaluation)
     if mustExist:
         raise HTTPException(status_code=404, detail="Evaluation not found")
-
 
     # Get all messages for this session
     messages = (

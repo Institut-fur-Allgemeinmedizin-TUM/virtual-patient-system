@@ -33,19 +33,18 @@ analyticsRouter = APIRouter()
 
 
 @analyticsRouter.post(
-    "/api/analytics/sessions/stats",
-    response_model=GetSessionsHistoryResponse
+    "/api/analytics/sessions/stats", response_model=GetSessionsHistoryResponse
 )
 async def get_sessions_stats(
     req: GetSessionsHistoryRequest,
     request: Request,
     as_csv: bool = False,
-    db: OrmSession = Depends(get_db)
+    db: OrmSession = Depends(get_db),
 ) -> Union[GetSessionsHistoryResponse, Response]:
     user = auth.require_user(request)
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized")
-    if user.get("is_vhb_user", False):
+    if user.is_vhb():
         raise HTTPException(status_code=403, detail="Forbidden")
     if not user.is_admin():
         raise HTTPException(status_code=403, detail="Forbidden")
@@ -59,8 +58,7 @@ async def get_sessions_stats(
 
 
 def _fetch_sessions_stats_data(
-    req: GetSessionsHistoryRequest,
-    db: OrmSession
+    req: GetSessionsHistoryRequest, db: OrmSession
 ) -> tuple[list[dict], int, list[str]]:
     if not req.selected_columns() and not req.aggregations:
         raise HTTPException(
@@ -70,7 +68,10 @@ def _fetch_sessions_stats_data(
         raise HTTPException(
             status_code=400, detail="Cannot order by more than 3 columns"
         )
-    if not req.aggregations and req.selected_columns().count(SessionHistoryColumn.id) == 0:
+    if (
+        not req.aggregations
+        and req.selected_columns().count(SessionHistoryColumn.id) == 0
+    ):
         raise HTTPException(
             status_code=400, detail="id column must be selected for pagination to work"
         )
@@ -80,7 +81,7 @@ def _fetch_sessions_stats_data(
 
     # Build full list of selected columns including aggregations
     selected_columns = list(base_columns)
-    for agg in (req.aggregations or []):
+    for agg in req.aggregations or []:
         if agg.function == "avg":
             selected_columns.append(
                 func.avg(column_db_map[agg.column]).label(agg.alias)
@@ -99,7 +100,8 @@ def _fetch_sessions_stats_data(
             )
         else:
             raise HTTPException(
-                status_code=400, detail=f"Unsupported aggregation function: {agg.function}"
+                status_code=400,
+                detail=f"Unsupported aggregation function: {agg.function}",
             )
 
     # Output keys in the same order as the selected_columns used in the query.
@@ -107,15 +109,17 @@ def _fetch_sessions_stats_data(
         agg.alias for agg in (req.aggregations or [])
     ]
 
-    query = db.query(
-        *selected_columns
-    ).select_from(Session).join(
-        Evaluation,
-        Evaluation.session_id == Session.id,
-        isouter=(not req.only_evaluated),
+    query = (
+        db.query(*selected_columns)
+        .select_from(Session)
+        .join(
+            Evaluation,
+            Evaluation.session_id == Session.id,
+            isouter=(not req.only_evaluated),
+        )
     )
 
-    for filter_item in (req.filters or []):
+    for filter_item in req.filters or []:
         col = column_db_map[filter_item.column]
         if filter_item.value is None:
             query = query.filter(col.is_(None))
@@ -144,12 +148,16 @@ def _fetch_sessions_stats_data(
         query = query.order_by(col.asc() if asc else col.desc())
 
     # Compute total
-    total_q = db.query(func.count(Session.id)).select_from(Session).join(
-        Evaluation,
-        Evaluation.session_id == Session.id,
-        isouter=(not req.only_evaluated),
+    total_q = (
+        db.query(func.count(Session.id))
+        .select_from(Session)
+        .join(
+            Evaluation,
+            Evaluation.session_id == Session.id,
+            isouter=(not req.only_evaluated),
+        )
     )
-    for filter_item in (req.filters or []):
+    for filter_item in req.filters or []:
         col = column_db_map[filter_item.column]
         if filter_item.value is None:
             total_q = total_q.filter(col.is_(None))
@@ -188,9 +196,7 @@ def _fetch_sessions_stats_data(
 
 
 def _format_sessions_stats_csv(
-    rows: list[dict],
-    output_keys: list[str],
-    include_messages: bool
+    rows: list[dict], output_keys: list[str], include_messages: bool
 ) -> Response:
     csv_buffer = io.StringIO()
     headers = output_keys.copy()
@@ -208,16 +214,12 @@ def _format_sessions_stats_csv(
     return Response(
         content=csv_buffer.getvalue(),
         media_type="text/csv",
-        headers={
-            "Content-Disposition": "attachment; filename=sessions_stats.csv"
-        }
+        headers={"Content-Disposition": "attachment; filename=sessions_stats.csv"},
     )
 
 
 def _format_sessions_stats_json(
-    rows: list[dict],
-    total: int,
-    req: GetSessionsHistoryRequest
+    rows: list[dict], total: int, req: GetSessionsHistoryRequest
 ) -> GetSessionsHistoryResponse:
     json_rows = [{"values": r} for r in rows]
     return GetSessionsHistoryResponse(
@@ -227,4 +229,3 @@ def _format_sessions_stats_json(
         limit=req.limit,
         offset=req.offset,
     )
-
