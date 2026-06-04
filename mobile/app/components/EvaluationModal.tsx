@@ -11,6 +11,9 @@ import {
   Divider,
   Avatar,
   useTheme,
+  Dialog,
+  TextInput,
+  IconButton,
 } from 'react-native-paper';
 import { useSessionStore } from '@/stores/useSessionStore';
 
@@ -25,7 +28,13 @@ export default function EvaluationModal() {
   const messagesError = useSessionStore((s) => s.evaluationMessagesError);
   const loadEvaluationMessages = useSessionStore((s) => s.loadEvaluationMessages);
   const resetEvaluation = useSessionStore((s) => s.resetEvaluation);
+  const submitFeedback = useSessionStore((s) => s.submitFeedback);
+  const submittingFeedback = useSessionStore((s) => s.waitingForFeedbackSubmission);
+
   const [showTranscript, setShowTranscript] = useState(false);
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [feedbackScore, setFeedbackScore] = useState(5);
+  const [feedbackComment, setFeedbackComment] = useState('');
 
   const visible = Boolean(loading || evaluation);
 
@@ -97,6 +106,17 @@ export default function EvaluationModal() {
                   </Text>
                 </View>
               </View>
+              {evaluation && (
+                <Button
+                  mode="text"
+                  icon="message-draw"
+                  onPress={() => setShowFeedbackDialog(true)}
+                  labelStyle={{ fontSize: 12 }}
+                  compact
+                >
+                  Feedback
+                </Button>
+              )}
             </View>
           </View>
 
@@ -415,6 +435,53 @@ export default function EvaluationModal() {
           ) : null}
         </Surface>
       </Modal>
+
+      <Portal>
+        <Dialog visible={showFeedbackDialog} onDismiss={() => setShowFeedbackDialog(false)}>
+          <Dialog.Title>Feedback geben</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium" style={{ marginBottom: 16 }}>
+              Wie zufrieden sind Sie mit der Simulation und der Evaluation?
+            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <IconButton
+                  key={s}
+                  icon={s <= feedbackScore ? 'star' : 'star-outline'}
+                  iconColor={theme.colors.primary}
+                  size={30}
+                  onPress={() => setFeedbackScore(s)}
+                />
+              ))}
+            </View>
+            <TextInput
+              label="Ihr Kommentar (optional)"
+              value={feedbackComment}
+              onChangeText={setFeedbackComment}
+              multiline
+              numberOfLines={4}
+              mode="outlined"
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setShowFeedbackDialog(false)}>Abbrechen</Button>
+            <Button
+              onPress={async () => {
+                const success = await submitFeedback(feedbackScore, feedbackComment);
+                if (success) {
+                  setShowFeedbackDialog(false);
+                  setFeedbackComment('');
+                  setFeedbackScore(5);
+                }
+              }}
+              loading={submittingFeedback}
+              disabled={submittingFeedback}
+            >
+              Absenden
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </Portal>
   );
 }
