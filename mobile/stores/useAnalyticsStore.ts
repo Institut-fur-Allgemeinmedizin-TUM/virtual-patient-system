@@ -276,6 +276,7 @@ export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
           SessionHistoryColumn.Criterion8Explanation,
           SessionHistoryColumn.LiveTimeUsed,
           SessionHistoryColumn.UserWordCount,
+          SessionHistoryColumn.DurationMinutes,
         ],
         aggregations: [],
       };
