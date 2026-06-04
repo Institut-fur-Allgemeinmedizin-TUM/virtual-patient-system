@@ -94,6 +94,7 @@ async def create_session(
         tum_id = user.get("tum_id") or user.get("sub")
 
         chat_session = ChatSession(id=session_id, case_id=req.case_id, user_id=tum_id)
+        chat_session.started_at = datetime.now()
         db.add(chat_session)
         db.add(
             Message(
@@ -607,7 +608,7 @@ async def evaluate_session(
     if chat_session.user_id != tum_id:
         if not user.get("is_admin", False):
             raise HTTPException(status_code=403, detail="Invalid user id")
-        else: 
+        else:
             mustExist = True
 
     # Check if evaluation already exists
@@ -616,6 +617,15 @@ async def evaluate_session(
     )
 
     if existing_evaluation:
+        # Mark session as ended if not already set
+        if chat_session.ended_at is None:
+            try:
+                chat_session.ended_at = datetime.now()
+                db.add(chat_session)
+                db.commit()
+            except Exception:
+                db.rollback()
+                # If saving the end date fails, still return the cached evaluation
         if os.environ.get("SIMULATE_AI") == "true":
             pytime.sleep(4)
         # Return existing evaluation
@@ -728,7 +738,10 @@ async def evaluate_session(
             improvement_suggestions=evaluation_data["suggestions"],
         )
 
+        # Persist evaluation and mark session as ended
         db.add(evaluation)
+        chat_session.ended_at = datetime.now()
+        db.add(chat_session)
         db.commit()
         db.refresh(evaluation)
 

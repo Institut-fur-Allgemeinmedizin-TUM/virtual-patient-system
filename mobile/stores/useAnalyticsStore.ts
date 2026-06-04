@@ -255,6 +255,7 @@ export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
         include_messages: false,
         filters: filters,
         include_columns: [
+          SessionHistoryColumn.StartedAt,
           SessionHistoryColumn.Id,
           SessionHistoryColumn.Case,
           SessionHistoryColumn.EndedAt,

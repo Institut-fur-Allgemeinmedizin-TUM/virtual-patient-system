@@ -75,7 +75,7 @@ column_db_map = {
         / 60
     ),
     SessionHistoryColumn.live_time_used: (
-        SessionLiveDefaultTime - Session.live_time_remaining
+        (SessionLiveDefaultTime - Session.live_time_remaining)
     ),
     SessionHistoryColumn.user_word_count: (
         select(
