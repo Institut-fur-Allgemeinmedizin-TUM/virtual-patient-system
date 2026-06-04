@@ -383,23 +383,28 @@ export default function SessionScreen() {
               />
 
               {/* Live Audio Button - single unified button */}
-              <IconButton
-                icon={liveAudio.isActive ? 'stop' : 'microphone'}
-                mode={liveAudio.isActive ? 'contained' : 'contained-tonal'}
-                size={24}
-                iconColor={liveAudio.isActive ? theme.colors.onPrimary : undefined}
-                onPress={async () => {
-                  if (liveAudio.isActive) {
-                    await liveAudio.stop();
-                  } else {
-                    await liveAudio.start();
+              <View style={{ position: 'relative' }}>
+                <Surface style={styles.betaBadge} elevation={0}>
+                  <Text style={styles.betaBadgeText}>BETA</Text>
+                </Surface>
+                <IconButton
+                  icon={liveAudio.isActive ? 'stop' : 'microphone'}
+                  mode={liveAudio.isActive ? 'contained' : 'contained-tonal'}
+                  size={24}
+                  iconColor={liveAudio.isActive ? theme.colors.onPrimary : undefined}
+                  onPress={async () => {
+                    if (liveAudio.isActive) {
+                      await liveAudio.stop();
+                    } else {
+                      await liveAudio.start();
+                    }
+                  }}
+                  disabled={liveAudio.isConnecting || isBotTyping}
+                  accessibilityLabel={
+                    liveAudio.isActive ? 'Aufnahme stoppen' : 'Mit Patient sprechen'
                   }
-                }}
-                disabled={liveAudio.isConnecting || isBotTyping}
-                accessibilityLabel={
-                  liveAudio.isActive ? 'Aufnahme stoppen' : 'Mit Patient sprechen'
-                }
-              />
+                />
+              </View>
 
               {/* Send Button */}
               <IconButton
@@ -556,5 +561,20 @@ const styles = StyleSheet.create({
   },
   tipText: {
     flex: 1,
+  },
+  betaBadge: {
+    backgroundColor: '#0065BD',
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 4,
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    zIndex: 1,
+  },
+  betaBadgeText: {
+    color: '#fff',
+    fontSize: 8,
+    fontWeight: '900',
   },
 });
