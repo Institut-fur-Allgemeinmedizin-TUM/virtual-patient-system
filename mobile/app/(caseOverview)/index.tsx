@@ -826,7 +826,8 @@ const createStyles = (theme: any) =>
     evalStars: {
       flexDirection: 'row',
       gap: 3,
-      marginTop: 12,
+      marginTop: 'auto',
+      paddingTop: 12,
     },
     starBar: {
       height: 4,

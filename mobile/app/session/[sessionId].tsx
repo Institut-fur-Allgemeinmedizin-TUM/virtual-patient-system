@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   betaBadge: {
-    backgroundColor: '#0065BD',
+    backgroundColor: '#BD0000',
     paddingHorizontal: 4,
     paddingVertical: 1,
     borderRadius: 4,
@@ -574,7 +574,7 @@ const styles = StyleSheet.create({
   },
   betaBadgeText: {
     color: '#fff',
-    fontSize: 8,
+    fontSize: 9,
     fontWeight: '900',
   },
 });
