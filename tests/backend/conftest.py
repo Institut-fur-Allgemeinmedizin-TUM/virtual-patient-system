@@ -88,6 +88,16 @@ def tum_user():
 
 
 @pytest.fixture
+def admin_user():
+    from app.auth.auth import AuthenticatedUser
+    from app.model.models import DefaultRoles
+
+    return AuthenticatedUser(
+        {"sub": "admin", "tum_id": "admin", "name": "Admin User", "roles": [DefaultRoles.admin.value]}
+    )
+
+
+@pytest.fixture
 def other_tum_user():
     return {"sub": "ab12cde", "tum_id": "ab12cde", "name": "Other TUM User"}
 
