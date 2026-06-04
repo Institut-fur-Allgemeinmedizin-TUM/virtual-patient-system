@@ -75,6 +75,7 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="unauthorized" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ title: '' }} />
           <Stack.Screen name="(caseOverview)" options={{ title: '' }} />
           <Stack.Screen name="session/[sessionId]" options={{ title: 'Session' }} />

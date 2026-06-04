@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Dropdown } from 'react-native-element-dropdown';
 import {
   Surface,
@@ -29,6 +30,7 @@ import { useSessionStore } from '@/stores/useSessionStore';
 import { mapEvaluationKeyToLabel } from '@/lib/evaluations';
 import EvaluationModal from '@/app/components/EvaluationModal';
 import { SortDirection, SessionHistoryOrderBy, SessionHistoryFilter, SessionHistoryColumn } from '@/services/api';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -265,6 +267,7 @@ const AnalyticsDashboard = () => {
   const loadSessionRecords = useAnalyticsStore((state) => state.loadSessionRecords);
   const totalSessionRecords = useAnalyticsStore((state) => state.totalSessionRecords);
   const downloadCSV = useAnalyticsStore((state) => state.downloadCSV);
+  const user = useAuthStore((state) => state.user);
   const isDownloadingCSV = useAnalyticsStore((state) => state.isDownloadingCSV);
   const analyticsError = useAnalyticsStore((state) => state.analyticsError);
   const clearAnalyticsError = useAnalyticsStore((state) => state.clearAnalyticsError);
@@ -272,6 +275,12 @@ const AnalyticsDashboard = () => {
   const loadAndGetCases = useCasesStore((state) => state.loadAndGetCases);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const router = useRouter();
+
+  if (!user?.roles?.includes("Admin")) {
+    //Redirect
+    router.replace('/unauthorized');
+  }
 
   useEffect(() => {
     loadAndGetCases();
