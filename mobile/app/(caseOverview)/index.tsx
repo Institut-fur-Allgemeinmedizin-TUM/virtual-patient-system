@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions, Platform } from 'react-native';
 import { Text, useTheme, Surface, TouchableRipple, Button, Icon } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -52,6 +52,13 @@ export default function LandingPage() {
       }
     }
   }, [scrollRequest]);
+
+  const landingEvalScores = useMemo(() => [4, 2, 5, 3, 1, 3, 5, 4], []);
+
+  const getScaleColor = (score: number) => {
+    const colors = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e'];
+    return colors[score - 1] || colors[2];
+  };
 
   const onLayout = (key: string) => (event: any) => {
     sectionPositions.current[key] = event.nativeEvent.layout.y;
@@ -343,26 +350,36 @@ export default function LandingPage() {
                 t: 'Gesprächseffektivität beurteilen',
                 p: 'Reflexion: Wurden gefährliche Diagnosen priorisiert?',
               },
-            ].map((dim, i) => (
-              <Surface
-                key={i}
-                style={[styles.evalCard, isWeb ? { width: '23%' } : { width: '100%' }]}
-                elevation={1}
-              >
-                <Text style={styles.evalDim}>Dimension {dim.d}</Text>
-                <Text variant="titleSmall" style={styles.evalTitle}>
-                  {dim.t}
-                </Text>
-                <Text variant="bodySmall" style={styles.evalDesc}>
-                  {dim.p}
-                </Text>
-                <View style={styles.evalStars}>
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <View key={s} style={[styles.starBar, s <= 3 && styles.starBarFilled]} />
-                  ))}
-                </View>
-              </Surface>
-            ))}
+            ].map((dim, i) => {
+              const score = landingEvalScores[i] || 3;
+              const barColor = getScaleColor(score);
+              return (
+                <Surface
+                  key={i}
+                  style={[styles.evalCard, isWeb ? { width: '23%' } : { width: '100%' }]}
+                  elevation={1}
+                >
+                  <Text style={styles.evalDim}>Dimension {dim.d}</Text>
+                  <Text variant="titleSmall" style={styles.evalTitle}>
+                    {dim.t}
+                  </Text>
+                  <Text variant="bodySmall" style={styles.evalDesc}>
+                    {dim.p}
+                  </Text>
+                  <View style={styles.evalStars}>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <View
+                        key={s}
+                        style={[
+                          styles.starBar,
+                          s <= score && { backgroundColor: barColor },
+                        ]}
+                      />
+                    ))}
+                  </View>
+                </Surface>
+              );
+            })}
           </View>
 
           <Surface style={styles.scaleInfo} elevation={0}>
@@ -816,9 +833,6 @@ const createStyles = (theme: any) =>
       flex: 1,
       backgroundColor: theme.colors.outlineVariant,
       borderRadius: 2,
-    },
-    starBarFilled: {
-      backgroundColor: theme.colors.primary,
     },
     scaleInfo: {
       marginTop: 32,
