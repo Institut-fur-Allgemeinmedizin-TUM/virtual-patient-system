@@ -36,11 +36,13 @@ from app.model.llm import (
     CreateSessionRequest,
     ChatResponse,
     ChatRequest,
+    UserSessionFeedBack,
 )
 from app.model.models import (
     Session as ChatSession,
     Message,
     SessionMessagesResponse,
+    SessionUserFeedback,
 )
 from app.model.models import (
     SessionLiveDefaultTime,
@@ -863,3 +865,41 @@ async def set_diagnosis(
     return JSONResponse(
         status_code=200, content={"ok": True, "diagnosis": diagnosis_value}
     )
+
+@sessionRouter.post("/api/sessions/{session_id}/feedback")
+async def create_feedback(
+    session_id: str,
+    req: UserSessionFeedBack,
+    request: Request,
+    db: OrmSession = Depends(get_db),
+):
+    """Create feedback for a session."""
+    user = auth.require_user(request)
+
+    chat_session = db.get(ChatSession, session_id)
+    if chat_session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    tum_id = user.get("tum_id") or user.get("sub")
+    if chat_session.user_id != tum_id:
+        raise HTTPException(status_code=403, detail="Invalid user id")
+
+    # Check if feedback already exists
+    existing_feedback = (
+        db.query(SessionUserFeedback)
+        .filter(SessionUserFeedback.session_id == session_id)
+        .first()
+    )
+    if existing_feedback:
+        existing_feedback.feedback_score = req.feedback_score
+        existing_feedback.feedback = req.feedback_comment
+    else:
+        feedback = SessionUserFeedback(
+            session_id=session_id,
+            feedback_score=req.feedback_score,
+            feedback=req.feedback_comment,
+        )
+        db.add(feedback)
+
+    db.commit()
+    return {"ok": True}
