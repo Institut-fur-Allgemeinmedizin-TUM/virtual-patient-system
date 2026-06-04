@@ -19,6 +19,8 @@ interface SessionState {
   evaluationMessages: ChatMessage[];
   waitingForEvaluationMessages: boolean;
   evaluationMessagesError?: string;
+  waitingForFeedbackSubmission: boolean;
+  submitFeedback: (score: number, comment: string) => Promise<boolean>;
   startSession: (caseId: string, caseData: Case) => Promise<string | undefined>;
   loadSession: () => Promise<void>;
   chat: (msg: string) => void;
@@ -38,6 +40,29 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   evaluationMessages: [],
   waitingForEvaluationMessages: false,
   evaluationMessagesError: undefined,
+  waitingForFeedbackSubmission: false,
+
+  submitFeedback: async (score: number, comment: string) => {
+    const sessionId = get().sessionId || get().evaluationResponse?.session_id;
+    if (!sessionId) {
+      console.error('No session ID for feedback');
+      return false;
+    }
+    set({ waitingForFeedbackSubmission: true });
+    try {
+      const resp = await apiClient.api.createFeedbackApiSessionsSessionIdFeedbackPost(sessionId, {
+        session_id: sessionId,
+        feedback_score: score,
+        feedback_comment: comment,
+      });
+      set({ waitingForFeedbackSubmission: false });
+      return resp.status === 200;
+    } catch (error) {
+      console.error('Feedback submission error:', error);
+      set({ waitingForFeedbackSubmission: false });
+      return false;
+    }
+  },
 
   startSession: async (caseId: string, caseData: Case) => {
     const resp = await apiClient.api.createSessionApiSessionsPost({ case_id: caseId });
