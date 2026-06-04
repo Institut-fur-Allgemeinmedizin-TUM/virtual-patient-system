@@ -191,6 +191,16 @@ export function AppHeader() {
               <Divider />
 
               <Drawer.Section>
+                {roles?.includes('Admin') && (
+                  <Drawer.Item
+                    icon="chart-bar"
+                    label="Analytics"
+                    onPress={() => {
+                      setProfileSidebarOpen(false);
+                      router.push('/analytics');
+                    }}
+                  />
+                )}
                 <Drawer.Item
                   icon="logout"
                   label="Sign out"
