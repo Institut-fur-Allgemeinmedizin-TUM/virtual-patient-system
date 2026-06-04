@@ -131,6 +131,10 @@ class Session(Base):
         back_populates="session", uselist=False, cascade="all, delete-orphan"
     )
 
+    user_feedback: Mapped[Optional["SessionUserFeedback"]] = relationship(
+        back_populates="session", uselist=False, cascade="all, delete-orphan"
+    )
+
     student_diagnosis: Mapped[Optional[str]] = mapped_column(
         String, nullable=True, server_default=None
     )
@@ -164,6 +168,17 @@ class Message(Base):
 
     session: Mapped[Session] = relationship(back_populates="messages")
 
+class SessionUserFeedback(Base):
+    __tablename__ = "session_user_feedback"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    session_id: Mapped[str] = mapped_column(
+        ForeignKey("sessions.id"), nullable=False, unique=True
+    )
+    feedback_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    feedback: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    session: Mapped["Session"] = relationship(back_populates="user_feedback")
 
 class Diagnostic(Base):
     __tablename__ = "diagnostics"

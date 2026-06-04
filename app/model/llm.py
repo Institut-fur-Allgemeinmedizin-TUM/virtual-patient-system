@@ -18,3 +18,8 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     session_id: str
+
+class UserSessionFeedBack(BaseModel):
+    session_id: str
+    feedback_score: int
+    feedback_comment: str
