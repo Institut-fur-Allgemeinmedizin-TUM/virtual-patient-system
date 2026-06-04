@@ -115,7 +115,7 @@ class Session(Base):
         ForeignKey("users.oidc_id"), nullable=True
     )
     started_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=datetime.now().isoformat()
+        DateTime(timezone=True), server_default=func.now()
     )
     ended_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True

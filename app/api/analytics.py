@@ -29,17 +29,17 @@ from app.model.models import (
 )
 from app.config.config import settings
 
-analyticRouter = APIRouter()
+analyticsRouter = APIRouter()
 
 
-@analyticRouter.post(
-    "/api/analytics/sessions/stats", 
+@analyticsRouter.post(
+    "/api/analytics/sessions/stats",
     response_model=GetSessionsHistoryResponse
 )
 async def get_sessions_stats(
-    req: GetSessionsHistoryRequest, 
-    request: Request, 
-    as_csv: bool = False, 
+    req: GetSessionsHistoryRequest,
+    request: Request,
+    as_csv: bool = False,
     db: OrmSession = Depends(get_db)
 ) -> Union[GetSessionsHistoryResponse, Response]:
     user = auth.require_user(request)
@@ -47,9 +47,21 @@ async def get_sessions_stats(
         raise HTTPException(status_code=401, detail="Unauthorized")
     if user.get("is_vhb_user", False):
         raise HTTPException(status_code=403, detail="Forbidden")
-    # TODO - implement better check
     if not user.is_admin():
         raise HTTPException(status_code=403, detail="Forbidden")
+
+    rows, total, output_keys = _fetch_sessions_stats_data(req, db)
+
+    if as_csv:
+        return _format_sessions_stats_csv(rows, output_keys, req.include_messages)
+
+    return _format_sessions_stats_json(rows, total, req)
+
+
+def _fetch_sessions_stats_data(
+    req: GetSessionsHistoryRequest,
+    db: OrmSession
+) -> tuple[list[dict], int, list[str]]:
     if not req.selected_columns() and not req.aggregations:
         raise HTTPException(
             status_code=400, detail="At least one column must be selected"
@@ -91,7 +103,6 @@ async def get_sessions_stats(
             )
 
     # Output keys in the same order as the selected_columns used in the query.
-    # For base columns use the enum string value; for aggregates use the provided alias.
     output_keys = [col.value for col in req.selected_columns()] + [
         agg.alias for agg in (req.aggregations or [])
     ]
@@ -114,12 +125,9 @@ async def get_sessions_stats(
             query = query.filter(col == filter_item.value)
 
     if req.include_messages:
-        # If messages are included, we need to join them and aggregate into a list
-
         MessageAlias = aliased(Message)
         query = (
             query.join(MessageAlias, MessageAlias.session_id == Session.id)
-            # Group only by the non-aggregated/base columns
             .group_by(*base_columns)
             .add_columns(
                 func.json_agg(
@@ -135,7 +143,7 @@ async def get_sessions_stats(
         asc = getattr(order.direction, "value", order.direction) == "asc"
         query = query.order_by(col.asc() if asc else col.desc())
 
-    # Compute total (without limit/offset)
+    # Compute total
     total_q = db.query(func.count(Session.id)).select_from(Session).join(
         Evaluation,
         Evaluation.session_id == Session.id,
@@ -150,13 +158,15 @@ async def get_sessions_stats(
         else:
             total_q = total_q.filter(col == filter_item.value)
     total = total_q.scalar() or 0
+
     if req.offset > 0:
         query = query.offset(req.offset)
     if req.limit > 0:
         query = query.limit(req.limit)
+
     results = query.all()
 
-    # Normalize rows into dicts keyed by column name
+    # Normalize rows into dicts
     rows = []
     for row in results:
         try:
@@ -165,50 +175,51 @@ async def get_sessions_stats(
             row_vals = (row,)
 
         values = {}
-        # Map result columns to their output keys (includes aggregations)
         for i, key in enumerate(output_keys):
             values[key] = row_vals[i] if i < len(row_vals) else None
 
         if req.include_messages:
-            # messages column is appended after all selected columns
             values["messages"] = (
                 row_vals[len(output_keys)] if len(row_vals) > len(output_keys) else []
             )
         rows.append(values)
 
-    # ---------------------------------------------------------
-    # CSV Return Logic
-    # ---------------------------------------------------------
-    if as_csv:
-        csv_buffer = io.StringIO()
-        
-        headers = output_keys.copy()
-        if req.include_messages:
-            headers.append("messages")
-            
-        writer = csv.DictWriter(csv_buffer, fieldnames=headers, delimiter=";")
-        writer.writeheader()
-        
-        for row in rows:
-            if req.include_messages and row.get("messages"):
-                row["messages"] = json.dumps(row["messages"], indent=2, ensure_ascii=False)
-            writer.writerow(row)
-            
-        # Returns FastAPI Response (bypasses response_model serialization)
-        return Response(
-            content=csv_buffer.getvalue(),
-            media_type="text/csv",
-            headers={
-                "Content-Disposition": "attachment; filename=sessions_stats.csv"
-            }
-        )
+    return rows, total, output_keys
 
-    # ---------------------------------------------------------
-    # JSON Return Logic
-    # ---------------------------------------------------------
+
+def _format_sessions_stats_csv(
+    rows: list[dict],
+    output_keys: list[str],
+    include_messages: bool
+) -> Response:
+    csv_buffer = io.StringIO()
+    headers = output_keys.copy()
+    if include_messages:
+        headers.append("messages")
+
+    writer = csv.DictWriter(csv_buffer, fieldnames=headers, delimiter=";")
+    writer.writeheader()
+
+    for row in rows:
+        if include_messages and row.get("messages"):
+            row["messages"] = json.dumps(row["messages"], indent=2, ensure_ascii=False)
+        writer.writerow(row)
+
+    return Response(
+        content=csv_buffer.getvalue(),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=sessions_stats.csv"
+        }
+    )
+
+
+def _format_sessions_stats_json(
+    rows: list[dict],
+    total: int,
+    req: GetSessionsHistoryRequest
+) -> GetSessionsHistoryResponse:
     json_rows = [{"values": r} for r in rows]
-    
-    # Returns Pydantic model (uses response_model serialization)
     return GetSessionsHistoryResponse(
         columns=req.selected_columns(),
         rows=json_rows,
@@ -216,3 +227,4 @@ async def get_sessions_stats(
         limit=req.limit,
         offset=req.offset,
     )
+

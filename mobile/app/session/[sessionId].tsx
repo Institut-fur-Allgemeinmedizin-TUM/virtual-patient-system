@@ -77,7 +77,6 @@ export default function SessionScreen() {
   const sendMessage = () => {
     if (!canSend) return;
 
-    setDraft('');
     if (liveAudio.isActive) {
       liveAudio.sendMessage(draft.trim());
     } else {

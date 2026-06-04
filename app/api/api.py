@@ -38,7 +38,7 @@ app.include_router(auth.authRouter)
 app.include_router(session.sessionRouter)
 app.include_router(util.utilRouter)
 app.include_router(health.healthRouter)
-app.include_router(analytics.analyticRouter)
+app.include_router(analytics.analyticsRouter)
 app.include_router(user.userRouter)
 app.include_router(medical_background.medical_background_router)
 
