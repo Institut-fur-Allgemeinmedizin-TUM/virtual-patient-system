@@ -370,10 +370,7 @@ export default function LandingPage() {
                     {[1, 2, 3, 4, 5].map((s) => (
                       <View
                         key={s}
-                        style={[
-                          styles.starBar,
-                          s <= score && { backgroundColor: barColor },
-                        ]}
+                        style={[styles.starBar, s <= score && { backgroundColor: barColor }]}
                       />
                     ))}
                   </View>
