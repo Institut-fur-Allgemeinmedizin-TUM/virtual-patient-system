@@ -63,9 +63,11 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       }
     } catch (error: any) {
       set({ waitingForFeedbackFetch: false });
+
       if (error.response?.status !== 404) {
         console.error('Failed to fetch feedback:', error);
       }
+      return { score: 0, comment: '' };
     }
     return undefined;
   },
