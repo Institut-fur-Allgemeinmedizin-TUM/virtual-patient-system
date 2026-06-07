@@ -2,6 +2,7 @@ from app.api.memory import vhb_sessions
 from tests.backend.factories.models import (
     create_case,
     create_evaluation,
+    create_feedback,
     create_message,
     create_session,
 )
@@ -190,3 +191,37 @@ def test_sessions_summary_vhb_forbidden(client, force_user, vhb_user):
     force_user(vhb_user)
     response = client.get("/api/sessions/summary")
     assert response.status_code == 403
+
+
+def test_get_feedback_happy_path_owner(client, force_user, tum_user, db_session):
+    create_case(db_session)
+    create_session(db_session, "s-fb-owner", user_id=tum_user["tum_id"])
+    create_feedback(db_session, "s-fb-owner", score=5, comment="Great!")
+    force_user(tum_user)
+
+    response = client.get("/api/sessions/s-fb-owner/feedback")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["session_id"] == "s-fb-owner"
+    assert data["feedback_score"] == 5
+    assert data["feedback_comment"] == "Great!"
+
+
+def test_get_feedback_happy_path_admin(client, force_user, admin_user, db_session):
+    create_case(db_session)
+    create_session(db_session, "s-fb-admin", user_id="other-user")
+    create_feedback(db_session, "s-fb-admin", score=4, comment="Good")
+    force_user(admin_user)
+
+    response = client.get("/api/sessions/s-fb-admin/feedback")
+    assert response.status_code == 200
+    assert response.json()["feedback_score"] == 4
+
+
+def test_get_feedback_not_found(client, force_user, tum_user, db_session):
+    create_case(db_session)
+    create_session(db_session, "s-fb-missing", user_id=tum_user["tum_id"])
+    force_user(tum_user)
+
+    response = client.get("/api/sessions/s-fb-missing/feedback")
+    assert response.status_code == 404

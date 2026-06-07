@@ -1,4 +1,4 @@
-from app.model.models import Case, Evaluation, Message, Session
+from app.model.models import Case, Evaluation, Message, Session, SessionUserFeedback
 
 
 def create_case(db, case_id: str = "bauchschmerzen") -> Case:
@@ -65,3 +65,14 @@ def create_evaluation(db, session_id: str, score: int = 4) -> Evaluation:
     db.add(evaluation)
     db.commit()
     return evaluation
+
+
+def create_feedback(
+    db, session_id: str, score: int = 5, comment: str = "Very good"
+) -> SessionUserFeedback:
+    feedback = SessionUserFeedback(
+        session_id=session_id, feedback_score=score, feedback=comment
+    )
+    db.add(feedback)
+    db.commit()
+    return feedback

@@ -866,6 +866,41 @@ async def set_diagnosis(
         status_code=200, content={"ok": True, "diagnosis": diagnosis_value}
     )
 
+
+@sessionRouter.get(
+    "/api/sessions/{session_id}/feedback", response_model=UserSessionFeedBack
+)
+async def get_feedback(
+    session_id: str, request: Request, db: OrmSession = Depends(get_db)
+) -> UserSessionFeedBack:
+    """Get feedback for a session."""
+    user = auth.require_user(request)
+
+    chat_session = db.get(ChatSession, session_id)
+    if chat_session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    tum_id = user.get("tum_id") or user.get("sub")
+    is_owner = chat_session.user_id == tum_id
+    if not is_owner and not user.is_admin():
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    feedback = (
+        db.query(SessionUserFeedback)
+        .filter(SessionUserFeedback.session_id == session_id)
+        .first()
+    )
+
+    if not feedback:
+        raise HTTPException(status_code=404, detail="Feedback not found")
+
+    return UserSessionFeedBack(
+        session_id=feedback.session_id,
+        feedback_score=feedback.feedback_score,
+        feedback_comment=feedback.feedback,
+    )
+
+
 @sessionRouter.post("/api/sessions/{session_id}/feedback")
 async def create_feedback(
     session_id: str,

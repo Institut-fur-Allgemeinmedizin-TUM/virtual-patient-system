@@ -168,6 +168,7 @@ class Message(Base):
 
     session: Mapped[Session] = relationship(back_populates="messages")
 
+
 class SessionUserFeedback(Base):
     __tablename__ = "session_user_feedback"
 
@@ -179,6 +180,7 @@ class SessionUserFeedback(Base):
     feedback: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     session: Mapped["Session"] = relationship(back_populates="user_feedback")
+
 
 class Diagnostic(Base):
     __tablename__ = "diagnostics"

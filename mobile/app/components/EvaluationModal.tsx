@@ -30,6 +30,8 @@ export default function EvaluationModal() {
   const resetEvaluation = useSessionStore((s) => s.resetEvaluation);
   const submitFeedback = useSessionStore((s) => s.submitFeedback);
   const submittingFeedback = useSessionStore((s) => s.waitingForFeedbackSubmission);
+  const fetchFeedback = useSessionStore((s) => s.fetchFeedback);
+  const fetchingFeedback = useSessionStore((s) => s.waitingForFeedbackFetch);
 
   const [showTranscript, setShowTranscript] = useState(false);
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
@@ -37,6 +39,17 @@ export default function EvaluationModal() {
   const [feedbackComment, setFeedbackComment] = useState('');
 
   const visible = Boolean(loading || evaluation);
+
+  useEffect(() => {
+    if (showFeedbackDialog) {
+      void fetchFeedback().then((fb) => {
+        if (fb) {
+          setFeedbackScore(fb.score);
+          setFeedbackComment(fb.comment);
+        }
+      });
+    }
+  }, [showFeedbackDialog, fetchFeedback]);
 
   useEffect(() => {
     setShowTranscript(false);
@@ -108,11 +121,11 @@ export default function EvaluationModal() {
               </View>
               {evaluation && (
                 <Button
-                  mode="text"
+                  mode="contained-tonal"
                   icon="message-draw"
                   onPress={() => setShowFeedbackDialog(true)}
-                  labelStyle={{ fontSize: 12 }}
-                  compact
+                  style={{ borderRadius: 20 }}
+                  labelStyle={{ fontWeight: 'bold' }}
                 >
                   Feedback
                 </Button>
@@ -417,6 +430,24 @@ export default function EvaluationModal() {
                   ))}
                 </Surface>
 
+                <View style={styles.feedbackCTA}>
+                  <Divider style={{ marginVertical: 24 }} />
+                  <Text
+                    variant="titleMedium"
+                    style={{ textAlign: 'center', marginBottom: 12, color: theme.colors.onSurface }}
+                  >
+                    Wie hilfreich war dieses Feedback für Sie?
+                  </Text>
+                  <Button
+                    mode="outlined"
+                    icon="star-face"
+                    onPress={() => setShowFeedbackDialog(true)}
+                    style={{ alignSelf: 'center', borderRadius: 8 }}
+                  >
+                    Bewertung abgeben / bearbeiten
+                  </Button>
+                </View>
+
                 <View style={{ height: 24 }} />
               </ScrollView>
 
@@ -440,28 +471,37 @@ export default function EvaluationModal() {
         <Dialog visible={showFeedbackDialog} onDismiss={() => setShowFeedbackDialog(false)}>
           <Dialog.Title>Feedback geben</Dialog.Title>
           <Dialog.Content>
-            <Text variant="bodyMedium" style={{ marginBottom: 16 }}>
-              Wie zufrieden sind Sie mit der Simulation und der Evaluation?
-            </Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
-              {[1, 2, 3, 4, 5].map((s) => (
-                <IconButton
-                  key={s}
-                  icon={s <= feedbackScore ? 'star' : 'star-outline'}
-                  iconColor={theme.colors.primary}
-                  size={30}
-                  onPress={() => setFeedbackScore(s)}
+            {fetchingFeedback ? (
+              <View style={{ padding: 20, alignItems: 'center' }}>
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+                <Text style={{ marginTop: 8 }}>Feedback wird geladen...</Text>
+              </View>
+            ) : (
+              <>
+                <Text variant="bodyMedium" style={{ marginBottom: 16 }}>
+                  Wie zufrieden sind Sie mit der Simulation und der Evaluation?
+                </Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <IconButton
+                      key={s}
+                      icon={s <= feedbackScore ? 'star' : 'star-outline'}
+                      iconColor={theme.colors.primary}
+                      size={30}
+                      onPress={() => setFeedbackScore(s)}
+                    />
+                  ))}
+                </View>
+                <TextInput
+                  label="Ihr Kommentar (optional)"
+                  value={feedbackComment}
+                  onChangeText={setFeedbackComment}
+                  multiline
+                  numberOfLines={4}
+                  mode="outlined"
                 />
-              ))}
-            </View>
-            <TextInput
-              label="Ihr Kommentar (optional)"
-              value={feedbackComment}
-              onChangeText={setFeedbackComment}
-              multiline
-              numberOfLines={4}
-              mode="outlined"
-            />
+              </>
+            )}
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setShowFeedbackDialog(false)}>Abbrechen</Button>
@@ -475,7 +515,7 @@ export default function EvaluationModal() {
                 }
               }}
               loading={submittingFeedback}
-              disabled={submittingFeedback}
+              disabled={submittingFeedback || fetchingFeedback}
             >
               Absenden
             </Button>
@@ -611,6 +651,9 @@ const styles = StyleSheet.create({
   },
   accordionTitle: {
     fontWeight: 'bold',
+  },
+  feedbackCTA: {
+    paddingBottom: 16,
   },
   smallBadge: {
     paddingHorizontal: 10,

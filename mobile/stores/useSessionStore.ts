@@ -20,6 +20,8 @@ interface SessionState {
   waitingForEvaluationMessages: boolean;
   evaluationMessagesError?: string;
   waitingForFeedbackSubmission: boolean;
+  waitingForFeedbackFetch: boolean;
+  fetchFeedback: () => Promise<{ score: number; comment: string } | undefined>;
   submitFeedback: (score: number, comment: string) => Promise<boolean>;
   startSession: (caseId: string, caseData: Case) => Promise<string | undefined>;
   loadSession: () => Promise<void>;
@@ -41,6 +43,32 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   waitingForEvaluationMessages: false,
   evaluationMessagesError: undefined,
   waitingForFeedbackSubmission: false,
+  waitingForFeedbackFetch: false,
+
+  fetchFeedback: async () => {
+    const sessionId = get().sessionId || get().evaluationResponse?.session_id;
+    if (!sessionId) {
+      console.error('No session ID to fetch feedback');
+      return undefined;
+    }
+    set({ waitingForFeedbackFetch: true });
+    try {
+      const resp = await apiClient.api.getFeedbackApiSessionsSessionIdFeedbackGet(sessionId);
+      set({ waitingForFeedbackFetch: false });
+      if (resp.status === 200) {
+        return {
+          score: resp.data.feedback_score,
+          comment: resp.data.feedback_comment,
+        };
+      }
+    } catch (error: any) {
+      set({ waitingForFeedbackFetch: false });
+      if (error.response?.status !== 404) {
+        console.error('Failed to fetch feedback:', error);
+      }
+    }
+    return undefined;
+  },
 
   submitFeedback: async (score: number, comment: string) => {
     const sessionId = get().sessionId || get().evaluationResponse?.session_id;
