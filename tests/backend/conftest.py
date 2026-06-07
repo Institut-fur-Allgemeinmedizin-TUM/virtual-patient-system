@@ -86,6 +86,10 @@ def client(session_local) -> Generator[TestClient, None, None]:
 def tum_user():
     return {"sub": "ge38qap", "tum_id": "ge38qap", "name": "TUM User"}
 
+@pytest.fixture
+def admin_user():
+    return {"sub": "ge38qap", "tum_id": "ge38qap", "name": "Admin User", "roles": ["Admin"]}
+
 
 @pytest.fixture
 def admin_user():
