@@ -879,6 +879,24 @@ export class Api<
       }),
 
     /**
+     * @description Get feedback for a session.
+     *
+     * @name GetFeedbackApiSessionsSessionIdFeedbackGet
+     * @summary Get Feedback
+     * @request GET:/api/sessions/{session_id}/feedback
+     */
+    getFeedbackApiSessionsSessionIdFeedbackGet: (
+      sessionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<UserSessionFeedBack, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/feedback`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Create feedback for a session.
      *
      * @name CreateFeedbackApiSessionsSessionIdFeedbackPost
