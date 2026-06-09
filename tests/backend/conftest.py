@@ -114,14 +114,18 @@ def vhb_user():
 
 @pytest.fixture
 def force_user(monkeypatch: pytest.MonkeyPatch):
+    from app.auth.auth import AuthenticatedUser
+
     def _force(user: dict):
-        monkeypatch.setattr(auth_module, "require_user", lambda _request: user)
+        # Ensure user is an AuthenticatedUser so it has methods like is_admin()
+        auth_user = user if isinstance(user, AuthenticatedUser) else AuthenticatedUser(user)
+        monkeypatch.setattr(auth_module, "require_user", lambda _request: auth_user)
         monkeypatch.setattr(
-            auth_module, "require_user_websocket", lambda _websocket: user
+            auth_module, "require_user_websocket", lambda _websocket: auth_user
         )
-        monkeypatch.setattr(auth_module, "get_current_user", lambda _request: user)
+        monkeypatch.setattr(auth_module, "get_current_user", lambda _request: auth_user)
         monkeypatch.setattr(
-            auth_module, "get_current_user_websocket", lambda _websocket: user
+            auth_module, "get_current_user_websocket", lambda _websocket: auth_user
         )
 
     return _force
