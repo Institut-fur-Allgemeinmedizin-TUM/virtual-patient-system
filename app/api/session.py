@@ -607,7 +607,7 @@ async def evaluate_session(
     # Ensures that admins can only see existing evaluations, but not create new ones for sessions they don't own
     mustExist = False
     if chat_session.user_id != tum_id:
-        if not user.get("is_admin", False):
+        if not user.is_admin():
             raise HTTPException(status_code=403, detail="Invalid user id")
         else:
             mustExist = True
