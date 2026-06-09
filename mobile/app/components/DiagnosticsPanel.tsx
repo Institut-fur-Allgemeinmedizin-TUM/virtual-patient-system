@@ -10,6 +10,7 @@ import {
   Portal,
   ActivityIndicator,
 } from 'react-native-paper';
+import ImageModal from 'react-native-image-modal';
 import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { DiagnosticValue } from '@/services/api';
@@ -57,7 +58,7 @@ export default function DiagnosticsPanel({
           <Text variant="labelMedium" style={styles.valueLabel}>
             {val.display_name}
           </Text>
-          <Image source={{ uri }} style={styles.diagnosticImage} resizeMode="contain" />
+          <ImageModal source={{ uri: uri }} style={styles.diagnosticImage} resizeMode="contain" />
         </View>
       );
     } else if (
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   diagnosticImage: {
-    width: '100%',
+    width: 200,
     height: 200,
     borderRadius: 4,
     marginTop: 4,
