@@ -546,7 +546,7 @@ async def get_session_messages(
     user = auth.require_user(request)
 
     tum_id = user.get("tum_id") or user.get("sub")
-    if session.user_id != tum_id:
+    if session.user_id != tum_id and not user.is_admin():
         raise HTTPException(status_code=403, detail="Invalid user id")
 
     messages = (
