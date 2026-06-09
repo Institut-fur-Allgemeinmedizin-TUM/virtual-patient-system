@@ -55,4 +55,4 @@ Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden 
 ## Datenschutz
 Informationen zur Verarbeitung personenbezogener Daten finden Sie in unserer Datenschutzerklärung.
 
-**Hinweis**: Dieses Impressum gilt für die Website des Projekts „Virtuelles Patientensystem“ des Instituts für Allgemeinmedizin und Versorgungsforschung der Technischen Universität München.
+**Hinweis**: Dieses Impressum ist aktuell gültig (Stand: Juni 2026). Dieses Impressum gilt für die Website des Projekts „Virtuelles Patientensystem“ des Instituts für Allgemeinmedizin und Versorgungsforschung der Technischen Universität München.

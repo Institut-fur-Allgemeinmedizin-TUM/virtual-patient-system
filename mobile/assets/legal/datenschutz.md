@@ -51,7 +51,7 @@ Der Zugang zum System erfolgt über den zentralen TUM-Login. Hierbei wird ein sp
 | **Art der Daten**      | Beim Login generierter User-Token, der technisch mit der Identität Ihres TUM-Accounts verknüpft ist (Pseudonymisierung).                                                                                             |
 | **Rückverfolgbarkeit** | Für die Administratoren des Virtuellen Patientensystems ist der Token pseudonymisiert. Über das zentrale Identitätsmanagement der TUM ist eine Zuordnung zu Ihrer Person (Name, Matrikelnummer) theoretisch möglich. |
 | **Zweck**              | Technische Sitzungsverwaltung, Autorisierung zur Nutzung des Lehrsystems und Zuordnung des Lernfortschritts.                                                                                                         |
-| **Speicherdauer**      | Der Token wird für die Dauer der aktiven Sitzung im System gehalten und nach dem Ausloggen bzw. Schließen der Sitzung weiterhin in der Datenbank gespeichert.                                                        |
+| **Speicherdauer**      | Der Token wird für die Dauer der aktiven Sitzung im System gehalten und nach dem Ausloggen bzw. Schließen der Sitzung weiterhin für zwei Jahre in der Datenbank gespeichert.                                         |
 
 ---
 
@@ -77,11 +77,11 @@ Weitere Informationen zum Datenschutz bei Google finden Sie unter: [https://poli
 
 Die während der Lehrsitzungen aufgezeichneten Gesprächstranskripte werden auf Servern der Google Cloud Platform gespeichert.
 
-| Merkmal                  | Beschreibung                                                                                                          |
-|--------------------------|-----------------------------------------------------------------------------------------------------------------------|
-| **Gespeicherte Inhalte** | Der pseudonyme User-Token (bzw. die sitzungsbezogene ID) und das vollständige Gesprächsprotokoll.                     |
-| **Zweck**                | Qualitätssicherung, Evaluation der Lehrinhalte und kontinuierliche Weiterentwicklung des medizinischen Lehrprogramms. |
-| **Speicherdauer**        | Die Protokolle werden so lange vorgehalten, wie es für die Evaluation Projekts erforderlich ist.                      |
+| Merkmal                  | Beschreibung                                                                                                           |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------|
+| **Gespeicherte Inhalte** | Der pseudonyme User-Token (bzw. die sitzungsbezogene ID) und das vollständige Gesprächsprotokoll.                      |
+| **Zweck**                | Qualitätssicherung, Evaluation der Lehrinhalte und kontinuierliche Weiterentwicklung des medizinischen Lehrprogramms.  |
+| **Speicherdauer**        | Die Protokolle werden so lange vorgehalten, wie es für die Evaluation Projekts erforderlich ist, maximal aber 2 Jahre. |
 
 ---
 
