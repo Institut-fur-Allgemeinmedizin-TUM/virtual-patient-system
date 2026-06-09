@@ -17,7 +17,7 @@ Arcisstraße 21\
 80333 München\
 E-Mail: beauftragter@datenschutz.tum.de
 
----
+
 
 ## Allgemeines zur Datenverarbeitung und Rechtsgrundlage
 
@@ -25,7 +25,7 @@ Das Virtuelle Patientensystem dient der Durchführung und Optimierung des digita
 
 Die Rechtsgrundlage für diese Verarbeitung ist **Art. 6 Abs. 1 lit. e DSGVO** in Verbindung mit **Art. 4 Abs. 1 des Bayerischen E-Government-Gesetzes (BayEGovG)** und den Aufgaben der Hochschule zur Durchführung des Lehrbetriebs gemäß dem Bayerischen Hochschulinnovationsgesetz (BayHIG). Die Verarbeitung ist erforderlich, um das System sicher bereitzustellen, den Authentifizierungsprozess zu ermöglichen und den studentischen Lehrbetrieb durchzuführen.
 
----
+
 
 ## Bereitstellung des Systems und Webhosting (Google Cloud)
 
@@ -40,7 +40,7 @@ Beim Zugriff auf das System werden technisch bedingt Zugriffsdaten erhoben und i
 | **Serverstandort**        | Standardmäßig in der EU, eine Übermittlung in die USA (Google LLC) kann jedoch nicht ausgeschlossen werden.           |
 | **Drittlandübermittlung** | Abgesichert durch das EU-US Data Privacy Framework bzw. Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.   |
 
----
+
 
 ## Authentifizierung (TUM-Login & User-Token)
 
@@ -53,7 +53,7 @@ Der Zugang zum System erfolgt über den zentralen TUM-Login. Hierbei wird ein sp
 | **Zweck**              | Technische Sitzungsverwaltung, Autorisierung zur Nutzung des Lehrsystems und Zuordnung des Lernfortschritts.                                                                                                         |
 | **Speicherdauer**      | Der Token wird für die Dauer der aktiven Sitzung im System gehalten und nach dem Ausloggen bzw. Schließen der Sitzung weiterhin für zwei Jahre in der Datenbank gespeichert.                                         |
 
----
+
 
 ## Einsatz des KI-Sprachmodells Google Gemini
 
@@ -71,7 +71,7 @@ An die Programmierschnittstelle (API) von Google werden die im Rahmen des Lehrge
 
 Weitere Informationen zum Datenschutz bei Google finden Sie unter: [https://policies.google.com/privacy](https://policies.google.com/privacy)
 
----
+
 
 ## Speicherung von Gesprächsprotokollen
 
@@ -83,13 +83,12 @@ Die während der Lehrsitzungen aufgezeichneten Gesprächstranskripte werden auf 
 | **Zweck**                | Qualitätssicherung, Evaluation der Lehrinhalte und kontinuierliche Weiterentwicklung des medizinischen Lehrprogramms.  |
 | **Speicherdauer**        | Die Protokolle werden so lange vorgehalten, wie es für die Evaluation Projekts erforderlich ist, maximal aber 2 Jahre. |
 
----
+
 
 ## Cookies und Tracking
 
 Das Virtuelle Patientensystem verwendet ausschließlich technisch notwendige Cookies (z. B. zur Speicherung des Session-Status). Es werden keine Tracking-Cookies eingesetzt und es findet keine Reichweitenmessung oder Web-Analyse (z. B. über Google Analytics) statt.
 
----
 
 ## Ihre Rechte als betroffene Person
 
@@ -113,7 +112,6 @@ Promenade 18\
 
 Web: www.lda.bayern.de
 
----
 
 ## Aktualität dieser Datenschutzerklärung
 
