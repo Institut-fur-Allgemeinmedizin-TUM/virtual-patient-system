@@ -34,7 +34,7 @@ export default function LandingPage() {
   const requestScroll = useUIStore((state) => state.requestScroll);
 
   const setImprintModalOpen = useUIStore((state) => state.setImprintModalOpen);
-const setPrivacyModalOpen = useUIStore((state) => state.setPrivacyModalOpen);
+  const setPrivacyModalOpen = useUIStore((state) => state.setPrivacyModalOpen);
 
   useEffect(() => {
     void loadAndGetCases();
@@ -545,9 +545,13 @@ const setPrivacyModalOpen = useUIStore((state) => state.setPrivacyModalOpen);
               Antworten sind nicht medizinisch validiert.
             </Text>
           </View>
-          <View style={{ flexDirection: "row", justifyContent: "center"}}>
-            <Button mode="text" compact onPress={() => setImprintModalOpen(true)}>Impressum</Button>
-            <Button mode="text" compact onPress={() => setPrivacyModalOpen(true)}>Datenschutz</Button>
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+            <Button mode="text" compact onPress={() => setImprintModalOpen(true)}>
+              Impressum
+            </Button>
+            <Button mode="text" compact onPress={() => setPrivacyModalOpen(true)}>
+              Datenschutz
+            </Button>
           </View>
         </View>
       </View>

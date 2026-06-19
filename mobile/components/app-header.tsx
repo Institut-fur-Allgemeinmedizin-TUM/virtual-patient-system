@@ -18,7 +18,7 @@ import { router, usePathname } from 'expo-router';
 import { appVersion } from '@/lib/util';
 import { MarkdownModal } from './markdown-modal';
 import { getMarkdownContent } from '@/lib/markdown';
-import {Icon} from "react-native-paper/src";
+import { Icon } from 'react-native-paper/src';
 
 export function AppHeader() {
   const { width } = useWindowDimensions();
@@ -45,11 +45,11 @@ export function AppHeader() {
   };
   const showPrivacyPolicy = async () => {
     setPrivacyModalOpen(true);
-  }
+  };
 
   const showImprint = async () => {
     setImprintModalOpen(true);
-  }
+  };
 
   const isLandingPage =
     pathname === '/' || pathname === '/(caseOverview)' || pathname === '/(caseOverview)/';
@@ -228,35 +228,35 @@ export function AppHeader() {
 
               <View style={{ flex: 1 }} />
 
-              <Divider/>
+              <Divider />
 
               <Drawer.Item
-                icon={({ color }) => (<Icon source={"text-box-search"} size={20} color={color}/>)}
+                icon={({ color }) => <Icon source={'text-box-search'} size={20} color={color} />}
                 label="Impressum"
                 onPress={() => {
-                  showImprint()
+                  showImprint();
                 }}
                 style={{ height: 40 }}
                 theme={{
                   fonts: {
                     labelLarge: {
-                      fontWeight: "normal"
+                      fontWeight: 'normal',
                     },
                   },
                 }}
               />
 
               <Drawer.Item
-                icon={({ color }) => (<Icon source={"gavel"} size={20} color={color}/>)}
+                icon={({ color }) => <Icon source={'gavel'} size={20} color={color} />}
                 label="Datenschutz"
                 onPress={() => {
-                  showPrivacyPolicy()
+                  showPrivacyPolicy();
                 }}
                 style={{ height: 40 }}
                 theme={{
                   fonts: {
                     labelLarge: {
-                      fontWeight: "normal"
+                      fontWeight: 'normal',
                     },
                   },
                 }}

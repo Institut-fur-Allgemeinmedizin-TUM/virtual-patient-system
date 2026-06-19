@@ -1,12 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import {
-  Appbar,
-  Divider,
-  Modal,
-  Portal,
-  useTheme,
-} from 'react-native-paper';
+import { Appbar, Divider, Modal, Portal, useTheme } from 'react-native-paper';
 import Markdown from 'react-native-markdown-display';
 
 interface MarkdownModalProps {
@@ -95,19 +89,12 @@ export function MarkdownModal({ visible, onDismiss, title, content }: MarkdownMo
         onDismiss={onDismiss}
         dismissable
         dismissableBackButton
-        contentContainerStyle={[
-          styles.modalContainer,
-          { backgroundColor: colors.surface },
-        ]}
+        contentContainerStyle={[styles.modalContainer, { backgroundColor: colors.surface }]}
       >
         <View style={styles.modalContent}>
           <Appbar.Header elevated={false}>
             <Appbar.Content title={title} />
-            <Appbar.Action
-              icon="close"
-              onPress={onDismiss}
-              accessibilityLabel={`Close ${title}`}
-            />
+            <Appbar.Action icon="close" onPress={onDismiss} accessibilityLabel={`Close ${title}`} />
           </Appbar.Header>
 
           <Divider />
@@ -117,9 +104,7 @@ export function MarkdownModal({ visible, onDismiss, title, content }: MarkdownMo
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={true}
           >
-            <Markdown style={markdownStyles as any}>
-              {content}
-            </Markdown>
+            <Markdown style={markdownStyles as any}>{content}</Markdown>
           </ScrollView>
         </View>
       </Modal>
@@ -147,10 +132,3 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
 });
-
-
-
-
-
-
-
