@@ -45,6 +45,12 @@ export enum SessionHistoryColumn {
   ImprovementSuggestions = "improvement_suggestions",
 }
 
+/** MedicalBackgroundResponseType */
+export enum MedicalBackgroundResponseType {
+  Value1 = 1,
+  Value2 = 2,
+}
+
 /** AggregationFunction */
 export enum AggregationFunction {
   Avg = "avg",
@@ -59,12 +65,6 @@ export interface AggregationParam {
   column: SessionHistoryColumn;
   /** @default "avg" */
   function?: AggregationFunction;
-}
-
-/** MedicalBackgroundResponseType */
-export enum MedicalBackgroundResponseType {
-  Value1 = 1,
-  Value2 = 2,
 }
 
 /** CaseItemModel */
@@ -756,108 +756,6 @@ export class Api<
       }),
 
     /**
-     * @description Get all messages for a specific session.
-     *
-     * @name GetSessionMessagesApiSessionsSessionIdMessagesGet
-     * @summary Get Session Messages
-     * @request GET:/api/sessions/{session_id}/messages
-     */
-    getSessionMessagesApiSessionsSessionIdMessagesGet: (
-      sessionId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<SessionMessagesResponse, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/messages`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Evaluate anamnesis performance for a session.
-     *
-     * @name EvaluateSessionApiSessionsSessionIdEvaluatePost
-     * @summary Evaluate Session
-     * @request POST:/api/sessions/{session_id}/evaluate
-     */
-    evaluateSessionApiSessionsSessionIdEvaluatePost: (
-      sessionId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<EvaluationResponse, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/evaluate`,
-        method: "POST",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Get a summary of the last sessions the user did per case.
-     *
-     * @name GetLastSessionSummaryApiSessionsSummaryGet
-     * @summary Get Last Session Summary
-     * @request GET:/api/sessions/summary
-     */
-    getLastSessionSummaryApiSessionsSummaryGet: (params: RequestParams = {}) =>
-      this.request<SessionsSummaryResponse, any>({
-        path: `/api/sessions/summary`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Get all messages for a specific session.
-     *
-     * @name GetSessionMessagesApiSessionsSessionIdMessagesGet
-     * @summary Get Session Messages
-     * @request GET:/api/sessions/{session_id}/messages
-     */
-    getSessionMessagesApiSessionsSessionIdMessagesGet: (
-      sessionId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<SessionMessagesResponse, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/messages`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Evaluate anamnesis performance for a session.
-     *
-     * @name EvaluateSessionApiSessionsSessionIdEvaluatePost
-     * @summary Evaluate Session
-     * @request POST:/api/sessions/{session_id}/evaluate
-     */
-    evaluateSessionApiSessionsSessionIdEvaluatePost: (
-      sessionId: string,
-      params: RequestParams = {},
-    ) =>
-      this.request<EvaluationResponse, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/evaluate`,
-        method: "POST",
-        format: "json",
-        ...params,
-      }),
-
-    /**
-     * @description Get a summary of the last sessions the user did per case.
-     *
-     * @name GetLastSessionSummaryApiSessionsSummaryGet
-     * @summary Get Last Session Summary
-     * @request GET:/api/sessions/summary
-     */
-    getLastSessionSummaryApiSessionsSummaryGet: (params: RequestParams = {}) =>
-      this.request<SessionsSummaryResponse, any>({
-        path: `/api/sessions/summary`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-
-    /**
      * @description Set current diagnosis of student
      *
      * @name SetDiagnosisApiSessionsSessionIdDiagnosisPost
@@ -1008,19 +906,127 @@ export class Api<
       }),
 
     /**
-     * @description Evaluate anamnesis performance for a session.
+     * No description
      *
-     * @name EvaluateSessionApiSessionsSessionIdEvaluatePost
-     * @summary Evaluate Session
-     * @request POST:/api/sessions/{session_id}/evaluate
+     * @name GetSessionsStatsApiAnalyticsSessionsStatsPost
+     * @summary Get Sessions Stats
+     * @request POST:/api/analytics/sessions/stats
      */
-    evaluateSessionApiSessionsSessionIdEvaluatePost: (
-      sessionId: string,
+    getSessionsStatsApiAnalyticsSessionsStatsPost: (
+      data: GetSessionsHistoryRequest,
+      query?: {
+        /**
+         * As Csv
+         * @default false
+         */
+        as_csv?: boolean;
+      },
       params: RequestParams = {},
     ) =>
-      this.request<EvaluationResponse, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/evaluate`,
+      this.request<GetSessionsHistoryResponse, HTTPValidationError>({
+        path: `/api/analytics/sessions/stats`,
         method: "POST",
+        query: query,
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get the current user's profile information.
+     *
+     * @name GetUserProfileApiUserProfileGet
+     * @summary Get User Profile
+     * @request GET:/api/user/profile
+     */
+    getUserProfileApiUserProfileGet: (params: RequestParams = {}) =>
+      this.request<UserProfileResponse, any>({
+        path: `/api/user/profile`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update the current user's profile information.
+     *
+     * @name UpdateUserProfileApiUserProfilePut
+     * @summary Update User Profile
+     * @request PUT:/api/user/profile
+     */
+    updateUserProfileApiUserProfilePut: (
+      data: UserProfileUpdateRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<UserProfileResponse, HTTPValidationError>({
+        path: `/api/user/profile`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Retrieve available diagnostics for a case or specific diagnostic data. Supports both database sessions and VHB sessions.
+     *
+     * @tags Medical Background
+     * @name GetMedicalBackgroundApiDiagnosticsCaseIdGet
+     * @summary Get medical background diagnostics
+     * @request GET:/api/diagnostics/{case_id}
+     */
+    getMedicalBackgroundApiDiagnosticsCaseIdGet: (
+      caseId: string,
+      query?: {
+        /**
+         * Session Id
+         * The session ID for tracking diagnostic usage. Required when requesting specific diagnostic data.
+         */
+        session_id?: string | null;
+        /**
+         * Diagnostic
+         * The specific diagnostic to retrieve. If not provided, returns list of available diagnostics for the case.
+         */
+        diagnostic?: string | null;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<MedicalBackgroundResponse, void | HTTPValidationError>({
+        path: `/api/diagnostics/${caseId}`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+  };
+  health = {
+    /**
+     * No description
+     *
+     * @name HealthHealthGet
+     * @summary Health
+     * @request GET:/health
+     */
+    healthHealthGet: (params: RequestParams = {}) =>
+      this.request<Record<string, any>, any>({
+        path: `/health`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Debug endpoint to check OIDC configuration (sanitized).
+     *
+     * @name HealthOidcHealthOidcGet
+     * @summary Health Oidc
+     * @request GET:/health/oidc
+     */
+    healthOidcHealthOidcGet: (params: RequestParams = {}) =>
+      this.request<Record<string, any>, any>({
+        path: `/health/oidc`,
+        method: "GET",
         format: "json",
         ...params,
       }),
