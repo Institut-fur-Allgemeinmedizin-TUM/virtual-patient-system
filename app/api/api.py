@@ -40,7 +40,7 @@ app.include_router(session.sessionRouter)
 app.include_router(util.utilRouter)
 app.include_router(health.healthRouter)
 app.include_router(user.userRouter)
-app.include_router(medical_background.medical_background_router)
+app.include_router(medical_background.diagnostics_router)
 
 # Check whether docs/build exists
 if os.path.isdir("docs/build"):

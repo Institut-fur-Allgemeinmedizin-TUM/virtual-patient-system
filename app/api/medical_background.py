@@ -7,18 +7,19 @@ from fastapi import APIRouter, HTTPException, Request, Depends, Query, Path
 from starlette.responses import JSONResponse
 from sqlalchemy.orm import Session as OrmSession
 
-from app.api.memory import vhb_sessions
+from app.api.memory import vhb_sessions, logger
 from app.auth import auth
 from app.model.cases import (
     MedicalBackgroundsAvailableResponse,
     DiagnosticValue,
     DiagnosticGroup,
+    DataType,
 )
 from app.model.models import Session as ChatSession, Diagnostic
 
 from app.db.db import get_db
 
-medical_background_router = APIRouter()
+diagnostics_router = APIRouter()
 
 
 def _load_background_data_from_disk(case_id: str) -> dict[str, list[DiagnosticGroup]]:
@@ -73,7 +74,7 @@ def _load_backgrounds_from_disk() -> dict[str, dict[str, DiagnosticGroup]]:
 BACKGROUNDS: dict[str, dict[str, DiagnosticGroup]] = _load_backgrounds_from_disk()
 
 
-@medical_background_router.get("/api/diagnostics/{case_id}/available")
+@diagnostics_router.get("/api/diagnostics/{case_id}/available")
 async def get_medical_background_available(
     request: Request,
     case_id: str = Path(description="The case to retrieve from the backend."),
@@ -96,7 +97,7 @@ async def get_medical_background_available(
     )
 
 
-@medical_background_router.get(
+@diagnostics_router.get(
     "/api/diagnostics/{case_id}",
 )
 async def get_medical_background(
@@ -122,11 +123,17 @@ async def get_medical_background(
     diagnostic_ret = BACKGROUNDS[case_id][diagnostic]
     if diagnostic_ret.data is not None:
         for i in range(len(diagnostic_ret.data)):
-            if isinstance(diagnostic_ret.data[i].data, str) and diagnostic_ret.data[
-                i
-            ].data.startswith("path:"):
+            is_large_data = (
+                diagnostic_ret.data[i].data_type == DataType.Audio
+                or diagnostic_ret.data[i].data_type == DataType.Video
+                or diagnostic_ret.data[i].data_type == DataType.Image_Png
+                or diagnostic_ret.data[i].data_type == DataType.Image_Jpeg
+            )
+            if isinstance(diagnostic_ret.data[i].data, str) and is_large_data:
                 # Load data from disk
-                print(os.getcwd())
+                if not diagnostic_ret.data[i].data.startswith("path:"):
+                    logger.warn("Error, filepath not starting with 'path:'")
+                    continue
                 with open(diagnostic_ret.data[i].data[5:], "rb") as file:
                     raw = file.read()
                     diagnostic_ret.data[i].data = {
