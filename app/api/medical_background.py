@@ -16,6 +16,8 @@ from app.model.cases import (
 )
 from app.model.models import Session as ChatSession, Diagnostic
 
+from app.db.db import get_db
+
 diagnostics_router = APIRouter()
 
 
