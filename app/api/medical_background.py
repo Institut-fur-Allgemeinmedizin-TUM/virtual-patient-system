@@ -12,7 +12,8 @@ from app.model.cases import (
     MedicalBackgroundsAvailableResponse,
     DiagnosticValue,
     DiagnosticGroup,
-    DataType, )
+    DataType,
+)
 from app.model.models import Session as ChatSession, Diagnostic
 
 diagnostics_router = APIRouter()

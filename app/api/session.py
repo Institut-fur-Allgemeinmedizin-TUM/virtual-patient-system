@@ -15,7 +15,9 @@ from fastapi import (
     Request,
     WebSocket,
     WebSocketDisconnect,
-    APIRouter, Query, Path,
+    APIRouter,
+    Query,
+    Path,
 )
 from google.genai.types import HistoryConfigDict
 from pydantic import BaseModel
@@ -558,18 +560,14 @@ async def get_used_diagnostics(
 
             # Session is vhb session
             session = vhb_sessions.get(session_id)
-            return UsedDiagnosticsResponse(
-                diagnostics_used=session["used_diagnostics"]
-            )
+            return UsedDiagnosticsResponse(diagnostics_used=session["used_diagnostics"])
 
     if session.user_id != tum_id:
         raise HTTPException(status_code=403, detail="Invalid user id")
 
     diagnostic_names = [d.name for d in session.used_diagnostics]
 
-    return UsedDiagnosticsResponse(
-        diagnostics_used=diagnostic_names
-    )
+    return UsedDiagnosticsResponse(diagnostics_used=diagnostic_names)
 
 
 @sessionRouter.get(

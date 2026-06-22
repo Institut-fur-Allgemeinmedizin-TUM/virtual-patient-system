@@ -44,5 +44,6 @@ class DiagnosticGroup(BaseModel):
 class MedicalBackgroundsAvailableResponse(BaseModel):
     diagnostics_available: list[DiagnosticGroup]
 
+
 class UsedDiagnosticsResponse(BaseModel):
     diagnostics_used: list[str]
