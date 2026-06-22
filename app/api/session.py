@@ -15,7 +15,7 @@ from fastapi import (
     Request,
     WebSocket,
     WebSocketDisconnect,
-    APIRouter,
+    APIRouter, Query, Path,
 )
 from google.genai.types import HistoryConfigDict
 from pydantic import BaseModel
@@ -31,6 +31,7 @@ from app.db.db import get_db
 from app.llm import chat as chat_functions, formatting
 from app.llm.chat import chat_llm, reasoning_llm
 from app.llm.prompts.evaluation import get_evaluation_prompt
+from app.model.cases import UsedDiagnosticsResponse
 from app.model.llm import (
     CreateSessionResponse,
     CreateSessionRequest,
@@ -531,6 +532,44 @@ async def live_websocket(
             except Exception as e:
                 db.rollback()
                 logger.error(f"Failed to save handle to database: {e}")
+
+
+@sessionRouter.get(
+    "/api/sessions/{session_id}/diagnostics",
+)
+async def get_used_diagnostics(
+    request: Request,
+    session_id: str = Path(
+        description="The session ID for tracking diagnostic usage. Required when requesting specific diagnostic data.",
+    ),
+    db: OrmSession = Depends(get_db),
+) -> UsedDiagnosticsResponse:
+    user = auth.require_user(request)
+    tum_id = user.get("tum_id") or user.get("sub")
+
+    session = db.query(ChatSession).where(ChatSession.id == session_id).first()
+    if session is None:
+        # Session could be vhb session
+        if session_id in vhb_sessions:
+            if not user.get("is_vhb_user", False):
+                raise HTTPException(
+                    status_code=403, detail="Non VHB user tried to access VHB session"
+                )
+
+            # Session is vhb session
+            session = vhb_sessions.get(session_id)
+            return UsedDiagnosticsResponse(
+                diagnostics_used=session["used_diagnostics"]
+            )
+
+    if session.user_id != tum_id:
+        raise HTTPException(status_code=403, detail="Invalid user id")
+
+    diagnostic_names = [d.name for d in session.used_diagnostics]
+
+    return UsedDiagnosticsResponse(
+        diagnostics_used=diagnostic_names
+    )
 
 
 @sessionRouter.get(
