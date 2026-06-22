@@ -1,23 +1,19 @@
 import base64
-import os
 import json
-from typing import Optional, Dict, List, Any
+import os
 
 from fastapi import APIRouter, HTTPException, Request, Depends, Query, Path
-from starlette.responses import JSONResponse
 from sqlalchemy.orm import Session as OrmSession
 
 from app.api.memory import vhb_sessions, logger
 from app.auth import auth
+from app.db.db import get_db
 from app.model.cases import (
     MedicalBackgroundsAvailableResponse,
     DiagnosticValue,
     DiagnosticGroup,
-    DataType,
-)
+    DataType, )
 from app.model.models import Session as ChatSession, Diagnostic
-
-from app.db.db import get_db
 
 diagnostics_router = APIRouter()
 
