@@ -47,7 +47,7 @@
         "display_name": "EKG",
         "unit": "",
         "data_type": "image/png",
-        "data": "path:app/cases/medical_background/sample_image.png"
+        "data": "path:app/cases/medical_background/images/sample_image.png"
       }
     }
   }

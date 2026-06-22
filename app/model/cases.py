@@ -17,11 +17,21 @@ class GetCasesResponse(BaseModel):
     cases: list[CaseItemModel]
 
 
+class DataType(Enum):
+    Integer = "integer"
+    String = "string"
+    Float = "float"
+    Image_Png = "image/png"
+    Image_Jpeg = "image/jpeg"
+    Video = "video"
+    Audio = "audio"
+
+
 class DiagnosticValue(BaseModel):
     name: str
     display_name: str
     unit: str
-    data_type: str
+    data_type: DataType
     data: Any
 
 
