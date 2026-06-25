@@ -15,6 +15,7 @@ import DiagnosticsPanel from '../components/DiagnosticsPanel';
 import { useLiveAudioSession } from '@/hooks/useLiveAudioSession';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSessionStore } from '@/stores/useSessionStore';
+import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 import { getCaseImage } from '@/lib/cases/case';
 
 type SessionProfile = {
@@ -54,6 +55,7 @@ export default function SessionScreen() {
   const session = useSessionStore((state) => state);
   session.sessionId = sessionId; // Ensure session ID is set in store for API calls
   const loadSession = useSessionStore((state) => state.loadSession);
+  const fetchUsedDiagnostics = useDiagnosticStore((state) => state.fetchUsedDiagnostics);
 
   const isBotTyping = session.waitingForBotresponse ?? false;
 
@@ -64,8 +66,11 @@ export default function SessionScreen() {
   useEffect(() => {
     if (!session.loaded) {
       void loadSession();
+    } else if (session.case?.id && sessionId) {
+      //Preload used diagnostics for the current session and case
+      void fetchUsedDiagnostics(sessionId, session.case.id);
     }
-  }, [loadSession, session.loaded]);
+  }, [loadSession, session.loaded, session.case?.id, sessionId, fetchUsedDiagnostics]);
 
   useEffect(() => {
     messageScrollRef.current?.scrollToEnd({ animated: true });

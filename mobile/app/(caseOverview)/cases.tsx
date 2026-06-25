@@ -162,6 +162,7 @@ export default function CasesScreen() {
                               if (!sessionInfo || !sessionInfo.sessionId) return;
                               useSessionStore.setState({
                                 sessionId: sessionInfo.sessionId,
+                                case: item,
                                 evaluationResponse: undefined,
                                 waitingForEvaluationResponse: false,
                               });

@@ -4,12 +4,14 @@ import { DiagnosticGroup } from '@/services/api';
 
 interface DiagnosticState {
   availableDiagnostics: DiagnosticGroup[];
+  usedDiagnostics: string[];
   diagnosticResults: Record<string, DiagnosticGroup>;
   loadingAvailable: boolean;
   loadingResults: Record<string, boolean>;
   error?: string;
 
   fetchAvailableDiagnostics: (caseId: string) => Promise<void>;
+  fetchUsedDiagnostics: (sessionId: string, caseId: string) => Promise<void>;
   fetchDiagnosticResult: (
     caseId: string,
     diagnosticName: string,
@@ -20,6 +22,7 @@ interface DiagnosticState {
 
 export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
   availableDiagnostics: [],
+  usedDiagnostics: [],
   diagnosticResults: {},
   loadingAvailable: false,
   loadingResults: {},
@@ -41,6 +44,20 @@ export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
     } catch (err) {
       set({ error: 'Error fetching available diagnostics', loadingAvailable: false });
       console.error(err);
+    }
+  },
+
+  fetchUsedDiagnostics: async (sessionId: string, caseId: string) => {
+    try {
+      const resp = await apiClient.api.getUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet(sessionId);
+      if (resp.status === 200) {
+        set({ usedDiagnostics: resp.data.diagnostics_used });
+        resp.data.diagnostics_used.forEach((diagName) => {
+          get().fetchDiagnosticResult(caseId, diagName, sessionId);
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching used diagnostics', err);
     }
   },
 
@@ -77,6 +94,7 @@ export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
   reset: () => {
     set({
       availableDiagnostics: [],
+      usedDiagnostics: [],
       diagnosticResults: {},
       loadingAvailable: false,
       loadingResults: {},

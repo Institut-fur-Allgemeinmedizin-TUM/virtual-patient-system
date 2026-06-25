@@ -475,6 +475,7 @@ export default function LandingPage() {
                                 if (!sessionInfo || !sessionInfo.sessionId) return;
                                 useSessionStore.setState({
                                   sessionId: sessionInfo.sessionId,
+                                  case: item,
                                   evaluationResponse: undefined,
                                   waitingForEvaluationResponse: false,
                                 });

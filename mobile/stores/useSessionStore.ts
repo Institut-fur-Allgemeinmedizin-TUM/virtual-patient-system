@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Case } from '@/lib/cases/case';
 import { apiClient } from '@/lib/apiClient';
 import { EvaluationResponse } from '@/services/api';
+import { useDiagnosticStore } from './useDiagnosticStore';
 
 type ChatRole = 'bot' | 'user';
 type ChatMessage = {
@@ -43,6 +44,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     const resp = await apiClient.api.createSessionApiSessionsPost({ case_id: caseId });
     if (resp.data?.session_id) {
       set({ loaded: true, sessionId: resp.data.session_id, case: caseData, chatHistory: [] });
+      useDiagnosticStore.getState().reset();
       return resp.data.session_id;
     } else {
       console.error('startSession failed: No session ID in response');

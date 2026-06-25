@@ -19,12 +19,14 @@ interface DiagnosticsPanelProps {
   isMobile: boolean;
   visible?: boolean;
   onClose?: () => void;
+  readOnly?: boolean;
 }
 
 export default function DiagnosticsPanel({
   isMobile,
   visible = false,
   onClose,
+  readOnly = false,
 }: DiagnosticsPanelProps) {
   const theme = useTheme();
   const { case: sessionCase, sessionId } = useSessionStore();
@@ -115,13 +117,15 @@ export default function DiagnosticsPanel({
             const isLoaded = !!diagnosticResults[diag.name];
             const isLoading = !!loadingResults[diag.name];
 
+            if (readOnly && !isLoaded) return null;
+
             return (
               <View key={diag.name} style={styles.diagRow}>
                 <Button
                   mode={isLoaded ? 'contained-tonal' : 'outlined'}
                   onPress={() => handleDiagnosticPress(diag.name)}
                   style={styles.diagButton}
-                  disabled={isLoaded || isLoading}
+                  disabled={isLoaded || isLoading || readOnly}
                   loading={isLoading}
                   textColor={
                     theme.dark
@@ -149,13 +153,13 @@ export default function DiagnosticsPanel({
               </View>
             );
           })}
-          {availableDiagnostics.length === 0 && !loadingAvailable && (
+          {availableDiagnostics.filter(diag => !readOnly || diagnosticResults[diag.name]).length === 0 && !loadingAvailable && (
             <View>
               <Text
                 variant="bodyMedium"
                 style={{ textAlign: 'center', marginTop: 20, opacity: 0.6 }}
               >
-                Keine Diagnostik für diesen Fall verfügbar.
+                {readOnly ? 'Keine Diagnostik in dieser Sitzung verwendet.' : 'Keine Diagnostik für diesen Fall verfügbar.'}
               </Text>
             </View>
           )}

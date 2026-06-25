@@ -214,6 +214,12 @@ export interface SessionsSummaryResponse {
   sessions: Record<string, SessionSummaryData>;
 }
 
+/** UsedDiagnosticsResponse */
+export interface UsedDiagnosticsResponse {
+  /** Diagnostics Used */
+  diagnostics_used: string[];
+}
+
 /** UserProfileResponse */
 export interface UserProfileResponse {
   /** Sub */
@@ -819,6 +825,24 @@ export class Api<
         path: `/api/diagnostics/${caseId}`,
         method: "GET",
         query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get diagnostics used in a specific session.
+     *
+     * @name GetUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet
+     * @summary Get Used Diagnostics
+     * @request GET:/api/sessions/{session_id}/diagnostics
+     */
+    getUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet: (
+      sessionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<UsedDiagnosticsResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/diagnostics`,
+        method: "GET",
         format: "json",
         ...params,
       }),
