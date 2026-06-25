@@ -343,11 +343,14 @@ export interface SessionsSummaryResponse {
   sessions: Record<string, SessionSummaryData>;
 }
 
+<<<<<<< HEAD
 /** UpdateFeedbackMarkerRequest */
 export interface UpdateFeedbackMarkerRequest {
   marker: FeedBackMarkerType;
 }
 
+=======
+>>>>>>> f67be9d (feat(diagnosik): implement diagnostics feature with session case tracking and diagnostics fetching)
 /** UsedDiagnosticsResponse */
 export interface UsedDiagnosticsResponse {
   /** Diagnostics Used */
@@ -1128,6 +1131,7 @@ export class Api<
       }),
 
     /**
+<<<<<<< HEAD
      * No description
      *
      * @name LeaderboardApiStatsLeaderboardCaseIdGet
@@ -1140,6 +1144,20 @@ export class Api<
     ) =>
       this.request<LeaderboardResponse, HTTPValidationError>({
         path: `/api/stats/leaderboard/${caseId}`,
+=======
+     * @description Get diagnostics used in a specific session.
+     *
+     * @name GetUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet
+     * @summary Get Used Diagnostics
+     * @request GET:/api/sessions/{session_id}/diagnostics
+     */
+    getUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet: (
+      sessionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<UsedDiagnosticsResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/diagnostics`,
+>>>>>>> f67be9d (feat(diagnosik): implement diagnostics feature with session case tracking and diagnostics fetching)
         method: "GET",
         format: "json",
         ...params,

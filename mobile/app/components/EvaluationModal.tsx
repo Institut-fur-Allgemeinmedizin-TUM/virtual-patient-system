@@ -16,6 +16,8 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { useSessionStore } from '@/stores/useSessionStore';
+import DiagnosticsPanel from './DiagnosticsPanel';
+import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 
 export default function EvaluationModal() {
   const theme = useTheme();
@@ -28,12 +30,22 @@ export default function EvaluationModal() {
   const messagesError = useSessionStore((s) => s.evaluationMessagesError);
   const loadEvaluationMessages = useSessionStore((s) => s.loadEvaluationMessages);
   const resetEvaluation = useSessionStore((s) => s.resetEvaluation);
+  const sessionCase = useSessionStore((s) => s.case);
+  const fetchUsedDiagnostics = useDiagnosticStore((s) => s.fetchUsedDiagnostics);
   const submitFeedback = useSessionStore((s) => s.submitFeedback);
   const submittingFeedback = useSessionStore((s) => s.waitingForFeedbackSubmission);
   const fetchFeedback = useSessionStore((s) => s.fetchFeedback);
   const fetchingFeedback = useSessionStore((s) => s.waitingForFeedbackFetch);
 
   const [showTranscript, setShowTranscript] = useState(false);
+  const [isDiagnosticsVisible, setIsDiagnosticsVisible] = useState(false);
+
+  const handleOpenDiagnostics = () => {
+    if (evaluation?.session_id && sessionCase?.id) {
+      void fetchUsedDiagnostics(evaluation.session_id, sessionCase.id);
+    }
+    setIsDiagnosticsVisible(true);
+  };
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [feedbackScore, setFeedbackScore] = useState(5);
   const [feedbackComment, setFeedbackComment] = useState('');
@@ -91,9 +103,10 @@ export default function EvaluationModal() {
     return total / evaluation.criteria.length;
   };
 
-  if (!visible) return null;
+  if (!visible && !isDiagnosticsVisible) return null;
 
   return (
+    <>
     <Portal>
       <Modal visible={visible} onDismiss={close} contentContainerStyle={styles.modalBackdrop}>
         <Surface style={containerStyle} elevation={2}>
@@ -458,7 +471,16 @@ export default function EvaluationModal() {
               </ScrollView>
 
               {/* STICKY BOTTOM BUTTON */}
-              <View style={[styles.footer, { borderTopColor: theme.colors.outlineVariant }]}>
+              <View style={[styles.footer, { borderTopColor: theme.colors.outlineVariant, gap: 12 }]}>
+                <Button
+                  mode="outlined"
+                  onPress={handleOpenDiagnostics}
+                  style={{ borderRadius: 4 }}
+                  contentStyle={{ paddingVertical: 8 }}
+                  icon="medical-bag"
+                >
+                  VERWENDETE DIAGNOSTIK
+                </Button>
                 <Button
                   mode="contained"
                   onPress={close}
@@ -529,6 +551,13 @@ export default function EvaluationModal() {
         </Dialog>
       </Portal>
     </Portal>
+    <DiagnosticsPanel
+      isMobile={true}
+      visible={isDiagnosticsVisible}
+      onClose={() => setIsDiagnosticsVisible(false)}
+      readOnly={true}
+    />
+    </>
   );
 }
 
