@@ -562,7 +562,7 @@ async def get_used_diagnostics(
             session = vhb_sessions.get(session_id)
             return UsedDiagnosticsResponse(diagnostics_used=session["used_diagnostics"])
 
-    if session.user_id != tum_id:
+    if session.user_id != tum_id and not user.is_admin:
         raise HTTPException(status_code=403, detail="Invalid user id")
 
     diagnostic_names = [d.name for d in session.used_diagnostics]
