@@ -169,11 +169,13 @@ class Message(Base):
 
     session: Mapped[Session] = relationship(back_populates="messages")
 
+
 class FeedBackMarkerType(enum.Enum):
     NONE = "none"
     READ = "read"
     IMPORTANT = "important"
     LOOK_AGAIN = "look_again"
+
 
 class SessionUserFeedback(Base):
     __tablename__ = "session_user_feedback"
@@ -188,7 +190,10 @@ class SessionUserFeedback(Base):
     session: Mapped["Session"] = relationship(back_populates="user_feedback")
 
     marker: Mapped[FeedBackMarkerType] = mapped_column(
-        Enum(FeedBackMarkerType), primary_key=True, default=FeedBackMarkerType.NONE, nullable=False
+        Enum(FeedBackMarkerType),
+        primary_key=True,
+        default=FeedBackMarkerType.NONE,
+        nullable=False,
     )
 
 

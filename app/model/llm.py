@@ -32,5 +32,6 @@ class PaginatedFeedbacksResponse(BaseModel):
     feedbacks: list[UserSessionFeedBack]
     total: int
 
+
 class UpdateFeedbackMarkerRequest(BaseModel):
     marker: FeedBackMarkerType
