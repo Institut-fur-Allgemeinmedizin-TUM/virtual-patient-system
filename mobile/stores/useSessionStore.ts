@@ -29,6 +29,7 @@ interface SessionState {
   allFeedbacks: UserSessionFeedBack[];
   totalFeedbacks: number;
   waitingForAllFeedbacks: boolean;
+  markFeedbackError?: string;
   fetchAllFeedbacks: (
     limit?: number,
     offset?: number,
@@ -61,6 +62,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   allFeedbacks: [],
   totalFeedbacks: 0,
   waitingForAllFeedbacks: false,
+  markFeedbackError: undefined,
 
   fetchAllFeedbacks: async (limit = 100, offset = 0, marker?: FeedBackMarkerType) => {
     set({ waitingForAllFeedbacks: true });
@@ -131,6 +133,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   },
 
   markFeedback: async (sessionId: string, marker: FeedBackMarkerType) => {
+    set({ markFeedbackError: undefined });
     try {
       const resp = await apiClient.request({
         path: `/api/admin/feedbacks/${sessionId}/mark`,
@@ -147,9 +150,12 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         }));
         return true;
       }
+      console.error('Failed to update feedback marker:');
+      set({ markFeedbackError: 'Failed to update feedback marker' });
       return false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update feedback marker:', error);
+      set({ markFeedbackError: error?.message || 'Failed to update feedback marker' });
       return false;
     }
   },
