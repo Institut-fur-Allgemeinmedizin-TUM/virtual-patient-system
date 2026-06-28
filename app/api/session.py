@@ -988,9 +988,6 @@ async def create_feedback(
     return {"ok": True}
 
 
-
-
-
 @sessionRouter.patch("/api/admin/feedbacks/{session_id}/mark")
 async def update_feedback_marker(
     session_id: str,

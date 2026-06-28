@@ -18,7 +18,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import EvaluationModal from '@/app/components/EvaluationModal';
 import { FeedBackMarkerType } from '@/services/api';
 
-const MarkerSelector = ({ item, markFeedback }: { item: any, markFeedback: any }) => {
+const MarkerSelector = ({ item, markFeedback }: { item: any; markFeedback: any }) => {
   const [visible, setVisible] = useState(false);
 
   const getIcon = (marker: string) => {
@@ -60,10 +60,34 @@ const MarkerSelector = ({ item, markFeedback }: { item: any, markFeedback: any }
         />
       }
     >
-      <Menu.Item onPress={() => { markFeedback(item.session_id, FeedBackMarkerType.None); setVisible(false); }} title="None" />
-      <Menu.Item onPress={() => { markFeedback(item.session_id, FeedBackMarkerType.Read); setVisible(false); }} title="Read" />
-      <Menu.Item onPress={() => { markFeedback(item.session_id, FeedBackMarkerType.Important); setVisible(false); }} title="Important" />
-      <Menu.Item onPress={() => { markFeedback(item.session_id, FeedBackMarkerType.LookAgain); setVisible(false); }} title="Look Again" />
+      <Menu.Item
+        onPress={() => {
+          markFeedback(item.session_id, FeedBackMarkerType.None);
+          setVisible(false);
+        }}
+        title="None"
+      />
+      <Menu.Item
+        onPress={() => {
+          markFeedback(item.session_id, FeedBackMarkerType.Read);
+          setVisible(false);
+        }}
+        title="Read"
+      />
+      <Menu.Item
+        onPress={() => {
+          markFeedback(item.session_id, FeedBackMarkerType.Important);
+          setVisible(false);
+        }}
+        title="Important"
+      />
+      <Menu.Item
+        onPress={() => {
+          markFeedback(item.session_id, FeedBackMarkerType.LookAgain);
+          setVisible(false);
+        }}
+        title="Look Again"
+      />
     </Menu>
   );
 };
@@ -93,7 +117,7 @@ const FeedbacksDashboard = () => {
     fetchAllFeedbacks(
       itemsPerPage,
       page * itemsPerPage,
-      filterMarker !== 'all' ? (filterMarker as FeedBackMarkerType) : undefined
+      filterMarker !== 'all' ? (filterMarker as FeedBackMarkerType) : undefined,
     );
   }, [fetchAllFeedbacks, page, itemsPerPage, filterMarker]);
 
@@ -254,7 +278,10 @@ const FeedbacksDashboard = () => {
               {allFeedbacks.map((item, index) => (
                 <View
                   key={`marker-${item.session_id || index}`}
-                  style={[styles.dataCell, { borderBottomColor: palette.border, alignItems: 'center' }]}
+                  style={[
+                    styles.dataCell,
+                    { borderBottomColor: palette.border, alignItems: 'center' },
+                  ]}
                 >
                   <MarkerSelector item={item} markFeedback={markFeedback} />
                 </View>

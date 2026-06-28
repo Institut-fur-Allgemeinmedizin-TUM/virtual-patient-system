@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 import { Case } from '@/lib/cases/case';
 import { apiClient } from '@/lib/apiClient';
-import { EvaluationResponse, UserSessionFeedBack, FeedBackMarkerType, ContentType } from '@/services/api';
+import {
+  EvaluationResponse,
+  UserSessionFeedBack,
+  FeedBackMarkerType,
+  ContentType,
+} from '@/services/api';
 
 type ChatRole = 'bot' | 'user';
 type ChatMessage = {
@@ -24,7 +29,11 @@ interface SessionState {
   allFeedbacks: UserSessionFeedBack[];
   totalFeedbacks: number;
   waitingForAllFeedbacks: boolean;
-  fetchAllFeedbacks: (limit?: number, offset?: number, marker?: FeedBackMarkerType) => Promise<UserSessionFeedBack[]>;
+  fetchAllFeedbacks: (
+    limit?: number,
+    offset?: number,
+    marker?: FeedBackMarkerType,
+  ) => Promise<UserSessionFeedBack[]>;
   fetchFeedback: () => Promise<{ score: number; comment: string } | undefined>;
   submitFeedback: (score: number, comment: string) => Promise<boolean>;
   startSession: (caseId: string, caseData: Case) => Promise<string | undefined>;
@@ -133,7 +142,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       if (resp.status === 200) {
         set((state) => ({
           allFeedbacks: state.allFeedbacks.map((f) =>
-            f.session_id === sessionId ? { ...f, marker } : f
+            f.session_id === sessionId ? { ...f, marker } : f,
           ),
         }));
         return true;
