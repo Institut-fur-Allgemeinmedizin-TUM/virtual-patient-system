@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Case } from '@/lib/cases/case';
 import { apiClient } from '@/lib/apiClient';
-import { EvaluationResponse, UserSessionFeedBack } from '@/services/api';
+import { EvaluationResponse, UserSessionFeedBack, FeedBackMarkerType, ContentType } from '@/services/api';
 
 type ChatRole = 'bot' | 'user';
 type ChatMessage = {
@@ -24,7 +24,7 @@ interface SessionState {
   allFeedbacks: UserSessionFeedBack[];
   totalFeedbacks: number;
   waitingForAllFeedbacks: boolean;
-  fetchAllFeedbacks: (limit?: number, offset?: number) => Promise<UserSessionFeedBack[]>;
+  fetchAllFeedbacks: (limit?: number, offset?: number, marker?: FeedBackMarkerType) => Promise<UserSessionFeedBack[]>;
   fetchFeedback: () => Promise<{ score: number; comment: string } | undefined>;
   submitFeedback: (score: number, comment: string) => Promise<boolean>;
   startSession: (caseId: string, caseData: Case) => Promise<string | undefined>;
@@ -33,6 +33,7 @@ interface SessionState {
   evaluate: () => void;
   loadEvaluationMessages: (sessionId?: string, force?: boolean) => Promise<void>;
   resetEvaluation: () => void;
+  markFeedback: (sessionId: string, marker: FeedBackMarkerType) => Promise<boolean>;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -52,10 +53,12 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   totalFeedbacks: 0,
   waitingForAllFeedbacks: false,
 
-  fetchAllFeedbacks: async (limit = 100, offset = 0) => {
+  fetchAllFeedbacks: async (limit = 100, offset = 0, marker?: FeedBackMarkerType) => {
     set({ waitingForAllFeedbacks: true });
     try {
-      const resp = await apiClient.api.getAllFeedbacksApiAdminFeedbacksGet({ limit, offset });
+      const queryParams: any = { limit, offset };
+      if (marker) queryParams.marker = marker;
+      const resp = await apiClient.api.getAllFeedbacksApiAdminFeedbacksGet(queryParams);
       set({
         waitingForAllFeedbacks: false,
         allFeedbacks: resp.data.feedbacks,
@@ -114,6 +117,30 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     } catch (error) {
       console.error('Feedback submission error:', error);
       set({ waitingForFeedbackSubmission: false });
+      return false;
+    }
+  },
+
+  markFeedback: async (sessionId: string, marker: FeedBackMarkerType) => {
+    try {
+      const resp = await apiClient.request({
+        path: `/api/admin/feedbacks/${sessionId}/mark`,
+        method: 'PATCH',
+        body: { marker },
+        secure: true,
+        type: ContentType.Json,
+      });
+      if (resp.status === 200) {
+        set((state) => ({
+          allFeedbacks: state.allFeedbacks.map((f) =>
+            f.session_id === sessionId ? { ...f, marker } : f
+          ),
+        }));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Failed to update feedback marker:', error);
       return false;
     }
   },

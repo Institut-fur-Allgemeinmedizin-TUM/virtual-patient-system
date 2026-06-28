@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
-
+import enum
 from pydantic import BaseModel
 from sqlalchemy import (
     JSON,
@@ -16,11 +16,12 @@ from sqlalchemy import (
     Table,
     Text,
     func,
+    Enum,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
-class DefaultRoles(str, Enum):
+class DefaultRoles(str, enum.Enum):
     admin = "Admin"
     default = "Default"
     tum_user = "TUMUser"
@@ -168,6 +169,11 @@ class Message(Base):
 
     session: Mapped[Session] = relationship(back_populates="messages")
 
+class FeedBackMarkerType(enum.Enum):
+    NONE = "none"
+    READ = "read"
+    IMPORTANT = "important"
+    LOOK_AGAIN = "look_again"
 
 class SessionUserFeedback(Base):
     __tablename__ = "session_user_feedback"
@@ -180,6 +186,10 @@ class SessionUserFeedback(Base):
     feedback: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     session: Mapped["Session"] = relationship(back_populates="user_feedback")
+
+    marker: Mapped[FeedBackMarkerType] = mapped_column(
+        Enum(FeedBackMarkerType), primary_key=True, default=FeedBackMarkerType.NONE, nullable=False
+    )
 
 
 class Diagnostic(Base):

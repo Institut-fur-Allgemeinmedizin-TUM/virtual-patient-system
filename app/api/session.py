@@ -6,7 +6,7 @@ import time as pytime
 import uuid
 from datetime import datetime, time as dt_time
 from random import Random
-from typing import List
+from typing import List, Optional
 
 import google.genai.types
 from fastapi import (
@@ -39,6 +39,7 @@ from app.model.llm import (
     CreateSessionRequest,
     ChatResponse,
     ChatRequest,
+    UpdateFeedbackMarkerRequest,
     UserSessionFeedBack,
     PaginatedFeedbacksResponse,
 )
@@ -47,6 +48,7 @@ from app.model.models import (
     Message,
     SessionMessagesResponse,
     SessionUserFeedback,
+    FeedBackMarkerType,
 )
 from app.model.models import (
     SessionLiveDefaultTime,
@@ -907,7 +909,11 @@ async def set_diagnosis(
 
 @sessionRouter.get("/api/admin/feedbacks", response_model=PaginatedFeedbacksResponse)
 async def get_all_feedbacks(
-    request: Request, limit: int = 100, offset: int = 0, db: OrmSession = Depends(get_db)
+    request: Request,
+    limit: int = 100,
+    offset: int = 0,
+    marker: Optional[FeedBackMarkerType] = None,
+    db: OrmSession = Depends(get_db),
 ) -> PaginatedFeedbacksResponse:
     """Get all feedback entries for admin users."""
     user = auth.require_user(request)
@@ -915,16 +921,17 @@ async def get_all_feedbacks(
     if not user.is_admin():
         raise HTTPException(status_code=403, detail="Forbidden")
 
-    query = (
-        db.query(SessionUserFeedback)
-        .join(ChatSession, SessionUserFeedback.session_id == ChatSession.id)
+    query = db.query(SessionUserFeedback).join(
+        ChatSession, SessionUserFeedback.session_id == ChatSession.id
     )
+
+    if marker is not None:
+        query = query.filter(SessionUserFeedback.marker == marker)
 
     total = query.count()
 
     feedbacks = (
-        query
-        .order_by(ChatSession.started_at.asc(), SessionUserFeedback.id.asc())
+        query.order_by(ChatSession.started_at.asc(), SessionUserFeedback.id.asc())
         .offset(offset)
         .limit(limit)
         .all()
@@ -936,10 +943,11 @@ async def get_all_feedbacks(
                 session_id=feedback.session_id,
                 feedback_score=feedback.feedback_score,
                 feedback_comment=feedback.feedback,
+                marker=feedback.marker,
             )
             for feedback in feedbacks
         ],
-        total=total
+        total=total,
     )
 
 
@@ -974,6 +982,7 @@ async def get_feedback(
         session_id=feedback.session_id,
         feedback_score=feedback.feedback_score,
         feedback_comment=feedback.feedback,
+        marker=feedback.marker,
     )
 
 
@@ -1013,4 +1022,35 @@ async def create_feedback(
         db.add(feedback)
 
     db.commit()
+    return {"ok": True}
+
+
+
+
+
+@sessionRouter.patch("/api/admin/feedbacks/{session_id}/mark")
+async def update_feedback_marker(
+    session_id: str,
+    req: UpdateFeedbackMarkerRequest,
+    request: Request,
+    db: OrmSession = Depends(get_db),
+):
+    """Update feedback marker for a session."""
+    user = auth.require_user(request)
+
+    if not user.is_admin():
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    feedback = (
+        db.query(SessionUserFeedback)
+        .filter(SessionUserFeedback.session_id == session_id)
+        .first()
+    )
+
+    if not feedback:
+        raise HTTPException(status_code=404, detail="Feedback not found")
+
+    feedback.marker = req.marker
+    db.commit()
+
     return {"ok": True}
