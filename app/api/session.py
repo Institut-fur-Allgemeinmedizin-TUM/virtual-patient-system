@@ -40,6 +40,7 @@ from app.model.llm import (
     ChatResponse,
     ChatRequest,
     UserSessionFeedBack,
+    PaginatedFeedbacksResponse,
 )
 from app.model.models import (
     Session as ChatSession,
@@ -901,6 +902,44 @@ async def set_diagnosis(
     db.commit()
     return JSONResponse(
         status_code=200, content={"ok": True, "diagnosis": diagnosis_value}
+    )
+
+
+@sessionRouter.get("/api/admin/feedbacks", response_model=PaginatedFeedbacksResponse)
+async def get_all_feedbacks(
+    request: Request, limit: int = 100, offset: int = 0, db: OrmSession = Depends(get_db)
+) -> PaginatedFeedbacksResponse:
+    """Get all feedback entries for admin users."""
+    user = auth.require_user(request)
+
+    if not user.is_admin():
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    query = (
+        db.query(SessionUserFeedback)
+        .join(ChatSession, SessionUserFeedback.session_id == ChatSession.id)
+    )
+
+    total = query.count()
+
+    feedbacks = (
+        query
+        .order_by(ChatSession.started_at.asc(), SessionUserFeedback.id.asc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
+    return PaginatedFeedbacksResponse(
+        feedbacks=[
+            UserSessionFeedBack(
+                session_id=feedback.session_id,
+                feedback_score=feedback.feedback_score,
+                feedback_comment=feedback.feedback,
+            )
+            for feedback in feedbacks
+        ],
+        total=total
     )
 
 

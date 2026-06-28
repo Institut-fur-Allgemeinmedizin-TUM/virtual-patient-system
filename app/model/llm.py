@@ -24,3 +24,8 @@ class UserSessionFeedBack(BaseModel):
     session_id: str
     feedback_score: int
     feedback_comment: str
+
+
+class PaginatedFeedbacksResponse(BaseModel):
+    feedbacks: list[UserSessionFeedBack]
+    total: int
