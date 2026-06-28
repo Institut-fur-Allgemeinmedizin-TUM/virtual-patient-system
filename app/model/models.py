@@ -191,7 +191,6 @@ class SessionUserFeedback(Base):
 
     marker: Mapped[FeedBackMarkerType] = mapped_column(
         Enum(FeedBackMarkerType),
-        primary_key=True,
         default=FeedBackMarkerType.NONE,
         nullable=False,
     )
