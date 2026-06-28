@@ -1,9 +1,9 @@
-VENV := .mri_env
+VENV := mri_env
 
 # 2. Define the paths to the venv's python and pip executables
 PYTHON := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
-
+EXPO_PUBLIC_BACKEND_URL := http://localhost:8000
 # 3. Default target when you just type 'make'
 .PHONY: all run clean venv
 all: run
@@ -27,7 +27,7 @@ setup-frontend:
 	cd mobile && npm install --exact
 
 run-frontend: setup-frontend
-	cd mobile && npm run web
+	cd mobile && EXPO_PUBLIC_BACKEND_URL=$(EXPO_PUBLIC_BACKEND_URL) npm run web
 
 format:	setup-venv setup-frontend
 	black app
