@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.model.models import FeedBackMarkerType
 
 
 class CreateSessionRequest(BaseModel):
@@ -24,8 +25,12 @@ class UserSessionFeedBack(BaseModel):
     session_id: str
     feedback_score: int
     feedback_comment: str
+    marker: FeedBackMarkerType | None = None
 
 
 class PaginatedFeedbacksResponse(BaseModel):
     feedbacks: list[UserSessionFeedBack]
     total: int
+
+class UpdateFeedbackMarkerRequest(BaseModel):
+    marker: FeedBackMarkerType

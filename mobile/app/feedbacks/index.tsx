@@ -10,10 +10,63 @@ import {
   Dialog,
   Button,
   IconButton,
+  Menu,
+  SegmentedButtons,
 } from 'react-native-paper';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import EvaluationModal from '@/app/components/EvaluationModal';
+import { FeedBackMarkerType } from '@/services/api';
+
+const MarkerSelector = ({ item, markFeedback }: { item: any, markFeedback: any }) => {
+  const [visible, setVisible] = useState(false);
+
+  const getIcon = (marker: string) => {
+    switch (marker) {
+      case FeedBackMarkerType.Read:
+        return 'check-circle';
+      case FeedBackMarkerType.Important:
+        return 'alert-circle';
+      case FeedBackMarkerType.LookAgain:
+        return 'eye';
+      default:
+        return 'help-circle-outline';
+    }
+  };
+
+  const getColor = (marker: string) => {
+    switch (marker) {
+      case FeedBackMarkerType.Read:
+        return '#4caf50';
+      case FeedBackMarkerType.Important:
+        return '#f44336';
+      case FeedBackMarkerType.LookAgain:
+        return '#ff9800';
+      default:
+        return '#9e9e9e';
+    }
+  };
+
+  return (
+    <Menu
+      visible={visible}
+      onDismiss={() => setVisible(false)}
+      anchor={
+        <IconButton
+          icon={getIcon(item.marker || FeedBackMarkerType.None)}
+          iconColor={getColor(item.marker || FeedBackMarkerType.None)}
+          size={20}
+          onPress={() => setVisible(true)}
+        />
+      }
+    >
+      <Menu.Item onPress={() => { markFeedback(item.session_id, FeedBackMarkerType.None); setVisible(false); }} title="None" />
+      <Menu.Item onPress={() => { markFeedback(item.session_id, FeedBackMarkerType.Read); setVisible(false); }} title="Read" />
+      <Menu.Item onPress={() => { markFeedback(item.session_id, FeedBackMarkerType.Important); setVisible(false); }} title="Important" />
+      <Menu.Item onPress={() => { markFeedback(item.session_id, FeedBackMarkerType.LookAgain); setVisible(false); }} title="Look Again" />
+    </Menu>
+  );
+};
 
 const FeedbacksDashboard = () => {
   const theme = useTheme();
@@ -23,8 +76,11 @@ const FeedbacksDashboard = () => {
   const fetchAllFeedbacks = useSessionStore((state) => state.fetchAllFeedbacks);
   const allFeedbacks = useSessionStore((state) => state.allFeedbacks);
   const totalFeedbacks = useSessionStore((state) => state.totalFeedbacks);
+  const markFeedback = useSessionStore((state) => state.markFeedback);
 
   const [expandedText, setExpandedText] = useState<{ title: string; content: string } | null>(null);
+
+  const [filterMarker, setFilterMarker] = useState<string>('all');
 
   const [page, setPage] = useState(0);
   const itemsPerPage = 100;
@@ -34,8 +90,12 @@ const FeedbacksDashboard = () => {
   }
 
   useEffect(() => {
-    fetchAllFeedbacks(itemsPerPage, page * itemsPerPage);
-  }, [fetchAllFeedbacks, page, itemsPerPage]);
+    fetchAllFeedbacks(
+      itemsPerPage,
+      page * itemsPerPage,
+      filterMarker !== 'all' ? (filterMarker as FeedBackMarkerType) : undefined
+    );
+  }, [fetchAllFeedbacks, page, itemsPerPage, filterMarker]);
 
   const openEvaluationForSession = (sessionIdValue: unknown) => {
     const sessionId = String(sessionIdValue ?? '').trim();
@@ -76,6 +136,23 @@ const FeedbacksDashboard = () => {
       <Text variant="headlineMedium" style={[styles.pageTitle, { color: palette.title }]}>
         Feedbacks Overview
       </Text>
+
+      <View style={{ marginBottom: 16 }}>
+        <SegmentedButtons
+          value={filterMarker}
+          onValueChange={(val) => {
+            setFilterMarker(val);
+            setPage(0);
+          }}
+          buttons={[
+            { value: 'all', label: 'All' },
+            { value: FeedBackMarkerType.None, label: 'None' },
+            { value: FeedBackMarkerType.Read, label: 'Read' },
+            { value: FeedBackMarkerType.Important, label: 'Important' },
+            { value: FeedBackMarkerType.LookAgain, label: 'Look Again' },
+          ]}
+        />
+      </View>
 
       <Surface
         style={[
@@ -160,6 +237,27 @@ const FeedbacksDashboard = () => {
                     {item.feedback_comment || '-'}
                   </Text>
                 </TouchableRipple>
+              ))}
+            </View>
+
+            <View style={[styles.columnWrapper, { borderRightColor: palette.border, width: 100 }]}>
+              <View
+                style={[
+                  styles.headerCell,
+                  { backgroundColor: palette.headerSurface, borderBottomColor: palette.border },
+                ]}
+              >
+                <Text style={[styles.headerLabel, { color: palette.subtitle }]} numberOfLines={1}>
+                  Marker
+                </Text>
+              </View>
+              {allFeedbacks.map((item, index) => (
+                <View
+                  key={`marker-${item.session_id || index}`}
+                  style={[styles.dataCell, { borderBottomColor: palette.border, alignItems: 'center' }]}
+                >
+                  <MarkerSelector item={item} markFeedback={markFeedback} />
+                </View>
               ))}
             </View>
 

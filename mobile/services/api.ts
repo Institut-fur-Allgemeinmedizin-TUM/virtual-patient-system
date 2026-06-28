@@ -51,6 +51,14 @@ export enum MedicalBackgroundResponseType {
   Value2 = 2,
 }
 
+/** FeedBackMarkerType */
+export enum FeedBackMarkerType {
+  None = "none",
+  Read = "read",
+  Important = "important",
+  LookAgain = "look_again",
+}
+
 /** AggregationFunction */
 export enum AggregationFunction {
   Avg = "avg",
@@ -225,6 +233,14 @@ export interface MedicalBackgroundResponse {
   diagnostic_data?: null;
 }
 
+/** PaginatedFeedbacksResponse */
+export interface PaginatedFeedbacksResponse {
+  /** Feedbacks */
+  feedbacks: UserSessionFeedBack[];
+  /** Total */
+  total: number;
+}
+
 /** SessionHistoryFilter */
 export interface SessionHistoryFilter {
   column: SessionHistoryColumn;
@@ -331,6 +347,11 @@ export interface SessionsSummaryResponse {
   sessions: Record<string, SessionSummaryData>;
 }
 
+/** UpdateFeedbackMarkerRequest */
+export interface UpdateFeedbackMarkerRequest {
+  marker: FeedBackMarkerType;
+}
+
 /** UserProfileResponse */
 export interface UserProfileResponse {
   /** Sub */
@@ -357,14 +378,7 @@ export interface UserSessionFeedBack {
   feedback_score: number;
   /** Feedback Comment */
   feedback_comment: string;
-}
-
-/** PaginatedFeedbacksResponse */
-export interface PaginatedFeedbacksResponse {
-  /** Feedbacks */
-  feedbacks: UserSessionFeedBack[];
-  /** Total */
-  total: number;
+  marker?: FeedBackMarkerType | null;
 }
 
 /** VHBLoginRequest */
@@ -803,10 +817,12 @@ export class Api<
          * @default 0
          */
         offset?: number;
+        /** Marker */
+        marker?: FeedBackMarkerType | null;
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
-      this.request<PaginatedFeedbacksResponse, any>({
+      this.request<PaginatedFeedbacksResponse, HTTPValidationError>({
         path: `/api/admin/feedbacks`,
         method: "GET",
         query: query,
@@ -847,6 +863,27 @@ export class Api<
       this.request<any, HTTPValidationError>({
         path: `/api/sessions/${sessionId}/feedback`,
         method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Update feedback marker for a session.
+     *
+     * @name UpdateFeedbackMarkerApiAdminFeedbacksSessionIdMarkPatch
+     * @summary Update Feedback Marker
+     * @request PATCH:/api/admin/feedbacks/{session_id}/mark
+     */
+    updateFeedbackMarkerApiAdminFeedbacksSessionIdMarkPatch: (
+      sessionId: string,
+      data: UpdateFeedbackMarkerRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<any, HTTPValidationError>({
+        path: `/api/admin/feedbacks/${sessionId}/mark`,
+        method: "PATCH",
         body: data,
         type: ContentType.Json,
         format: "json",
