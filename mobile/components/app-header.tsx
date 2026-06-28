@@ -207,14 +207,24 @@ export function AppHeader() {
 
               <Drawer.Section>
                 {roles?.includes('Admin') && (
-                  <Drawer.Item
-                    icon="chart-bar"
-                    label="Analytics"
-                    onPress={() => {
-                      setProfileSidebarOpen(false);
-                      router.push('/analytics');
-                    }}
-                  />
+                  <>
+                    <Drawer.Item
+                      icon="chart-bar"
+                      label="Analytics"
+                      onPress={() => {
+                        setProfileSidebarOpen(false);
+                        router.push('/analytics');
+                      }}
+                    />
+                    <Drawer.Item
+                      icon="comment-multiple-outline"
+                      label="Feedbacks"
+                      onPress={() => {
+                        setProfileSidebarOpen(false);
+                        router.push('/feedbacks');
+                      }}
+                    />
+                  </>
                 )}
                 <Drawer.Item
                   icon="logout"

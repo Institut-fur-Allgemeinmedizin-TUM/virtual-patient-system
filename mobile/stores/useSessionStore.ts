@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Case } from '@/lib/cases/case';
 import { apiClient } from '@/lib/apiClient';
-import { EvaluationResponse } from '@/services/api';
+import { EvaluationResponse, UserSessionFeedBack } from '@/services/api';
 
 type ChatRole = 'bot' | 'user';
 type ChatMessage = {
@@ -21,6 +21,10 @@ interface SessionState {
   evaluationMessagesError?: string;
   waitingForFeedbackSubmission: boolean;
   waitingForFeedbackFetch: boolean;
+  allFeedbacks: UserSessionFeedBack[];
+  totalFeedbacks: number;
+  waitingForAllFeedbacks: boolean;
+  fetchAllFeedbacks: (limit?: number, offset?: number) => Promise<UserSessionFeedBack[]>;
   fetchFeedback: () => Promise<{ score: number; comment: string } | undefined>;
   submitFeedback: (score: number, comment: string) => Promise<boolean>;
   startSession: (caseId: string, caseData: Case) => Promise<string | undefined>;
@@ -44,6 +48,26 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   evaluationMessagesError: undefined,
   waitingForFeedbackSubmission: false,
   waitingForFeedbackFetch: false,
+  allFeedbacks: [],
+  totalFeedbacks: 0,
+  waitingForAllFeedbacks: false,
+
+  fetchAllFeedbacks: async (limit = 100, offset = 0) => {
+    set({ waitingForAllFeedbacks: true });
+    try {
+      const resp = await apiClient.api.getAllFeedbacksApiAdminFeedbacksGet({ limit, offset });
+      set({
+        waitingForAllFeedbacks: false,
+        allFeedbacks: resp.data.feedbacks,
+        totalFeedbacks: resp.data.total,
+      });
+      return resp.data.feedbacks;
+    } catch (error) {
+      console.error('Failed to fetch all feedbacks:', error);
+      set({ waitingForAllFeedbacks: false });
+      return [];
+    }
+  },
 
   fetchFeedback: async () => {
     const sessionId = get().sessionId || get().evaluationResponse?.session_id;

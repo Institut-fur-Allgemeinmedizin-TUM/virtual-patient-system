@@ -359,6 +359,14 @@ export interface UserSessionFeedBack {
   feedback_comment: string;
 }
 
+/** PaginatedFeedbacksResponse */
+export interface PaginatedFeedbacksResponse {
+  /** Feedbacks */
+  feedbacks: UserSessionFeedBack[];
+  /** Total */
+  total: number;
+}
+
 /** VHBLoginRequest */
 export interface VHBLoginRequest {
   /** Password */
@@ -772,6 +780,36 @@ export class Api<
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get all feedback entries for admin users.
+     *
+     * @name GetAllFeedbacksApiAdminFeedbacksGet
+     * @summary Get All Feedbacks
+     * @request GET:/api/admin/feedbacks
+     */
+    getAllFeedbacksApiAdminFeedbacksGet: (
+      query?: {
+        /**
+         * Limit
+         * @default 100
+         */
+        limit?: number;
+        /**
+         * Offset
+         * @default 0
+         */
+        offset?: number;
+      },
+      params: RequestParams = {}
+    ) =>
+      this.request<PaginatedFeedbacksResponse, any>({
+        path: `/api/admin/feedbacks`,
+        method: "GET",
+        query: query,
         format: "json",
         ...params,
       }),
