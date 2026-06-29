@@ -47,3 +47,7 @@ clean:
 	rm -rf __pycache__
 	rm -rf .pytest_cache
 	rm -rf mobile/node_modules
+
+build-apk: setup-frontend
+	cd mobile && npx expo prebuild -p android --clean
+	cd mobile/android && ./gradlew assembleRelease
