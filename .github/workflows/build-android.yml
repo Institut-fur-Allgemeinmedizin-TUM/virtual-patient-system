@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - fe-mobile-app
+      - test/mobile-app
     paths:
       - "mobile/**"
       - ".github/workflows/build-android.yml"
