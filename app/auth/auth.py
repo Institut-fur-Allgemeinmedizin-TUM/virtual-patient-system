@@ -140,6 +140,8 @@ def get_current_user(request: Request) -> Optional[dict]:
 
 def get_current_user_websocket(websocket: WebSocket) -> Optional[AuthenticatedUser]:
     token = websocket.cookies.get("session")
+    if not token:
+        token = websocket.query_params.get("access_token")
     return get_current_user_by_token(token)
 
 
