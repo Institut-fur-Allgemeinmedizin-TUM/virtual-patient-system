@@ -76,8 +76,8 @@ cors_origins = [
     "http://localhost:8081",
 ]
 cors_origin_regex = r"^http://((localhost|127\.0\.0\.1)|((10|192\.168)\.\d+\.\d+)|(172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+))(:\d+)?$"
-if settings.environment == "production":
-    # Allow same-origin requests in production
+if settings.environment in ("production", "beta"):
+    # Allow same-origin requests in production and beta
     cors_origins = ["*"]  # Or specify your Cloud Run URL
     cors_origin_regex = None
 
