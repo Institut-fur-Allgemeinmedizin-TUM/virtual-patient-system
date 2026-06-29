@@ -3,6 +3,7 @@ import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import LiveAudioStream from 'react-native-live-audio-stream';
 import { Buffer } from 'buffer';
+import * as FileSystem from 'expo-file-system/legacy';
 import { API_BASE_URL, getAccessToken } from '@/lib/auth';
 import { Platform } from 'react-native';
 
@@ -196,7 +197,7 @@ export function useLiveAudioSession(
     }
   };
 
-  const MIN_CHUNKS_TO_PLAY = 20;
+  const MIN_CHUNKS_TO_PLAY = 5;
   const isReceivingRef = useRef(false);
 
   // Playback logic using expo-av Data URIs
@@ -212,8 +213,8 @@ export function useLiveAudioSession(
       const chunksToPlay = [...playbackBufferRef.current];
       playbackBufferRef.current = []; // Clear buffer immediately for next incoming chunks
 
-      const combinedBase64 = chunksToPlay.join('');
-      const pcmBuffer = Buffer.from(combinedBase64, 'base64');
+      const buffers = chunksToPlay.map((b64) => Buffer.from(b64, 'base64'));
+      const pcmBuffer = Buffer.concat(buffers);
 
       const wavHeader = createWavHeader(pcmBuffer.length, 24000);
       const wavData = new Uint8Array(wavHeader.length + pcmBuffer.length);
@@ -221,9 +222,10 @@ export function useLiveAudioSession(
       wavData.set(new Uint8Array(pcmBuffer), wavHeader.length);
 
       const wavBase64 = Buffer.from(wavData).toString('base64');
-      const uri = `data:audio/wav;base64,${wavBase64}`;
+      const fileUri = `${FileSystem.documentDirectory}temp_audio_${Date.now()}.wav`;
+      await FileSystem.writeAsStringAsync(fileUri, wavBase64, { encoding: 'base64' });
 
-      const { sound } = await Audio.Sound.createAsync({ uri });
+      const { sound } = await Audio.Sound.createAsync({ uri: fileUri });
       currentSoundRef.current = sound;
 
       sound.setOnPlaybackStatusUpdate((status) => {
@@ -236,9 +238,11 @@ export function useLiveAudioSession(
                 currentSoundRef.current = null;
               }
               isPlayingRef.current = false;
+              
+              // Clean up the temp file
+              FileSystem.deleteAsync(fileUri, { idempotent: true }).catch(() => {});
 
               // As soon as this large chunk finishes, immediately check if more arrived
-              // We use forcePlay = true here so it doesn't wait for MIN_CHUNKS if it's lagging behind
               playBufferedAudio(true);
             })
             .catch(() => {
@@ -247,6 +251,7 @@ export function useLiveAudioSession(
               }
               setError('Fehler beim Abspielen des Audios');
               isPlayingRef.current = false;
+              FileSystem.deleteAsync(fileUri, { idempotent: true }).catch(() => {});
             });
         }
       });
