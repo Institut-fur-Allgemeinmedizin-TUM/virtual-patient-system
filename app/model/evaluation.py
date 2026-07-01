@@ -24,6 +24,7 @@ class EvaluationResponse(BaseModel):
     rank: int
     top_percentage: float
 
+
 class RankingResponse(BaseModel):
     session_id: str
     rank: int

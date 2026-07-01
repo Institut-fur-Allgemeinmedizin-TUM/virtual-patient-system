@@ -617,11 +617,10 @@ async def get_session_messages(
         ],
     )
 
-@sessionRouter.get(
-    "/api/sessions/{session_id}/ranking", response_model=RankingResponse
-)
+
+@sessionRouter.get("/api/sessions/{session_id}/ranking", response_model=RankingResponse)
 async def get_ranking(
-        session_id: str, request: Request, db: OrmSession = Depends(get_db)
+    session_id: str, request: Request, db: OrmSession = Depends(get_db)
 ):
     user = auth.require_user(request)
 
@@ -649,14 +648,14 @@ async def get_ranking(
 
     one_year_ago = datetime.now() - timedelta(days=365)
     total_score_expr = (
-        Evaluation.criterion1_score +
-        Evaluation.criterion2_score +
-        Evaluation.criterion3_score +
-        Evaluation.criterion4_score +
-        Evaluation.criterion5_score +
-        Evaluation.criterion6_score +
-        Evaluation.criterion7_score +
-        Evaluation.criterion8_score
+        Evaluation.criterion1_score
+        + Evaluation.criterion2_score
+        + Evaluation.criterion3_score
+        + Evaluation.criterion4_score
+        + Evaluation.criterion5_score
+        + Evaluation.criterion6_score
+        + Evaluation.criterion7_score
+        + Evaluation.criterion8_score
     )
 
     rank_window = func.rank().over(order_by=desc(total_score_expr)).label("rank")
@@ -666,30 +665,34 @@ async def get_ranking(
             Session.id.label("session_id"),
             total_score_expr.label("total_score"),
             rank_window.label("rank"),
-        ).join(Evaluation, Session.id == Evaluation.session_id)
+        )
+        .join(Evaluation, Session.id == Evaluation.session_id)
         .where(Session.case_id == case_id)
         .where(Session.started_at >= one_year_ago)
         .subquery()
     )
 
-    total_count = db.query(Session).join(Evaluation, Session.id == Evaluation.session_id).filter(Session.case_id == case_id).filter(Session.started_at >= one_year_ago).count() or 0
+    total_count = (
+        db.query(Session)
+        .join(Evaluation, Session.id == Evaluation.session_id)
+        .filter(Session.case_id == case_id)
+        .filter(Session.started_at >= one_year_ago)
+        .count()
+        or 0
+    )
 
     if total_count == 0:
         return RankingResponse(
-            session_id=session_id,
-            rank = 0,
-            top_percentage=0,
-            total_participants=0
+            session_id=session_id, rank=0, top_percentage=0, total_participants=0
         )
 
-    target_stmt = select(subquery.c.rank).where(subquery.columns.session_id == session_id)
+    target_stmt = select(subquery.c.rank).where(
+        subquery.columns.session_id == session_id
+    )
     result = db.execute(target_stmt).first()
     if not result:
         return RankingResponse(
-            session_id=session_id,
-            rank=0,
-            top_percentage=0,
-            total_participants=0
+            session_id=session_id, rank=0, top_percentage=0, total_participants=0
         )
 
     current_rank = result.rank
@@ -698,8 +701,9 @@ async def get_ranking(
         session_id=session_id,
         rank=current_rank,
         top_percentage=top_percentage,
-        total_participants=total_count
+        total_participants=total_count,
     )
+
 
 @sessionRouter.post(
     "/api/sessions/{session_id}/evaluate", response_model=EvaluationResponse
@@ -756,8 +760,10 @@ async def evaluate_session(
         if os.environ.get("SIMULATE_AI") == "true":
             pytime.sleep(4)
         # Return existing evaluation
-        ranking_result : RankingResponse = await get_ranking(session_id, request, db)
-        return formatting.format_evaluation_response(existing_evaluation, ranking_result)
+        ranking_result: RankingResponse = await get_ranking(session_id, request, db)
+        return formatting.format_evaluation_response(
+            existing_evaluation, ranking_result
+        )
     if mustExist:
         raise HTTPException(status_code=404, detail="Evaluation not found")
 
@@ -912,7 +918,9 @@ async def get_last_session_summary(
             db.query(Evaluation).filter(Evaluation.session_id == session.id).first()
         )
         if evaluation:
-            ranking_response : RankingResponse = await get_ranking(str(session.id), request, db)
+            ranking_response: RankingResponse = await get_ranking(
+                str(session.id), request, db
+            )
 
             summary = SessionSummaryData(
                 sessionId=session.id,
@@ -927,8 +935,8 @@ async def get_last_session_summary(
                     + evaluation.criterion8_score
                 )
                 / 8.0,
-                rank = ranking_response.rank,
-                topPercentage=ranking_response.top_percentage
+                rank=ranking_response.rank,
+                topPercentage=ranking_response.top_percentage,
             )
             session_summary.sessions[session.case_id] = summary
 
