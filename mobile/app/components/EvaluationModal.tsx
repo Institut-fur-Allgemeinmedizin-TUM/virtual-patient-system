@@ -183,7 +183,8 @@ export default function EvaluationModal() {
                   </View>
                   <View>
                     <Text style={styles.rankText}>
-                      Aktueller Rang: {evaluation.rank} | Top {evaluation.top_percentage.toFixed(2)}%
+                      Aktueller Rang: {evaluation.rank} | Top {evaluation.top_percentage.toFixed(2)}
+                      %
                     </Text>
                   </View>
 

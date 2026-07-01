@@ -115,6 +115,13 @@ export default function CasesScreen() {
                         style={styles.cardImage}
                         contentFit="cover"
                       />
+                      {hasTopPercentage && hasRank && (
+                        <View style={[styles.rankBadge, { backgroundColor: rankStyle.bg }]}>
+                          <Text style={{ color: rankStyle.text, fontSize: 11, fontWeight: '700' }}>
+                            Rang {rank} | Top {topPercentage}%
+                          </Text>
+                        </View>
+                      )}
                       <View style={[styles.difficultyBadge, { backgroundColor: diffStyle.bg }]}>
                         <Text style={{ color: diffStyle.text, fontSize: 12, fontWeight: '700' }}>
                           {mockDifficulty}
