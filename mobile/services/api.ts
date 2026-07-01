@@ -152,6 +152,10 @@ export interface EvaluationResponse {
   criteria: EvaluationCriterion[];
   /** Improvement Suggestions */
   improvement_suggestions: string[];
+
+  rank: number;
+
+  top_percentage: number;
 }
 
 /** ExportResponse */
@@ -339,6 +343,10 @@ export interface SessionSummaryData {
   sessionId: string;
   /** Score */
   score: number;
+  /** Rank */
+  rank: number;
+  /** Top Percentage */
+  topPercentage: number;
 }
 
 /** SessionsSummaryResponse */

@@ -4,7 +4,7 @@ import json
 import os
 import time as pytime
 import uuid
-from datetime import datetime, time as dt_time
+from datetime import datetime, time as dt_time, timedelta
 from random import Random
 from typing import List, Optional
 
@@ -22,7 +22,7 @@ from fastapi import (
 from google.genai.types import HistoryConfigDict
 from pydantic import BaseModel
 from langchain.agents import create_agent
-from sqlalchemy import select, desc
+from sqlalchemy import func, select, desc
 from sqlalchemy.orm import Session as OrmSession
 from starlette.responses import JSONResponse
 
@@ -49,13 +49,14 @@ from app.model.models import (
     SessionMessagesResponse,
     SessionUserFeedback,
     FeedBackMarkerType,
+    Session,
 )
 from app.model.models import (
     SessionLiveDefaultTime,
     UserMaxDailyUsage,
 )
 
-from app.model.evaluation import EvaluationResponse
+from app.model.evaluation import EvaluationResponse, RankingResponse
 from app.model.models import (
     Evaluation,
     SessionSummaryData,
@@ -616,6 +617,89 @@ async def get_session_messages(
         ],
     )
 
+@sessionRouter.get(
+    "/api/sessions/{session_id}/ranking", response_model=RankingResponse
+)
+async def get_ranking(
+        session_id: str, request: Request, db: OrmSession = Depends(get_db)
+):
+    user = auth.require_user(request)
+
+    if user.get("is_vhb_user", False):
+        raise HTTPException(
+            status_code=403,
+            detail="Ranking feature is only available for TUM users",
+        )
+
+    # Check if session is in VHB sessions (shouldn't happen, but double-check)
+    if session_id in vhb_sessions:
+        raise HTTPException(
+            status_code=403, detail="Ranking not available for VHB sessions"
+        )
+
+    session = db.get(ChatSession, session_id)
+    tum_id = user.get("tum_id") or user.get("sub")
+
+    if not user.is_admin():
+        if not session.user_id == tum_id:
+            raise HTTPException(status_code=403, detail="Invalid user id")
+
+    # Calculate current position of session (based on total scored points)
+    case_id = session.case_id
+
+    one_year_ago = datetime.now() - timedelta(days=365)
+    total_score_expr = (
+        Evaluation.criterion1_score +
+        Evaluation.criterion2_score +
+        Evaluation.criterion3_score +
+        Evaluation.criterion4_score +
+        Evaluation.criterion5_score +
+        Evaluation.criterion6_score +
+        Evaluation.criterion7_score +
+        Evaluation.criterion8_score
+    )
+
+    rank_window = func.rank().over(order_by=desc(total_score_expr)).label("rank")
+
+    subquery = (
+        select(
+            Session.id.label("session_id"),
+            total_score_expr.label("total_score"),
+            rank_window.label("rank"),
+        ).join(Evaluation, Session.id == Evaluation.session_id)
+        .where(Session.case_id == case_id)
+        .where(Session.started_at >= one_year_ago)
+        .subquery()
+    )
+
+    total_count = db.query(Session).join(Evaluation, Session.id == Evaluation.session_id).filter(Session.case_id == case_id).filter(Session.started_at >= one_year_ago).count() or 0
+
+    if total_count == 0:
+        return RankingResponse(
+            session_id=session_id,
+            rank = 0,
+            top_percentage=0,
+            total_participants=0
+        )
+
+    target_stmt = select(subquery.c.rank).where(subquery.columns.session_id == session_id)
+    result = db.execute(target_stmt).first()
+    if not result:
+        return RankingResponse(
+            session_id=session_id,
+            rank=0,
+            top_percentage=0,
+            total_participants=0
+        )
+
+    current_rank = result.rank
+    top_percentage = round((current_rank / total_count) * 100, 2)
+    return RankingResponse(
+        session_id=session_id,
+        rank=current_rank,
+        top_percentage=top_percentage,
+        total_participants=total_count
+    )
 
 @sessionRouter.post(
     "/api/sessions/{session_id}/evaluate", response_model=EvaluationResponse
@@ -672,7 +756,8 @@ async def evaluate_session(
         if os.environ.get("SIMULATE_AI") == "true":
             pytime.sleep(4)
         # Return existing evaluation
-        return formatting.format_evaluation_response(existing_evaluation)
+        ranking_result : RankingResponse = await get_ranking(session_id, request, db)
+        return formatting.format_evaluation_response(existing_evaluation, ranking_result)
     if mustExist:
         raise HTTPException(status_code=404, detail="Evaluation not found")
 
@@ -787,7 +872,8 @@ async def evaluate_session(
         db.commit()
         db.refresh(evaluation)
 
-        return formatting.format_evaluation_response(evaluation)
+        ranking_result: RankingResponse = await get_ranking(session_id, request, db)
+        return formatting.format_evaluation_response(evaluation, ranking_result)
 
     except json.JSONDecodeError as e:
         raise HTTPException(
@@ -804,7 +890,6 @@ async def get_last_session_summary(
     """Get a summary of the last sessions the user did per case."""
 
     user = auth.require_user(request)
-    session_id = str(uuid.uuid4())
 
     # Check if this is a VHB user
     is_vhb = user.get("is_vhb_user", False)
@@ -827,6 +912,8 @@ async def get_last_session_summary(
             db.query(Evaluation).filter(Evaluation.session_id == session.id).first()
         )
         if evaluation:
+            ranking_response : RankingResponse = await get_ranking(str(session.id), request, db)
+
             summary = SessionSummaryData(
                 sessionId=session.id,
                 score=(
@@ -840,6 +927,8 @@ async def get_last_session_summary(
                     + evaluation.criterion8_score
                 )
                 / 8.0,
+                rank = ranking_response.rank,
+                topPercentage=ranking_response.top_percentage
             )
             session_summary.sessions[session.case_id] = summary
 

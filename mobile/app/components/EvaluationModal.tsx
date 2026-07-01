@@ -181,6 +181,11 @@ export default function EvaluationModal() {
                       </Text>
                     </View>
                   </View>
+                  <View>
+                    <Text style={styles.rankText}>
+                      Aktueller Rang: {evaluation.rank} | Top {evaluation.top_percentage.toFixed(2)}%
+                    </Text>
+                  </View>
 
                   <View
                     style={[
@@ -582,6 +587,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     marginLeft: 6,
+  },
+  rankText: {
+    color: '#bfbfbf',
   },
   progressBarBackground: {
     height: 8,

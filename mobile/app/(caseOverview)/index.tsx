@@ -69,6 +69,26 @@ export default function LandingPage() {
 
   const isWeb = width > 768;
 
+  const getRankStyle = (percentage: number, rank: number) => {
+    if (theme.dark) {
+      if (percentage > 66 || rank < 3) {
+        return { bg: '#1b2e1d', text: '#81c784' };
+      } else if (percentage > 33) {
+        return { bg: '#2b261b', text: '#ffd54f' };
+      } else {
+        return { bg: '#2b261b', text: '#ffd54f' };
+      }
+    } else {
+      if (percentage > 66 || rank < 3) {
+        return { bg: '#e8f5e9', text: '#2e7d32' };
+      } else if (percentage > 33) {
+        return { bg: '#fffbeb', text: '#92400e' };
+      } else {
+        return { bg: '#fdf2f2', text: '#c0392b' };
+      }
+    }
+  };
+
   const getDifficultyStyle = (difficulty: string) => {
     if (theme.dark) {
       switch (difficulty) {
@@ -421,9 +441,20 @@ export default function LandingPage() {
                 index % 3 === 0 ? 'Leicht' : index % 3 === 1 ? 'Mittel' : 'Schwer';
               const diffStyle = getDifficultyStyle(mockDifficulty);
 
-              const sessionInfo: { sessionId: string; score: number } = sessionScores[item.id];
+              const sessionInfo: {
+                sessionId: string;
+                score: number;
+                rank: number;
+                topPercentage: number;
+              } = sessionScores[item.id];
               const score = sessionInfo ? sessionInfo.score : null;
               const hasScore = typeof score === 'number';
+              const rank = sessionInfo ? sessionInfo.rank : null;
+              const hasRank = typeof rank === 'number';
+              const topPercentage = sessionInfo ? sessionInfo.topPercentage : null;
+              const hasTopPercentage = typeof topPercentage === 'number';
+
+              const rankStyle = getRankStyle(topPercentage || 0, rank || 1000);
 
               return (
                 <Surface
@@ -444,6 +475,15 @@ export default function LandingPage() {
                           style={styles.caseImage}
                           contentFit="cover"
                         />
+                        {hasTopPercentage && hasRank && (
+                          <View style={[styles.rankBadge, { backgroundColor: rankStyle.bg }]}>
+                            <Text
+                              style={{ color: rankStyle.text, fontSize: 11, fontWeight: '700' }}
+                            >
+                              Rang {rank} | Top {topPercentage}%
+                            </Text>
+                          </View>
+                        )}
                         <View style={[styles.diffBadge, { backgroundColor: diffStyle.bg }]}>
                           <Text style={{ color: diffStyle.text, fontSize: 11, fontWeight: '700' }}>
                             {mockDifficulty}
@@ -900,6 +940,14 @@ const createStyles = (theme: any) =>
       position: 'absolute',
       top: 10,
       right: 10,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    rankBadge: {
+      position: 'absolute',
+      top: 10,
+      left: 10,
       paddingHorizontal: 10,
       paddingVertical: 4,
       borderRadius: 12,
