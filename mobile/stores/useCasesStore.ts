@@ -8,7 +8,10 @@ interface CasesState {
   summaryLoaded: boolean;
   summaryLoading: boolean;
   cases: Case[];
-  sessionScores: Record<string, { sessionId: string; score: number }>;
+  sessionScores: Record<
+    string,
+    { sessionId: string; score: number; rank: number; topPercentage: number }
+  >;
   error: boolean;
   summaryError: boolean;
 
@@ -68,11 +71,16 @@ export const useCasesStore = create<CasesState>((set, get) => ({
       if (data === null) {
         throw new Error('Response is null');
       }
-      let sessionScores: Record<string, { sessionId: string; score: number }> = {};
+      let sessionScores: Record<
+        string,
+        { sessionId: string; score: number; rank: number; topPercentage: number }
+      > = {};
       for (const [caseId, sD] of Object.entries(data.sessions)) {
         sessionScores[caseId] = {
           sessionId: sD.sessionId,
           score: sD.score,
+          rank: sD.rank,
+          topPercentage: sD.topPercentage,
         };
       }
       set({

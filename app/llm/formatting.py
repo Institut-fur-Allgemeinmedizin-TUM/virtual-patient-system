@@ -1,8 +1,8 @@
-from app.model.evaluation import EvaluationResponse, EvaluationCriterion
+from app.model.evaluation import EvaluationResponse, EvaluationCriterion, RankingResponse
 from app.model.models import Evaluation
 
 
-def format_evaluation_response(evaluation: Evaluation) -> EvaluationResponse:
+def format_evaluation_response(evaluation: Evaluation, ranking_result: RankingResponse) -> EvaluationResponse:
     """Format an Evaluation model instance as an EvaluationResponse."""
     criteria = [
         EvaluationCriterion(
@@ -53,4 +53,6 @@ def format_evaluation_response(evaluation: Evaluation) -> EvaluationResponse:
         created_at=evaluation.created_at,
         criteria=criteria,
         improvement_suggestions=evaluation.improvement_suggestions,
+        rank=ranking_result.rank,
+        top_percentage=ranking_result.top_percentage,
     )

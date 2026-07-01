@@ -75,9 +75,18 @@ export default function CasesScreen() {
         columnWrapperStyle={columns > 1 ? styles.columnWrapper : undefined}
         renderItem={({ item, index }) => {
           const mockDifficulty = index % 3 === 0 ? 'Leicht' : index % 3 === 1 ? 'Mittel' : 'Schwer';
-          const sessionInfo: { sessionId: string; score: number } = sessionScores[item.id];
+          const sessionInfo: {
+            sessionId: string;
+            score: number;
+            rank: number;
+            topPercentage: number;
+          } = sessionScores[item.id];
           const score = sessionInfo ? sessionInfo.score : null;
           const hasScore = typeof score === 'number';
+          const rank = sessionInfo ? sessionInfo.rank : null;
+          const hasRank = typeof rank === 'number';
+          const topPercentage = sessionInfo ? sessionInfo.topPercentage : null;
+          const hasTopPercentage = typeof topPercentage === 'number';
           const diffStyle = getDifficultyStyle(mockDifficulty);
 
           return (

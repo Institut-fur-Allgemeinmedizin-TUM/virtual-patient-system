@@ -20,3 +20,12 @@ class EvaluationResponse(BaseModel):
     created_at: datetime
     criteria: List[EvaluationCriterion]
     improvement_suggestions: List[str]
+
+    rank: int
+    top_percentage: float
+
+class RankingResponse(BaseModel):
+    session_id: str
+    rank: int
+    top_percentage: float | int
+    total_participants: int

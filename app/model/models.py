@@ -295,6 +295,8 @@ class SessionMessagesResponse(BaseModel):
 class SessionSummaryData(BaseModel):
     sessionId: str
     score: float
+    rank: int
+    topPercentage: float | int
 
 
 class SessionsSummaryResponse(BaseModel):
