@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { Avatar, Button, IconButton, Surface, Text, TextInput, useTheme } from 'react-native-paper';
 import EvaluationModal from '../components/EvaluationModal';
 import DiagnosticsPanel from '../components/DiagnosticsPanel';
@@ -45,6 +46,7 @@ function getSessionProfile(sessionId: string): SessionProfile {
 
 export default function SessionScreen() {
   const theme = useTheme();
+  const headerHeight = useHeaderHeight();
   const { width } = useWindowDimensions();
   const params = useLocalSearchParams<{ sessionId?: string | string[] }>();
   const sessionId =
@@ -191,6 +193,7 @@ export default function SessionScreen() {
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
       >
         <View
           style={[
