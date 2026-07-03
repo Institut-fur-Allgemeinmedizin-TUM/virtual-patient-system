@@ -67,5 +67,17 @@
         "data": "path:app/cases/medical_background/audio/Auskultation-Herz-normal.mp3"
       }
     }
+  },
+  "video_sample": {
+    "display_name": "Sample Video",
+    "data": {
+      
+      "Vid 1": {
+        "display_name": "Sample",
+        "unit": "",
+        "data_type": "video",
+        "data": "path:app/cases/medical_background/video/sample.mp4"
+      }
+    }
   }
 }
