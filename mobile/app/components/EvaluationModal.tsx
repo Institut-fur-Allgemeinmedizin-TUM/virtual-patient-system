@@ -107,93 +107,93 @@ export default function EvaluationModal() {
 
   return (
     <>
-    <Portal>
-      <Modal visible={visible} onDismiss={close} contentContainerStyle={styles.modalBackdrop}>
-        <Surface style={containerStyle} elevation={2}>
-          {/* HEADER */}
-          <View style={styles.header}>
-            <View style={styles.headerTopRow}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                <Avatar.Icon
-                  size={40}
-                  icon="chart-bar"
-                  style={{ backgroundColor: theme.colors.primary }}
-                  color={theme.colors.onPrimary}
-                />
-                <View style={{ marginLeft: 16 }}>
-                  <Text
-                    variant="titleLarge"
-                    style={[styles.headerTitle, { color: theme.colors.primary }]}
-                  >
-                    Anamnese-Evaluation
-                  </Text>
-                  <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                    Detailliertes Feedback zu Ihrer Gesprächsführung
-                  </Text>
-                </View>
-              </View>
-              {evaluation && (
-                <Button
-                  mode="contained-tonal"
-                  icon="message-draw"
-                  onPress={() => setShowFeedbackDialog(true)}
-                  style={{ borderRadius: 20 }}
-                  labelStyle={{ fontWeight: 'bold' }}
-                >
-                  Feedback
-                </Button>
-              )}
-            </View>
-          </View>
-
-          <Divider />
-
-          {loading ? (
-            <View style={styles.loadingWrap}>
-              <ActivityIndicator size="large" color={theme.colors.primary} />
-              <Text style={{ marginTop: 12, color: theme.colors.onSurface }}>
-                Evaluation läuft …
-              </Text>
-            </View>
-          ) : evaluation ? (
-            <>
-              <ScrollView contentContainerStyle={styles.content}>
-                {/* OVERALL SCORE CARD */}
-                <Surface
-                  style={[
-                    styles.card,
-                    {
-                      backgroundColor: theme.colors.elevation.level1,
-                      borderColor: theme.colors.outlineVariant,
-                    },
-                  ]}
-                  elevation={0}
-                >
-                  <View style={styles.overallRow}>
-                    {/* FIXED: Text color forced to onSurface so it's visible */}
+      <Portal>
+        <Modal visible={visible} onDismiss={close} contentContainerStyle={styles.modalBackdrop}>
+          <Surface style={containerStyle} elevation={2}>
+            {/* HEADER */}
+            <View style={styles.header}>
+              <View style={styles.headerTopRow}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                  <Avatar.Icon
+                    size={40}
+                    icon="chart-bar"
+                    style={{ backgroundColor: theme.colors.primary }}
+                    color={theme.colors.onPrimary}
+                  />
+                  <View style={{ marginLeft: 16 }}>
                     <Text
-                      variant="titleMedium"
-                      style={{ fontWeight: 'bold', color: theme.colors.onSurface }}
+                      variant="titleLarge"
+                      style={[styles.headerTitle, { color: theme.colors.primary }]}
                     >
-                      Gesamtbewertung
+                      Anamnese-Evaluation
                     </Text>
-                    <View
-                      style={[
-                        styles.mainBadge,
-                        { backgroundColor: getScoreColor(calculateOverall()) },
-                      ]}
-                    >
-                      <Avatar.Icon
-                        size={18}
-                        icon="check-circle"
-                        color="white"
-                        style={{ backgroundColor: 'transparent' }}
-                      />
-                      <Text style={styles.mainBadgeText}>
-                        {calculateOverall().toFixed(1)} / 5.0
-                      </Text>
-                    </View>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
+                      Detailliertes Feedback zu Ihrer Gesprächsführung
+                    </Text>
                   </View>
+                </View>
+                {evaluation && (
+                  <Button
+                    mode="contained-tonal"
+                    icon="message-draw"
+                    onPress={() => setShowFeedbackDialog(true)}
+                    style={{ borderRadius: 20 }}
+                    labelStyle={{ fontWeight: 'bold' }}
+                  >
+                    Feedback
+                  </Button>
+                )}
+              </View>
+            </View>
+
+            <Divider />
+
+            {loading ? (
+              <View style={styles.loadingWrap}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text style={{ marginTop: 12, color: theme.colors.onSurface }}>
+                  Evaluation läuft …
+                </Text>
+              </View>
+            ) : evaluation ? (
+              <>
+                <ScrollView contentContainerStyle={styles.content}>
+                  {/* OVERALL SCORE CARD */}
+                  <Surface
+                    style={[
+                      styles.card,
+                      {
+                        backgroundColor: theme.colors.elevation.level1,
+                        borderColor: theme.colors.outlineVariant,
+                      },
+                    ]}
+                    elevation={0}
+                  >
+                    <View style={styles.overallRow}>
+                      {/* FIXED: Text color forced to onSurface so it's visible */}
+                      <Text
+                        variant="titleMedium"
+                        style={{ fontWeight: 'bold', color: theme.colors.onSurface }}
+                      >
+                        Gesamtbewertung
+                      </Text>
+                      <View
+                        style={[
+                          styles.mainBadge,
+                          { backgroundColor: getScoreColor(calculateOverall()) },
+                        ]}
+                      >
+                        <Avatar.Icon
+                          size={18}
+                          icon="check-circle"
+                          color="white"
+                          style={{ backgroundColor: 'transparent' }}
+                        />
+                        <Text style={styles.mainBadgeText}>
+                          {calculateOverall().toFixed(1)} / 5.0
+                        </Text>
+                      </View>
+                    </View>
                   <View>
                     <Text style={styles.rankText}>
                       Aktueller Rang: {evaluation.rank} | Top {evaluation.top_percentage.toFixed(2)}
@@ -201,38 +201,94 @@ export default function EvaluationModal() {
                     </Text>
                   </View>
 
-                  <View
-                    style={[
-                      styles.progressBarBackground,
-                      { backgroundColor: theme.colors.surfaceVariant },
-                    ]}
-                  >
                     <View
                       style={[
-                        styles.progressBarFill,
+                        styles.progressBarBackground,
+                        { backgroundColor: theme.colors.surfaceVariant },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.progressBarFill,
+                          {
+                            width: `${(calculateOverall() / 5) * 100}%`,
+                            backgroundColor: getScoreColor(calculateOverall()),
+                          },
+                        ]}
+                      />
+                    </View>
+                  </Surface>
+
+                  <Text
+                    variant="titleLarge"
+                    style={[styles.sectionTitle, { color: theme.colors.primary }]}
+                  >
+                    Bewertungskriterien
+                  </Text>
+
+                  {/* CRITERIA ACCORDIONS */}
+                  {evaluation.criteria.map((c, idx) => (
+                    <Surface
+                      key={idx}
+                      // FIXED: Dynamic background and borders
+                      style={[
+                        styles.accordionCard,
                         {
-                          width: `${(calculateOverall() / 5) * 100}%`,
-                          backgroundColor: getScoreColor(calculateOverall()),
+                          backgroundColor: theme.colors.elevation.level1,
+                          borderColor: theme.colors.outlineVariant,
                         },
                       ]}
-                    />
-                  </View>
-                </Surface>
+                      elevation={0}
+                    >
+                      <List.Accordion
+                        title={c.name || `Kriterium ${idx + 1}`}
+                        titleStyle={[styles.accordionTitle, { color: theme.colors.primary }]}
+                        style={styles.accordionBase}
+                        right={(props) => (
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View
+                              style={[
+                                styles.smallBadge,
+                                { backgroundColor: getScoreColor(c.score) },
+                              ]}
+                            >
+                              <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
+                                {c.score}/5
+                              </Text>
+                            </View>
+                            <List.Icon
+                              {...props}
+                              icon={props.isExpanded ? 'chevron-up' : 'chevron-down'}
+                              color={theme.colors.onSurfaceVariant}
+                            />
+                          </View>
+                        )}
+                      >
+                        <View
+                          style={[
+                            styles.expandedContent,
+                            { borderTopColor: theme.colors.outlineVariant },
+                          ]}
+                        >
+                          <Text
+                            variant="labelMedium"
+                            style={{ color: theme.colors.onSurfaceVariant, marginBottom: 4 }}
+                          >
+                            Bewertung:{' '}
+                            {c.score >= 4 ? 'Gut' : c.score >= 3 ? 'Teilweise' : 'Eher nicht'}
+                          </Text>
+                          <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>
+                            {c.explanation}
+                          </Text>
+                        </View>
+                      </List.Accordion>
+                    </Surface>
+                  ))}
 
-                <Text
-                  variant="titleLarge"
-                  style={[styles.sectionTitle, { color: theme.colors.primary }]}
-                >
-                  Bewertungskriterien
-                </Text>
-
-                {/* CRITERIA ACCORDIONS */}
-                {evaluation.criteria.map((c, idx) => (
                   <Surface
-                    key={idx}
-                    // FIXED: Dynamic background and borders
                     style={[
-                      styles.accordionCard,
+                      styles.card,
+                      styles.transcriptCard,
                       {
                         backgroundColor: theme.colors.elevation.level1,
                         borderColor: theme.colors.outlineVariant,
@@ -241,322 +297,283 @@ export default function EvaluationModal() {
                     elevation={0}
                   >
                     <List.Accordion
-                      title={c.name || `Kriterium ${idx + 1}`}
-                      titleStyle={[styles.accordionTitle, { color: theme.colors.primary }]}
-                      style={styles.accordionBase}
-                      right={(props) => (
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <View
-                            style={[styles.smallBadge, { backgroundColor: getScoreColor(c.score) }]}
-                          >
-                            <Text style={{ color: 'white', fontSize: 12, fontWeight: 'bold' }}>
-                              {c.score}/5
-                            </Text>
-                          </View>
+                      title="Gesprächsverlauf"
+                      description="Einsehbar, falls Sie einzelne Antworten nachverfolgen möchten"
+                      expanded={showTranscript}
+                      onPress={() => setShowTranscript((prev) => !prev)}
+                      titleStyle={{ color: theme.colors.primary, fontWeight: '700' }}
+                      descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+                      style={styles.transcriptAccordion}
+                      right={(props) =>
+                        loadingMessages ? (
+                          <ActivityIndicator size="small" color={theme.colors.primary} />
+                        ) : (
                           <List.Icon
                             {...props}
-                            icon={props.isExpanded ? 'chevron-up' : 'chevron-down'}
+                            icon={showTranscript ? 'chevron-up' : 'chevron-down'}
                             color={theme.colors.onSurfaceVariant}
                           />
-                        </View>
-                      )}
+                        )
+                      }
                     >
                       <View
                         style={[
-                          styles.expandedContent,
+                          styles.transcriptContent,
                           { borderTopColor: theme.colors.outlineVariant },
                         ]}
                       >
-                        <Text
-                          variant="labelMedium"
-                          style={{ color: theme.colors.onSurfaceVariant, marginBottom: 4 }}
-                        >
-                          Bewertung:{' '}
-                          {c.score >= 4 ? 'Gut' : c.score >= 3 ? 'Teilweise' : 'Eher nicht'}
-                        </Text>
-                        <Text variant="bodyMedium" style={{ color: theme.colors.onSurface }}>
-                          {c.explanation}
-                        </Text>
+                        {messagesError ? (
+                          <Surface
+                            elevation={0}
+                            style={[
+                              styles.transcriptMessageError,
+                              { backgroundColor: theme.colors.errorContainer },
+                            ]}
+                          >
+                            <Text style={{ color: theme.colors.onErrorContainer }}>
+                              {messagesError}
+                            </Text>
+                            <Button
+                              mode="text"
+                              onPress={() =>
+                                void loadEvaluationMessages(evaluation.session_id, true)
+                              }
+                              textColor={theme.colors.error}
+                            >
+                              Erneut laden
+                            </Button>
+                          </Surface>
+                        ) : !loadingMessages && evaluationMessages.length === 0 ? (
+                          <Text style={{ color: theme.colors.onSurfaceVariant }}>
+                            Für diese Sitzung liegen keine sichtbaren Nachrichten vor.
+                          </Text>
+                        ) : (
+                          <ScrollView
+                            style={styles.transcriptMessagesScroll}
+                            contentContainerStyle={styles.transcriptMessagesWrap}
+                            nestedScrollEnabled
+                            showsVerticalScrollIndicator
+                          >
+                            {evaluationMessages.map((message, index) => {
+                              const isUser = message.role === 'user';
+                              return (
+                                <View
+                                  key={`eval-transcript-${index}`}
+                                  style={[
+                                    styles.transcriptMessageRow,
+                                    isUser
+                                      ? styles.transcriptMessageRowUser
+                                      : styles.transcriptMessageRowBot,
+                                  ]}
+                                >
+                                  <Surface
+                                    elevation={0}
+                                    style={[
+                                      styles.transcriptMessageBubble,
+                                      {
+                                        backgroundColor: isUser
+                                          ? theme.colors.primaryContainer
+                                          : theme.colors.surfaceVariant,
+                                      },
+                                    ]}
+                                  >
+                                    <Text
+                                      style={{
+                                        color: isUser
+                                          ? theme.colors.onPrimaryContainer
+                                          : theme.colors.onSurfaceVariant,
+                                        lineHeight: 20,
+                                      }}
+                                    >
+                                      {message.text}
+                                    </Text>
+                                  </Surface>
+                                </View>
+                              );
+                            })}
+                          </ScrollView>
+                        )}
                       </View>
                     </List.Accordion>
                   </Surface>
-                ))}
 
-                <Surface
-                  style={[
-                    styles.card,
-                    styles.transcriptCard,
-                    {
-                      backgroundColor: theme.colors.elevation.level1,
-                      borderColor: theme.colors.outlineVariant,
-                    },
-                  ]}
-                  elevation={0}
-                >
-                  <List.Accordion
-                    title="Gesprächsverlauf"
-                    description="Einsehbar, falls Sie einzelne Antworten nachverfolgen möchten"
-                    expanded={showTranscript}
-                    onPress={() => setShowTranscript((prev) => !prev)}
-                    titleStyle={{ color: theme.colors.primary, fontWeight: '700' }}
-                    descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
-                    style={styles.transcriptAccordion}
-                    right={(props) =>
-                      loadingMessages ? (
-                        <ActivityIndicator size="small" color={theme.colors.primary} />
-                      ) : (
-                        <List.Icon
-                          {...props}
-                          icon={showTranscript ? 'chevron-up' : 'chevron-down'}
-                          color={theme.colors.onSurfaceVariant}
-                        />
-                      )
-                    }
+                  {/* IMPROVEMENT SUGGESTIONS CARD */}
+                  <Surface
+                    style={[
+                      styles.card,
+                      {
+                        marginTop: 16,
+                        backgroundColor: theme.colors.primaryContainer,
+                        borderColor: theme.colors.primary,
+                        borderWidth: 1.5,
+                      },
+                    ]}
+                    elevation={0}
                   >
-                    <View
-                      style={[
-                        styles.transcriptContent,
-                        { borderTopColor: theme.colors.outlineVariant },
-                      ]}
-                    >
-                      {messagesError ? (
-                        <Surface
-                          elevation={0}
-                          style={[
-                            styles.transcriptMessageError,
-                            { backgroundColor: theme.colors.errorContainer },
-                          ]}
-                        >
-                          <Text style={{ color: theme.colors.onErrorContainer }}>
-                            {messagesError}
-                          </Text>
-                          <Button
-                            mode="text"
-                            onPress={() => void loadEvaluationMessages(evaluation.session_id, true)}
-                            textColor={theme.colors.error}
-                          >
-                            Erneut laden
-                          </Button>
-                        </Surface>
-                      ) : !loadingMessages && evaluationMessages.length === 0 ? (
-                        <Text style={{ color: theme.colors.onSurfaceVariant }}>
-                          Für diese Sitzung liegen keine sichtbaren Nachrichten vor.
-                        </Text>
-                      ) : (
-                        <ScrollView
-                          style={styles.transcriptMessagesScroll}
-                          contentContainerStyle={styles.transcriptMessagesWrap}
-                          nestedScrollEnabled
-                          showsVerticalScrollIndicator
-                        >
-                          {evaluationMessages.map((message, index) => {
-                            const isUser = message.role === 'user';
-                            return (
-                              <View
-                                key={`eval-transcript-${index}`}
-                                style={[
-                                  styles.transcriptMessageRow,
-                                  isUser
-                                    ? styles.transcriptMessageRowUser
-                                    : styles.transcriptMessageRowBot,
-                                ]}
-                              >
-                                <Surface
-                                  elevation={0}
-                                  style={[
-                                    styles.transcriptMessageBubble,
-                                    {
-                                      backgroundColor: isUser
-                                        ? theme.colors.primaryContainer
-                                        : theme.colors.surfaceVariant,
-                                    },
-                                  ]}
-                                >
-                                  <Text
-                                    style={{
-                                      color: isUser
-                                        ? theme.colors.onPrimaryContainer
-                                        : theme.colors.onSurfaceVariant,
-                                      lineHeight: 20,
-                                    }}
-                                  >
-                                    {message.text}
-                                  </Text>
-                                </Surface>
-                              </View>
-                            );
-                          })}
-                        </ScrollView>
-                      )}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                      <Avatar.Icon
+                        size={32}
+                        icon="lightbulb-on"
+                        style={{ backgroundColor: theme.colors.primary }}
+                        color={theme.colors.onPrimary}
+                      />
+                      <Text
+                        variant="titleMedium"
+                        style={{
+                          marginLeft: 12,
+                          fontWeight: 'bold',
+                          color: theme.colors.onPrimaryContainer,
+                        }}
+                      >
+                        Verbesserungsvorschläge
+                      </Text>
                     </View>
-                  </List.Accordion>
-                </Surface>
 
-                {/* IMPROVEMENT SUGGESTIONS CARD */}
-                <Surface
-                  style={[
-                    styles.card,
-                    {
-                      marginTop: 16,
-                      backgroundColor: theme.colors.primaryContainer,
-                      borderColor: theme.colors.primary,
-                      borderWidth: 1.5,
-                    },
-                  ]}
-                  elevation={0}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-                    <Avatar.Icon
-                      size={32}
-                      icon="lightbulb-on"
-                      style={{ backgroundColor: theme.colors.primary }}
-                      color={theme.colors.onPrimary}
-                    />
+                    {evaluation.improvement_suggestions.map((sug, i) => (
+                      <View
+                        key={i}
+                        style={{ flexDirection: 'row', marginBottom: 10, paddingRight: 12 }}
+                      >
+                        <Text
+                          style={{
+                            color: theme.colors.primary,
+                            marginRight: 10,
+                            fontSize: 18,
+                            lineHeight: 22,
+                          }}
+                        >
+                          •
+                        </Text>
+                        <Text
+                          variant="bodyMedium"
+                          style={{
+                            color: theme.colors.onPrimaryContainer,
+                            flex: 1,
+                            lineHeight: 22,
+                          }}
+                        >
+                          {sug}
+                        </Text>
+                      </View>
+                    ))}
+                  </Surface>
+
+                  <View style={styles.feedbackCTA}>
+                    <Divider style={{ marginVertical: 24 }} />
                     <Text
                       variant="titleMedium"
                       style={{
-                        marginLeft: 12,
-                        fontWeight: 'bold',
-                        color: theme.colors.onPrimaryContainer,
+                        textAlign: 'center',
+                        marginBottom: 12,
+                        color: theme.colors.onSurface,
                       }}
                     >
-                      Verbesserungsvorschläge
+                      Wie hilfreich war dieses Feedback für Sie?
                     </Text>
+                    <Button
+                      mode="outlined"
+                      icon="star-face"
+                      onPress={() => setShowFeedbackDialog(true)}
+                      style={{ alignSelf: 'center', borderRadius: 8 }}
+                    >
+                      Bewertung abgeben / bearbeiten
+                    </Button>
                   </View>
 
-                  {evaluation.improvement_suggestions.map((sug, i) => (
-                    <View
-                      key={i}
-                      style={{ flexDirection: 'row', marginBottom: 10, paddingRight: 12 }}
-                    >
-                      <Text
-                        style={{
-                          color: theme.colors.primary,
-                          marginRight: 10,
-                          fontSize: 18,
-                          lineHeight: 22,
-                        }}
-                      >
-                        •
-                      </Text>
-                      <Text
-                        variant="bodyMedium"
-                        style={{ color: theme.colors.onPrimaryContainer, flex: 1, lineHeight: 22 }}
-                      >
-                        {sug}
-                      </Text>
-                    </View>
-                  ))}
-                </Surface>
+                  <View style={{ height: 24 }} />
+                </ScrollView>
 
-                <View style={styles.feedbackCTA}>
-                  <Divider style={{ marginVertical: 24 }} />
-                  <Text
-                    variant="titleMedium"
-                    style={{ textAlign: 'center', marginBottom: 12, color: theme.colors.onSurface }}
-                  >
-                    Wie hilfreich war dieses Feedback für Sie?
-                  </Text>
+                {/* STICKY BOTTOM BUTTON */}
+                <View
+                  style={[styles.footer, { borderTopColor: theme.colors.outlineVariant, gap: 12 }]}
+                >
                   <Button
                     mode="outlined"
-                    icon="star-face"
-                    onPress={() => setShowFeedbackDialog(true)}
-                    style={{ alignSelf: 'center', borderRadius: 8 }}
+                    onPress={handleOpenDiagnostics}
+                    style={{ borderRadius: 4 }}
+                    contentStyle={{ paddingVertical: 8 }}
+                    icon="medical-bag"
                   >
-                    Bewertung abgeben / bearbeiten
+                    VERWENDETE DIAGNOSTIK
+                  </Button>
+                  <Button
+                    mode="contained"
+                    onPress={close}
+                    style={{ borderRadius: 4 }}
+                    contentStyle={{ paddingVertical: 8 }}
+                  >
+                    ZURÜCK ZUR FALLAUSWAHL
                   </Button>
                 </View>
-
-                <View style={{ height: 24 }} />
-              </ScrollView>
-
-              {/* STICKY BOTTOM BUTTON */}
-              <View style={[styles.footer, { borderTopColor: theme.colors.outlineVariant, gap: 12 }]}>
-                <Button
-                  mode="outlined"
-                  onPress={handleOpenDiagnostics}
-                  style={{ borderRadius: 4 }}
-                  contentStyle={{ paddingVertical: 8 }}
-                  icon="medical-bag"
-                >
-                  VERWENDETE DIAGNOSTIK
-                </Button>
-                <Button
-                  mode="contained"
-                  onPress={close}
-                  style={{ borderRadius: 4 }}
-                  contentStyle={{ paddingVertical: 8 }}
-                >
-                  ZURÜCK ZUR FALLAUSWAHL
-                </Button>
-              </View>
-            </>
-          ) : null}
-        </Surface>
-      </Modal>
-
-      <Portal>
-        <Dialog visible={showFeedbackDialog} onDismiss={() => setShowFeedbackDialog(false)}>
-          <Dialog.Title>Feedback geben</Dialog.Title>
-          <Dialog.Content>
-            {fetchingFeedback ? (
-              <View style={{ padding: 20, alignItems: 'center' }}>
-                <ActivityIndicator size="small" color={theme.colors.primary} />
-                <Text style={{ marginTop: 8 }}>Feedback wird geladen...</Text>
-              </View>
-            ) : (
-              <>
-                <Text variant="bodyMedium" style={{ marginBottom: 16 }}>
-                  Wie zufrieden sind Sie mit der Simulation und der Evaluation?
-                </Text>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}>
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <IconButton
-                      key={s}
-                      icon={s <= feedbackScore ? 'star' : 'star-outline'}
-                      iconColor={theme.colors.primary}
-                      size={30}
-                      onPress={() => setFeedbackScore(s)}
-                    />
-                  ))}
-                </View>
-                <TextInput
-                  label="Ihr Kommentar (optional)"
-                  value={feedbackComment}
-                  onChangeText={setFeedbackComment}
-                  multiline
-                  numberOfLines={4}
-                  mode="outlined"
-                />
               </>
-            )}
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setShowFeedbackDialog(false)}>Abbrechen</Button>
-            <Button
-              onPress={async () => {
-                const success = await submitFeedback(feedbackScore, feedbackComment);
-                if (success) {
-                  setShowFeedbackDialog(false);
-                  setFeedbackComment('');
-                  setFeedbackScore(5);
-                }
-              }}
-              loading={submittingFeedback}
-              disabled={submittingFeedback || fetchingFeedback}
-            >
-              Absenden
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
+            ) : null}
+          </Surface>
+        </Modal>
+
+        <Portal>
+          <Dialog visible={showFeedbackDialog} onDismiss={() => setShowFeedbackDialog(false)}>
+            <Dialog.Title>Feedback geben</Dialog.Title>
+            <Dialog.Content>
+              {fetchingFeedback ? (
+                <View style={{ padding: 20, alignItems: 'center' }}>
+                  <ActivityIndicator size="small" color={theme.colors.primary} />
+                  <Text style={{ marginTop: 8 }}>Feedback wird geladen...</Text>
+                </View>
+              ) : (
+                <>
+                  <Text variant="bodyMedium" style={{ marginBottom: 16 }}>
+                    Wie zufrieden sind Sie mit der Simulation und der Evaluation?
+                  </Text>
+                  <View
+                    style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 16 }}
+                  >
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <IconButton
+                        key={s}
+                        icon={s <= feedbackScore ? 'star' : 'star-outline'}
+                        iconColor={theme.colors.primary}
+                        size={30}
+                        onPress={() => setFeedbackScore(s)}
+                      />
+                    ))}
+                  </View>
+                  <TextInput
+                    label="Ihr Kommentar (optional)"
+                    value={feedbackComment}
+                    onChangeText={setFeedbackComment}
+                    multiline
+                    numberOfLines={4}
+                    mode="outlined"
+                  />
+                </>
+              )}
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => setShowFeedbackDialog(false)}>Abbrechen</Button>
+              <Button
+                onPress={async () => {
+                  const success = await submitFeedback(feedbackScore, feedbackComment);
+                  if (success) {
+                    setShowFeedbackDialog(false);
+                    setFeedbackComment('');
+                    setFeedbackScore(5);
+                  }
+                }}
+                loading={submittingFeedback}
+                disabled={submittingFeedback || fetchingFeedback}
+              >
+                Absenden
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
       </Portal>
-    </Portal>
-    <DiagnosticsPanel
-      isMobile={true}
-      visible={isDiagnosticsVisible}
-      onClose={() => setIsDiagnosticsVisible(false)}
-      readOnly={true}
-    />
+      <DiagnosticsPanel
+        isMobile={true}
+        visible={isDiagnosticsVisible}
+        onClose={() => setIsDiagnosticsVisible(false)}
+        readOnly={true}
+      />
     </>
   );
 }

@@ -49,7 +49,8 @@ export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
 
   fetchUsedDiagnostics: async (sessionId: string, caseId: string) => {
     try {
-      const resp = await apiClient.api.getUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet(sessionId);
+      const resp =
+        await apiClient.api.getUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet(sessionId);
       if (resp.status === 200) {
         set({ usedDiagnostics: resp.data.diagnostics_used });
         resp.data.diagnostics_used.forEach((diagName) => {
