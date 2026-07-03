@@ -45,10 +45,22 @@ export enum SessionHistoryColumn {
   ImprovementSuggestions = "improvement_suggestions",
 }
 
+<<<<<<< HEAD
 /** MedicalBackgroundResponseType */
 export enum MedicalBackgroundResponseType {
   Value1 = 1,
   Value2 = 2,
+=======
+/** DataType */
+export enum DataType {
+  Integer = "integer",
+  String = "string",
+  Float = "float",
+  ImagePng = "image/png",
+  ImageJpeg = "image/jpeg",
+  Video = "video",
+  Audio = "audio",
+>>>>>>> 353007e (feat(diagnostic): Add audio playback functionality and integrate audio samples into medical background)
 }
 
 /** AggregationFunction */
@@ -119,6 +131,32 @@ export interface DiagnosisUpdate {
   diagnosis: string;
 }
 
+<<<<<<< HEAD
+=======
+/** DiagnosticGroup */
+export interface DiagnosticGroup {
+  /** Name */
+  name: string;
+  /** Display Name */
+  display_name: string;
+  /** Data */
+  data?: DiagnosticValue[] | null;
+}
+
+/** DiagnosticValue */
+export interface DiagnosticValue {
+  /** Name */
+  name: string;
+  /** Display Name */
+  display_name: string;
+  /** Unit */
+  unit: string;
+  data_type: DataType;
+  /** Data */
+  data: any;
+}
+
+>>>>>>> 353007e (feat(diagnostic): Add audio playback functionality and integrate audio samples into medical background)
 /** EvaluationCriterion */
 export interface EvaluationCriterion {
   /** Name */
@@ -227,6 +265,27 @@ export interface MedicalBackgroundResponse {
   diagnostics_available?: string[] | null;
   /** Diagnostic Data */
   diagnostic_data?: null;
+}
+
+/** SessionHistoryFilter */
+export interface SessionHistoryFilter {
+  column: SessionHistoryColumn;
+  /** Value */
+  value: any;
+}
+
+/** SessionHistoryOrderBy */
+export interface SessionHistoryOrderBy {
+  /** Column */
+  column: SessionHistoryColumn | string;
+  /** @default "asc" */
+  direction?: SortDirection;
+}
+
+/** SessionHistoryRow */
+export interface SessionHistoryRow {
+  /** Values */
+  values: Record<string, any>;
 }
 
 /** SessionHistoryFilter */
@@ -407,10 +466,6 @@ export interface ValidationError {
   msg: string;
   /** Error Type */
   type: string;
-  /** Input */
-  input?: any;
-  /** Context */
-  ctx?: object;
   /** Input */
   input?: any;
   /** Context */
@@ -736,6 +791,7 @@ export class Api<
 
     /**
      * No description
+<<<<<<< HEAD
      *
      * @name GetUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet
      * @summary Get Used Diagnostics
@@ -754,23 +810,26 @@ export class Api<
 
     /**
      * @description Get all messages for a specific session.
+=======
+>>>>>>> 353007e (feat(diagnostic): Add audio playback functionality and integrate audio samples into medical background)
      *
-     * @name GetSessionMessagesApiSessionsSessionIdMessagesGet
-     * @summary Get Session Messages
-     * @request GET:/api/sessions/{session_id}/messages
+     * @name GetUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet
+     * @summary Get Used Diagnostics
+     * @request GET:/api/sessions/{session_id}/diagnostics
      */
-    getSessionMessagesApiSessionsSessionIdMessagesGet: (
+    getUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet: (
       sessionId: string,
       params: RequestParams = {},
     ) =>
-      this.request<SessionMessagesResponse, HTTPValidationError>({
-        path: `/api/sessions/${sessionId}/messages`,
+      this.request<UsedDiagnosticsResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/diagnostics`,
         method: "GET",
         format: "json",
         ...params,
       }),
 
     /**
+<<<<<<< HEAD
      * No description
      *
      * @name GetRankingApiSessionsSessionIdRankingGet
@@ -831,6 +890,8 @@ export class Api<
     setDiagnosisApiSessionsSessionIdDiagnosisPost: (
       sessionId: string,
       data: DiagnosisUpdate,
+=======
+>>>>>>> 353007e (feat(diagnostic): Add audio playback functionality and integrate audio samples into medical background)
      * @description Get all messages for a specific session.
      *
      * @name GetSessionMessagesApiSessionsSessionIdMessagesGet
@@ -927,7 +988,45 @@ export class Api<
     ) =>
       this.request<any, HTTPValidationError>({
         path: `/api/sessions/${sessionId}/diagnosis`,
-        path: `/api/sessions/${sessionId}/diagnosis`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Get feedback for a session.
+     *
+     * @name GetFeedbackApiSessionsSessionIdFeedbackGet
+     * @summary Get Feedback
+     * @request GET:/api/sessions/{session_id}/feedback
+     */
+    getFeedbackApiSessionsSessionIdFeedbackGet: (
+      sessionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<UserSessionFeedBack, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/feedback`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Create feedback for a session.
+     *
+     * @name CreateFeedbackApiSessionsSessionIdFeedbackPost
+     * @summary Create Feedback
+     * @request POST:/api/sessions/{session_id}/feedback
+     */
+    createFeedbackApiSessionsSessionIdFeedbackPost: (
+      sessionId: string,
+      data: UserSessionFeedBack,
+      params: RequestParams = {},
+    ) =>
+      this.request<any, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/feedback`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -1047,6 +1146,34 @@ export class Api<
       }),
 
     /**
+     * No description
+     *
+     * @name GetSessionsStatsApiAnalyticsSessionsStatsPost
+     * @summary Get Sessions Stats
+     * @request POST:/api/analytics/sessions/stats
+     */
+    getSessionsStatsApiAnalyticsSessionsStatsPost: (
+      data: GetSessionsHistoryRequest,
+      query?: {
+        /**
+         * As Csv
+         * @default false
+         */
+        as_csv?: boolean;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<GetSessionsHistoryResponse, HTTPValidationError>({
+        path: `/api/analytics/sessions/stats`,
+        method: "POST",
+        query: query,
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Get the current user's profile information.
      *
      * @name GetUserProfileApiUserProfileGet
@@ -1129,6 +1256,7 @@ export class Api<
         format: "json",
         ...params,
       }),
+<<<<<<< HEAD
 
     /**
 <<<<<<< HEAD
@@ -1162,6 +1290,8 @@ export class Api<
         format: "json",
         ...params,
       }),
+=======
+>>>>>>> 353007e (feat(diagnostic): Add audio playback functionality and integrate audio samples into medical background)
   };
   health = {
     /**

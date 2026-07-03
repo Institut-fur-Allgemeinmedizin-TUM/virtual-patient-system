@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Image } from 'react-native';
 import {
   Surface,
@@ -14,6 +14,34 @@ import ImageModal from 'react-native-image-modal';
 import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { DiagnosticValue } from '@/services/api';
+import { playAudioFile, stopAudioFile } from '@/utils/audioPlayer';
+
+const AudioPlayerButton = ({ base64Data, mimeType }: { base64Data: string; mimeType: string }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handlePress = async () => {
+    if (isPlaying) {
+      await stopAudioFile();
+      setIsPlaying(false);
+    } else {
+      setIsPlaying(true);
+      await playAudioFile(base64Data, mimeType, () => {
+        setIsPlaying(false);
+      });
+    }
+  };
+
+  return (
+    <Button
+      icon={isPlaying ? 'stop' : 'play'}
+      mode="contained-tonal"
+      onPress={handlePress}
+      style={{ alignSelf: 'flex-start', marginTop: 8 }}
+    >
+      {isPlaying ? 'Audio stoppen' : 'Audio abspielen'}
+    </Button>
+  );
+};
 
 interface DiagnosticsPanelProps {
   isMobile: boolean;
@@ -52,8 +80,19 @@ export default function DiagnosticsPanel({
   };
 
   const renderDiagnosticValue = (val: DiagnosticValue) => {
+    //--------------AUDIO----------------
+    if (val.data_type === 'audio' && val.data?.data) {
+      return (
+        <View key={val.name} style={styles.valueRow}>
+          <Text variant="labelMedium" style={styles.valueLabel}>
+            {val.display_name}
+          </Text>
+          <AudioPlayerButton base64Data={val.data.data} mimeType={val.data.mime || 'audio/mpeg'} />
+        </View>
+      );
+    }
     //--------------IMAGE----------------
-    if (val.data_type.startsWith('image/') && val.data?.data) {
+    else if (val.data_type.startsWith('image/') && val.data?.data) {
       const uri = `data:${val.data.mime || val.data_type};base64,${val.data.data}`;
       return (
         <View key={val.name} style={styles.valueRow}>
@@ -153,16 +192,20 @@ export default function DiagnosticsPanel({
               </View>
             );
           })}
-          {availableDiagnostics.filter(diag => !readOnly || diagnosticResults[diag.name]).length === 0 && !loadingAvailable && (
-            <View>
-              <Text
-                variant="bodyMedium"
-                style={{ textAlign: 'center', marginTop: 20, opacity: 0.6 }}
-              >
-                {readOnly ? 'Keine Diagnostik in dieser Sitzung verwendet.' : 'Keine Diagnostik für diesen Fall verfügbar.'}
-              </Text>
-            </View>
-          )}
+          {availableDiagnostics.filter((diag) => !readOnly || diagnosticResults[diag.name])
+            .length === 0 &&
+            !loadingAvailable && (
+              <View>
+                <Text
+                  variant="bodyMedium"
+                  style={{ textAlign: 'center', marginTop: 20, opacity: 0.6 }}
+                >
+                  {readOnly
+                    ? 'Keine Diagnostik in dieser Sitzung verwendet.'
+                    : 'Keine Diagnostik für diesen Fall verfügbar.'}
+                </Text>
+              </View>
+            )}
         </ScrollView>
       )}
     </View>
