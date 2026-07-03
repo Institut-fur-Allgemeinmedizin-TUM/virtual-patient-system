@@ -129,9 +129,12 @@ async def chat(
             )
         vhb_session = vhb_sessions[req.session_id]
         case_id = vhb_session["case_id"]
-        
+
         pronouns = "sie/ihr"
-        persona = chat_functions.load_case_prompt(case_id) + f"\nDie Pronomen des Nutzers (Arztes) sind: {pronouns}."
+        persona = (
+            chat_functions.load_case_prompt(case_id)
+            + f"\nDie Pronomen des Nutzers (Arztes) sind: {pronouns}."
+        )
 
         # Build messages from in-memory storage
         messages_to_send = [{"role": "system", "content": persona}]
@@ -176,13 +179,17 @@ async def chat(
     )
 
     case_id = chat_session.case_id
-    
+
     pronouns = "sie/ihr"
-    if chat_session.user and chat_session.user.pronouns and chat_session.user.pronouns != "not_specified":
+    if (
+        chat_session.user
+        and chat_session.user.pronouns
+        and chat_session.user.pronouns != "not_specified"
+    ):
         pronouns = chat_session.user.pronouns
-        
+
     persona = (
-        chat_functions.load_case_prompt(case_id) 
+        chat_functions.load_case_prompt(case_id)
         + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX
         + f"\nDie Pronomen des Nutzers (Arztes) sind: {pronouns}."
     )
@@ -300,11 +307,15 @@ async def live_websocket(
         raise WebSocketDisconnect(reason="Invalid user id")
 
     case_id = chat_session.case_id
-    
+
     pronouns = "sie/ihr"
-    if chat_session.user and chat_session.user.pronouns and chat_session.user.pronouns != "not_specified":
+    if (
+        chat_session.user
+        and chat_session.user.pronouns
+        and chat_session.user.pronouns != "not_specified"
+    ):
         pronouns = chat_session.user.pronouns
-        
+
     system_prompt = (
         chat_functions.load_case_prompt(case_id)
         + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX

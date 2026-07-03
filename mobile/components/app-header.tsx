@@ -35,8 +35,8 @@ export function AppHeader() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const pronouns = useAuthStore((state) => state.user?.pronouns);
   const updatePronouns = useAuthStore((state) => state.updatePronouns);
-  
-  const getDisplayPronouns = (p?: string) => (p && p !== 'not_specified') ? p : 'sie/ihr';
+
+  const getDisplayPronouns = (p?: string) => (p && p !== 'not_specified' ? p : 'sie/ihr');
 
   const [localPronouns, setLocalPronouns] = useState(getDisplayPronouns(pronouns));
 
