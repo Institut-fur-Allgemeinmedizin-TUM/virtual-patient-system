@@ -133,12 +133,22 @@ async def get_medical_background(
                 if not diagnostic_ret.data[i].data.startswith("path:"):
                     logger.warn("Error, filepath not starting with 'path:'")
                     continue
+                mime_type = "application/octet-stream"
+                if diagnostic_ret.data[i].data_type == DataType.Audio:
+                    mime_type = "audio/mpeg"
+                elif diagnostic_ret.data[i].data_type == DataType.Video:
+                    mime_type = "video/mp4"
+                elif diagnostic_ret.data[i].data_type == DataType.Image_Png:
+                    mime_type = "image/png"
+                elif diagnostic_ret.data[i].data_type == DataType.Image_Jpeg:
+                    mime_type = "image/jpeg"
+
                 with open(diagnostic_ret.data[i].data[5:], "rb") as file:
                     raw = file.read()
                     diagnostic_ret.data[i].data = {
                         "type": "binary",
                         "encoding": "base64",
-                        "mime": "application/octet-stream",
+                        "mime": mime_type,
                         "data": base64.b64encode(raw).decode("ascii"),
                     }
 

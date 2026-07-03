@@ -50,5 +50,22 @@
         "data": "path:app/cases/medical_background/images/sample_image.png"
       }
     }
+  },
+  "audio_sample": {
+    "display_name": "Auskultation",
+    "data": {
+      "auskultation-n": {
+        "display_name": "Auskultation-n",
+        "unit": "",
+        "data_type": "audio",
+        "data": "path:app/cases/medical_background/audio/Auskultation-Herz-normal.mp3"
+      },
+      "auskultation-x": {
+        "display_name": "Auskultation-x",
+        "unit": "",
+        "data_type": "audio",
+        "data": "path:app/cases/medical_background/audio/Auskultation-Herz-normal.mp3"
+      }
+    }
   }
 }
