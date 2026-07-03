@@ -12,6 +12,7 @@ interface User {
   email?: string;
   name?: string;
   roles?: string[];
+  pronouns?: string;
   display_name?: string;
 }
 
@@ -27,6 +28,7 @@ interface AuthState {
   loginWithTum: () => Promise<boolean>;
   loginWithVhb: (password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  updatePronouns: (pronouns: string) => Promise<boolean>;
 }
 
 function readApiErrorMessage(error: unknown, fallback: string) {
@@ -187,6 +189,22 @@ export const useAuthStore = create<AuthState>((set) => ({
     } finally {
       await clearAccessToken();
       set({ isAuthenticated: false, authError: '', authChecked: true });
+    }
+  },
+
+  updatePronouns: async (pronouns: string) => {
+    try {
+      const res = await apiClient.user.updateUserProfileApiUserProfilePut({ pronouns });
+      if (res.status === 200) {
+        set((state) => ({
+          user: state.user ? { ...state.user, pronouns: res.data.pronouns } : undefined,
+        }));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Failed to update pronouns:', error);
+      return false;
     }
   },
 }));
