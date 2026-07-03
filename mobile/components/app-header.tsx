@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import {
   Appbar,
@@ -8,6 +8,7 @@ import {
   Modal,
   Portal,
   Surface,
+  TextInput,
   useTheme,
 } from 'react-native-paper';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -32,6 +33,25 @@ export function AppHeader() {
   const themeMode = useThemeStore((state) => state.mode);
   const requestScroll = useUIStore((state) => state.requestScroll);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const pronouns = useAuthStore((state) => state.user?.pronouns);
+  const updatePronouns = useAuthStore((state) => state.updatePronouns);
+  
+  const getDisplayPronouns = (p?: string) => (p && p !== 'not_specified') ? p : 'sie/ihr';
+
+  const [localPronouns, setLocalPronouns] = useState(getDisplayPronouns(pronouns));
+
+  useEffect(() => {
+    setLocalPronouns(getDisplayPronouns(pronouns));
+  }, [pronouns]);
+
+  const handlePronounsBlur = () => {
+    if (localPronouns !== getDisplayPronouns(pronouns)) {
+      updatePronouns(localPronouns || 'sie/ihr');
+      if (!localPronouns) {
+        setLocalPronouns('sie/ihr');
+      }
+    }
+  };
 
   const imprintModalOpen = useUIStore((state) => state.imprintModalOpen);
   const privacyModalOpen = useUIStore((state) => state.privacyModalOpen);
@@ -233,6 +253,15 @@ export function AppHeader() {
                       Roles: {roles.join(', ')}
                     </Text>
                   )}
+                  <TextInput
+                    mode="outlined"
+                    label="Pronouns"
+                    value={localPronouns}
+                    onChangeText={setLocalPronouns}
+                    onBlur={handlePronounsBlur}
+                    style={styles.pronounsInput}
+                    dense
+                  />
                 </View>
               ) : null}
 
@@ -386,6 +415,10 @@ const styles = StyleSheet.create({
   profileRoles: {
     fontSize: 12,
     marginTop: 2,
+  },
+  pronounsInput: {
+    marginTop: 12,
+    fontSize: 14,
   },
   versionContainer: {
     paddingHorizontal: 8,
