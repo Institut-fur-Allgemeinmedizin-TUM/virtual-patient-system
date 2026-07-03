@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, Image, Platform } from 'react-native';
 import {
   Surface,
   Text,
@@ -15,6 +15,73 @@ import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { DiagnosticValue } from '@/services/api';
 import { playAudioFile, stopAudioFile } from '@/utils/audioPlayer';
+import * as FileSystem from 'expo-file-system';
+import { Video, ResizeMode } from 'expo-av';
+
+const VideoPlayerComponent = ({
+  base64Data,
+  mimeType,
+}: {
+  base64Data: string;
+  mimeType: string;
+}) => {
+  const [uri, setUri] = useState<string | null>(null);
+  const videoRef = React.useRef<Video>(null);
+
+  useEffect(() => {
+    const prepareVideo = async () => {
+      try {
+        if (Platform.OS === 'web') {
+          setUri(`data:${mimeType};base64,${base64Data}`);
+        } else {
+          const filename = `temp_video_${Date.now()}.mp4`;
+          const localUri = FileSystem.cacheDirectory + filename;
+          await FileSystem.writeAsStringAsync(localUri, base64Data, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          setUri(localUri);
+        }
+      } catch (err) {
+        console.error('Error preparing video', err);
+      }
+    };
+    prepareVideo();
+  }, [base64Data, mimeType]);
+
+  if (!uri) {
+    return <ActivityIndicator animating={true} style={{ marginTop: 8, alignSelf: 'flex-start' }} />;
+  }
+
+  return (
+    <View style={{ width: '100%' }}>
+      <Video
+        ref={videoRef}
+        source={{ uri }}
+        useNativeControls
+        resizeMode={ResizeMode.CONTAIN}
+        style={{
+          width: '100%',
+          height: 200,
+          marginTop: 8,
+          borderRadius: 8,
+          backgroundColor: '#000',
+        }}
+      />
+      <Button
+        icon="fullscreen"
+        mode="contained-tonal"
+        onPress={() => {
+          if (videoRef.current) {
+            videoRef.current.presentFullscreenPlayer();
+          }
+        }}
+        style={{ marginTop: 8, alignSelf: 'flex-start' }}
+      >
+        Im Vollbild öffnen
+      </Button>
+    </View>
+  );
+};
 
 const AudioPlayerButton = ({ base64Data, mimeType }: { base64Data: string; mimeType: string }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -88,6 +155,20 @@ export default function DiagnosticsPanel({
             {val.display_name}
           </Text>
           <AudioPlayerButton base64Data={val.data.data} mimeType={val.data.mime || 'audio/mpeg'} />
+        </View>
+      );
+    }
+    //--------------VIDEO----------------
+    else if (val.data_type === 'video' && val.data?.data) {
+      return (
+        <View key={val.name} style={styles.valueRow}>
+          <Text variant="labelMedium" style={styles.valueLabel}>
+            {val.display_name}
+          </Text>
+          <VideoPlayerComponent
+            base64Data={val.data.data}
+            mimeType={val.data.mime || 'video/mp4'}
+          />
         </View>
       );
     }
