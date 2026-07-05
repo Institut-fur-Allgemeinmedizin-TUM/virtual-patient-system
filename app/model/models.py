@@ -78,6 +78,10 @@ class User(Base):
     )
     sessions: Mapped[List["Session"]] = relationship(back_populates="user")
 
+    preferred_username: Mapped[str] = mapped_column(
+        String(50), nullable=False, default=""
+    )
+
     def is_admin(self) -> bool:
         return any(role.name == DefaultRoles.admin.value for role in self.roles)
 
