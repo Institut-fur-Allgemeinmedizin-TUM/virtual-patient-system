@@ -48,6 +48,7 @@ def db_engine():
     finally:
         # Clear all tables after each test to isolate them
         from sqlalchemy import text
+
         with app_engine.begin() as connection:
             for table in reversed(Base.metadata.sorted_tables):
                 connection.execute(table.delete())
@@ -86,9 +87,15 @@ def client(session_local) -> Generator[TestClient, None, None]:
 def tum_user():
     return {"sub": "ge38qap", "tum_id": "ge38qap", "name": "TUM User"}
 
+
 @pytest.fixture
 def admin_user():
-    return {"sub": "ge38qap", "tum_id": "ge38qap", "name": "Admin User", "roles": ["Admin"]}
+    return {
+        "sub": "ge38qap",
+        "tum_id": "ge38qap",
+        "name": "Admin User",
+        "roles": ["Admin"],
+    }
 
 
 @pytest.fixture
@@ -97,7 +104,12 @@ def admin_user():
     from app.model.models import DefaultRoles
 
     return AuthenticatedUser(
-        {"sub": "admin", "tum_id": "admin", "name": "Admin User", "roles": [DefaultRoles.admin.value]}
+        {
+            "sub": "admin",
+            "tum_id": "admin",
+            "name": "Admin User",
+            "roles": [DefaultRoles.admin.value],
+        }
     )
 
 
@@ -122,7 +134,9 @@ def force_user(monkeypatch: pytest.MonkeyPatch):
 
     def _force(user: dict):
         # Ensure user is an AuthenticatedUser so it has methods like is_admin()
-        auth_user = user if isinstance(user, AuthenticatedUser) else AuthenticatedUser(user)
+        auth_user = (
+            user if isinstance(user, AuthenticatedUser) else AuthenticatedUser(user)
+        )
         monkeypatch.setattr(auth_module, "require_user", lambda _request: auth_user)
         monkeypatch.setattr(
             auth_module, "require_user_websocket", lambda _websocket: auth_user

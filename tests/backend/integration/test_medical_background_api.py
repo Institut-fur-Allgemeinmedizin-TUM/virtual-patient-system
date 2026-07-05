@@ -60,7 +60,9 @@ def test_get_diagnostic_db_session_persists(client, force_user, tum_user, db_ses
     """Test that diagnostics are persisted to DB for TUM users"""
     # create corresponding case and session in DB
     create_case(db_session, "brustschmerzen")
-    create_session(db_session, "s-mb-1", case_id="brustschmerzen", user_id=tum_user["tum_id"])
+    create_session(
+        db_session, "s-mb-1", case_id="brustschmerzen", user_id=tum_user["tum_id"]
+    )
     force_user(tum_user)
 
     response = client.get(
@@ -81,10 +83,14 @@ def test_get_diagnostic_db_session_persists(client, force_user, tum_user, db_ses
     assert any(d.name == "vital_params" for d in session.used_diagnostics)
 
 
-def test_get_diagnostic_db_forbidden_wrong_user(client, force_user, other_tum_user, db_session):
+def test_get_diagnostic_db_forbidden_wrong_user(
+    client, force_user, other_tum_user, db_session
+):
     """Test that users cannot access other users' session diagnostics"""
     create_case(db_session, "brustschmerzen")
-    create_session(db_session, "s-mb-2", case_id="brustschmerzen", user_id="someone-else")
+    create_session(
+        db_session, "s-mb-2", case_id="brustschmerzen", user_id="someone-else"
+    )
     force_user(other_tum_user)
 
     response = client.get(
@@ -111,6 +117,3 @@ def test_get_diagnostic_unknown_case(client):
         "/api/diagnostics/unknown-case?diagnostic=vital_params&session_id=vhb-3"
     )
     assert response.status_code == 404
-
-
-

@@ -1,6 +1,7 @@
 import pytest
 from app.model.analytics import SessionHistoryColumn, AggregationFunction
 
+
 def test_get_sessions_stats_unauthorized(client):
     # settings.require_auth is False by default in tests (reset_global_state)
     # But wait, require_auth is False by default?
@@ -9,14 +10,18 @@ def test_get_sessions_stats_unauthorized(client):
     # If require_auth is False, require_user returns Anonymous user.
     # Anonymous user is NOT an admin.
 
-    response = client.post("/api/analytics/sessions/stats", json={
-        "include_columns": [SessionHistoryColumn.id]
-    })
-    assert response.status_code == 403 # Forbidden because anonymous is not admin
+    response = client.post(
+        "/api/analytics/sessions/stats",
+        json={"include_columns": [SessionHistoryColumn.id]},
+    )
+    assert response.status_code == 403  # Forbidden because anonymous is not admin
 
 
-def test_get_sessions_stats_happy_path_simple(client, force_user, admin_user, db_session):
+def test_get_sessions_stats_happy_path_simple(
+    client, force_user, admin_user, db_session
+):
     from tests.backend.factories.models import create_case, create_session
+
     create_case(db_session)
     create_session(db_session, "s1", user_id="u1")
     create_session(db_session, "s2", user_id="u2")
@@ -25,7 +30,7 @@ def test_get_sessions_stats_happy_path_simple(client, force_user, admin_user, db
 
     request_data = {
         "include_columns": [SessionHistoryColumn.id, SessionHistoryColumn.case],
-        "limit": 10
+        "limit": 10,
     }
 
     response = client.post("/api/analytics/sessions/stats", json=request_data)
@@ -39,8 +44,12 @@ def test_get_sessions_stats_happy_path_simple(client, force_user, admin_user, db
     assert "id" in row_values
     assert "case" in row_values
 
-def test_get_sessions_stats_with_aggregation(client, force_user, admin_user, db_session):
+
+def test_get_sessions_stats_with_aggregation(
+    client, force_user, admin_user, db_session
+):
     from tests.backend.factories.models import create_case, create_session
+
     # Clear existing sessions if any (though SQLite is fresh per test usually)
     create_case(db_session, "case-agg")
     create_session(db_session, "s-agg-1", case_id="case-agg")
@@ -51,14 +60,9 @@ def test_get_sessions_stats_with_aggregation(client, force_user, admin_user, db_
     request_data = {
         "include_columns": [SessionHistoryColumn.case],
         "aggregations": [
-            {
-                "column": SessionHistoryColumn.id,
-                "function": AggregationFunction.count
-            }
+            {"column": SessionHistoryColumn.id, "function": AggregationFunction.count}
         ],
-        "filters": [
-            {"column": SessionHistoryColumn.case, "value": "case-agg"}
-        ]
+        "filters": [{"column": SessionHistoryColumn.case, "value": "case-agg"}],
     }
 
     response = client.post("/api/analytics/sessions/stats", json=request_data)
@@ -70,8 +74,10 @@ def test_get_sessions_stats_with_aggregation(client, force_user, admin_user, db_
     assert row["case"] == "case-agg"
     assert row["count_id"] == 2
 
+
 def test_get_sessions_stats_csv(client, force_user, admin_user, db_session):
     from tests.backend.factories.models import create_case, create_session
+
     create_case(db_session, "case-csv")
     create_session(db_session, "s-csv-1", case_id="case-csv")
 
@@ -81,17 +87,28 @@ def test_get_sessions_stats_csv(client, force_user, admin_user, db_session):
         "include_columns": [SessionHistoryColumn.id, SessionHistoryColumn.case],
     }
 
-    response = client.post("/api/analytics/sessions/stats?as_csv=true", json=request_data)
+    response = client.post(
+        "/api/analytics/sessions/stats?as_csv=true", json=request_data
+    )
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/csv; charset=utf-8"
-    assert "attachment; filename=sessions_stats.csv" in response.headers["content-disposition"]
+    assert (
+        "attachment; filename=sessions_stats.csv"
+        in response.headers["content-disposition"]
+    )
 
     content = response.text
     assert "id;case" in content
     assert "s-csv-1;case-csv" in content
 
+
 def test_get_sessions_stats_with_messages(client, force_user, admin_user, db_session):
-    from tests.backend.factories.models import create_case, create_session, create_message
+    from tests.backend.factories.models import (
+        create_case,
+        create_session,
+        create_message,
+    )
+
     create_case(db_session, "case-msg")
     create_session(db_session, "s-msg", case_id="case-msg")
     create_message(db_session, "s-msg", "user", "Hello")
@@ -102,9 +119,7 @@ def test_get_sessions_stats_with_messages(client, force_user, admin_user, db_ses
     request_data = {
         "include_columns": [SessionHistoryColumn.id],
         "include_messages": True,
-        "filters": [
-            {"column": SessionHistoryColumn.id, "value": "s-msg"}
-        ]
+        "filters": [{"column": SessionHistoryColumn.id, "value": "s-msg"}],
     }
 
     # This might fail on SQLite because of func.json_agg and func.json_build_object
