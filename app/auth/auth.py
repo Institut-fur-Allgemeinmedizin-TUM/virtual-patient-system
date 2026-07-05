@@ -134,7 +134,7 @@ def get_current_user(request: Request) -> Optional[dict]:
     if not token:
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header[len("Bearer "):]
+            token = auth_header[len("Bearer ") :]
     return get_current_user_by_token(token)
 
 
