@@ -50,6 +50,7 @@ async def leaderboard(
         select(stmt.c.preferred_username, stmt.c.total_score, stmt.c.rank)
         .where(stmt.c.rank <= 10)
         .order_by(stmt.c.rank.asc())
+        .limit(10)
     )
 
     result = db.execute(leaderboard_stmt)
