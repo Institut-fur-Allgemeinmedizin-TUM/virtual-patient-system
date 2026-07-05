@@ -1,6 +1,14 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, View, useWindowDimensions, Platform } from 'react-native';
-import { Text, useTheme, Surface, TouchableRipple, Button, Icon } from 'react-native-paper';
+import {
+  Text,
+  useTheme,
+  Surface,
+  TouchableRipple,
+  Button,
+  Icon,
+  IconButton,
+} from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp } from 'react-native-reanimated';
@@ -11,6 +19,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { Case, getCaseImage } from '@/lib/cases/case';
 import { Image } from 'expo-image';
 import EvaluationModal from '../components/EvaluationModal';
+import LeaderboardModal from '@/app/components/LeaderboardModal';
 
 const TUM_BLUE = '#0065BD';
 const TUM_DARK = '#003359';
@@ -27,6 +36,11 @@ export default function LandingPage() {
   const loadSessionSummaries = useCasesStore((state) => state.loadSessionSummaries);
   const startCase = useSessionStore((state) => state.startSession);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  const [selectedLeaderboardCaseId, setSelectedLeaderboardCaseId] = React.useState<string | null>(
+    null,
+  );
+  const [leaderboardModalOpen, setLeaderboardModalOpen] = React.useState<boolean>(false);
 
   const scrollRef = useRef<ScrollView>(null);
   const sectionPositions = useRef<Record<string, number>>({});
@@ -468,38 +482,57 @@ export default function LandingPage() {
                     }}
                     style={{ flex: 1 }}
                   >
-                    <View style={{ flex: 1 }}>
-                      <View style={styles.caseImageContainer}>
-                        <Image
-                          source={getCaseImage(item.imageName)}
-                          style={styles.caseImage}
-                          contentFit="cover"
-                        />
-                        {hasTopPercentage && hasRank && (
-                          <View style={[styles.rankBadge, { backgroundColor: rankStyle.bg }]}>
+                    <View
+                      style={{ flex: 1, flexDirection: 'column', justifyContent: 'space-between' }}
+                    >
+                      <View>
+                        <View style={styles.caseImageContainer}>
+                          <Image
+                            source={getCaseImage(item.imageName)}
+                            style={styles.caseImage}
+                            contentFit="cover"
+                          />
+                          {hasTopPercentage && hasRank && (
+                            <View style={[styles.rankBadge, { backgroundColor: rankStyle.bg }]}>
+                              <Text
+                                style={{ color: rankStyle.text, fontSize: 11, fontWeight: '700' }}
+                              >
+                                Rang {rank} | Top {topPercentage}%
+                              </Text>
+                            </View>
+                          )}
+                          <View style={[styles.diffBadge, { backgroundColor: diffStyle.bg }]}>
                             <Text
-                              style={{ color: rankStyle.text, fontSize: 11, fontWeight: '700' }}
+                              style={{ color: diffStyle.text, fontSize: 11, fontWeight: '700' }}
                             >
-                              Rang {rank} | Top {topPercentage}%
+                              {mockDifficulty}
                             </Text>
                           </View>
-                        )}
-                        <View style={[styles.diffBadge, { backgroundColor: diffStyle.bg }]}>
-                          <Text style={{ color: diffStyle.text, fontSize: 11, fontWeight: '700' }}>
-                            {mockDifficulty}
-                          </Text>
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                          <View style={styles.caseTextContainer}>
+                            <Text variant="titleMedium" style={styles.caseTitle}>
+                              {item.title}
+                            </Text>
+                            <Text variant="bodySmall" style={styles.caseSubtext}>
+                              {item.patientName}, {item.patientAge} J. {'\n'}
+                              {item.patientOccupation}
+                            </Text>
+                          </View>
+                          <View>
+                            <IconButton
+                              icon="podium"
+                              size={20}
+                              iconColor={theme.colors.surface}
+                              style={styles.leaderboardButton}
+                              onPress={() => {
+                                setSelectedLeaderboardCaseId(item.id);
+                                setLeaderboardModalOpen(true);
+                              }}
+                            />
+                          </View>
                         </View>
                       </View>
-                      <View style={styles.caseTextContainer}>
-                        <Text variant="titleMedium" style={styles.caseTitle}>
-                          {item.title}
-                        </Text>
-                        <Text variant="bodySmall" style={styles.caseSubtext}>
-                          {item.patientName}, {item.patientAge} J. {'\n'}
-                          {item.patientOccupation}
-                        </Text>
-                      </View>
-
                       <View>
                         {hasScore && (
                           <View
@@ -634,6 +667,14 @@ export default function LandingPage() {
         <View style={{ height: 60 }} />
       </ScrollView>
       <EvaluationModal />
+      <LeaderboardModal
+        visible={leaderboardModalOpen}
+        caseId={selectedLeaderboardCaseId}
+        onClose={() => {
+          setLeaderboardModalOpen(false);
+          setSelectedLeaderboardCaseId(null);
+        }}
+      />
     </>
   );
 }
@@ -987,6 +1028,16 @@ const createStyles = (theme: any) =>
       fontSize: 14,
       fontWeight: '700',
       letterSpacing: 0.2,
+    },
+    leaderboardButton: {
+      backgroundColor: theme.colors.onSurfaceVariant,
+      width: 33,
+      height: 33,
+      margin: 10,
+      padding: 10,
+      borderRadius: 1000,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     disclaimer: {
       fontSize: 12,

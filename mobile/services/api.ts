@@ -389,6 +389,24 @@ export interface UserSessionFeedBack {
   marker?: FeedBackMarkerType | null;
 }
 
+/** LeaderboardEntry */
+export interface LeaderboardEntry {
+  /** Rank */
+  rank: number;
+  /** Username */
+  username: string;
+  /** Total Score */
+  total_score: number;
+}
+
+/** LeaderboardResponse */
+export interface LeaderboardResponse {
+  /** Case Id */
+  case_id: string;
+  /** Top Entries */
+  top_entries: LeaderboardEntry[];
+}
+
 /** VHBLoginRequest */
 export interface VHBLoginRequest {
   /** Password */
@@ -1082,6 +1100,17 @@ export class Api<
         format: "json",
         ...params,
       }),
+
+    getLeaderboard: (
+        caseId: string,
+        params: RequestParams = {},
+    ) =>
+        this.request<LeaderboardResponse, void | HTTPValidationError>({
+          path: `/api/stats/leaderboard/${caseId}`,
+          method: "GET",
+          format: "json",
+          ...params
+        }),
   };
   health = {
     /**
