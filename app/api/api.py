@@ -8,7 +8,7 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 
-from app.api import auth, session, util, health, analytics, user, medical_background
+from app.api import auth, session, util, health, analytics, user, medical_background, stats
 from app.config.config import settings
 from app.db.db import SessionLocal
 from app.db.init_db import init_roles, init_anon_user
@@ -42,6 +42,7 @@ app.include_router(health.healthRouter)
 app.include_router(analytics.analyticsRouter)
 app.include_router(user.userRouter)
 app.include_router(medical_background.diagnostics_router)
+app.include_router(stats.statsRouter)
 
 # Check whether docs/build exists
 if os.path.isdir("docs/build"):
