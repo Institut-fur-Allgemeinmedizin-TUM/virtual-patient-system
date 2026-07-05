@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 
 from app.llm.formatting import format_evaluation_response
+from app.model.evaluation import RankingResponse
 
 
 def test_format_evaluation_response_maps_all_criteria():
@@ -28,7 +29,14 @@ def test_format_evaluation_response_maps_all_criteria():
         improvement_suggestions=["x", "y", "z"],
     )
 
-    response = format_evaluation_response(evaluation)
+    ranking_result = RankingResponse(
+        session_id="s-1",
+        top_percentage=50,
+        rank=1,
+        total_participants=100
+    )
+
+    response = format_evaluation_response(evaluation, ranking_result)
 
     assert response.id == 1
     assert response.session_id == "s-1"
