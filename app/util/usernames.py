@@ -1,0 +1,55 @@
+import random
+
+# Expanded datasets with 50 unique entries per category
+ADJECTIVES = [
+    "Aggressive", "Anxious", "Apocalyptic", "Baffled", "Biochemically", "Bionic",
+    "Caffeinated", "Chaotic", "Combustible", "Confused", "Dehydrated", "Delusional",
+    "Deranged", "Domesticated", "Dubious", "Dysfunctional", "Elusive", "Enraged",
+    "Ferocious", "Flamboyant", "Formal", "Frantic", "Glitchy", "Gothic",
+    "Holographic", "Hyperactive", "Incompetent", "Industrial", "Inflatable", "IronyDeficient",
+    "Lethargic", "Liquid", "LowRes", "Malfunctioning", "Medieval", "Microscopic",
+    "Mundane", "Neon", "Nomadic", "Organic", "Overclocked", "Paranoid",
+    "Passive", "Prehistoric", "Psychedelic", "Radioactive", "Sarcastic", "Sedated",
+    "Suboptimal", "Toxic"
+]
+
+NOUNS = [
+    "Appliance", "Avocado", "Barista", "Bagel", "Broomstick", "Cactus",
+    "Capybara", "Cardboard", "Centaur", "Chihuahua", "Croissant", "Cryptid",
+    "Cucumber", " Cyborg", "Eggplant", "Ferret", " Flamingo", "Fungus",
+    "Goblin", "Hamster", "Hedgehog", "Iceberg", "Llama", "Lobster",
+    "Manatee", "Microphone", "Mannequin", "Marmot", "Muffin", "Noodle",
+    "Ostrich", "Pancake", "Penguin", "Pigeon", "Platypus", "Potato",
+    "Pringle", "Raccoon", "Reboot", "Robot", "Spatula", "Sloth",
+    "Snail", "Sponge", "Squid", "TaxEvader", "Toaster", "Turnip",
+    "Waffle", "Walrus"
+]
+
+SUFFIXES = [
+    "404", "Approved", "Architect", "Beta", "Boss", "Casual",
+    "CEO", "Certified", "Collector", "Connoisseur", "Consultant", "Czar",
+    "Data", "Denied", "Deprived", "Detective", "Director", "Enthusiast",
+    "Expert", " Failed", "Glitch", "Guru", "InDisguise", "Incognit0",
+    "Intern", "Junior", "Kingpin", "Lord", "Lover", "Manager",
+    "Master", "Mechanic", "Monarch", "Mogul", "OfDoom", "Official",
+    "Overlord", "Pilot", "Pro", "Professor", "Protocol", "Scout",
+    "Simp", "Specialist", "System", "TheGreat", "Vanguard", "Veteran",
+    "Wrangler", "X"
+]
+
+
+def generate_single_username(use_numbers=True):
+    """
+    Generates exactly one funny username.
+    Optimized for single-call execution during user sign-up.
+    """
+    adj = random.choice(ADJECTIVES)
+    noun = random.choice(NOUNS)
+    suffix = random.choice(SUFFIXES)
+
+    if use_numbers:
+        # 3-digit padding ensures uniform string structure and high entropy
+        num = random.randint(100, 999)
+        return f"{adj}{noun}{suffix}{num}"
+
+    return f"{adj}{noun}{suffix}"
