@@ -2,6 +2,7 @@ from io import BytesIO
 
 from tests.backend.factories.models import create_case, create_message, create_session
 
+
 def test_get_cases_and_case_details(client):
     cases_response = client.get("/api/cases")
     assert cases_response.status_code == 200
