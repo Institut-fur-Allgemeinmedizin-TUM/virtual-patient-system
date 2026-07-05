@@ -15,22 +15,20 @@ from app.model.stats import LeaderboardEntry, LeaderboardResponse
 statsRouter = APIRouter()
 
 
-@statsRouter.get(
-    "/api/stats/leaderboard/{case_id}", response_model=LeaderboardResponse
-)
+@statsRouter.get("/api/stats/leaderboard/{case_id}", response_model=LeaderboardResponse)
 async def leaderboard(
-        case_id: str,
-        db: OrmSession = Depends(get_db),
+    case_id: str,
+    db: OrmSession = Depends(get_db),
 ):
     total_score_exp = (
-        Evaluation.criterion1_score +
-        Evaluation.criterion2_score +
-        Evaluation.criterion3_score +
-        Evaluation.criterion4_score +
-        Evaluation.criterion5_score +
-        Evaluation.criterion6_score +
-        Evaluation.criterion7_score +
-        Evaluation.criterion8_score
+        Evaluation.criterion1_score
+        + Evaluation.criterion2_score
+        + Evaluation.criterion3_score
+        + Evaluation.criterion4_score
+        + Evaluation.criterion5_score
+        + Evaluation.criterion6_score
+        + Evaluation.criterion7_score
+        + Evaluation.criterion8_score
     )
 
     rank_window = func.rank().over(order_by=total_score_exp.desc())
@@ -62,9 +60,7 @@ async def leaderboard(
         display_name = row.preferred_username or "Anon"
         top_entries.append(
             LeaderboardEntry(
-                rank = row.rank,
-                username = display_name,
-                total_score = row.total_score
+                rank=row.rank, username=display_name, total_score=row.total_score
             )
         )
 

@@ -8,6 +8,7 @@ class LeaderboardEntry(BaseModel):
     username: str
     total_score: int
 
+
 class LeaderboardResponse(BaseModel):
     case_id: str
     top_entries: List[LeaderboardEntry]
