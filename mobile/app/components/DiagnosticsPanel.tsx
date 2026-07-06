@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Image, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, Platform } from 'react-native';
 import {
   Surface,
   Text,
@@ -15,7 +15,7 @@ import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { DiagnosticValue } from '@/services/api';
 import { playAudioFile, stopAudioFile } from '@/utils/audioPlayer';
-import * as FileSystem from 'expo-file-system';
+import { cacheDirectory, writeAsStringAsync, EncodingType } from 'expo-file-system';
 import { Video, ResizeMode } from 'expo-av';
 
 const VideoPlayerComponent = ({
@@ -35,9 +35,9 @@ const VideoPlayerComponent = ({
           setUri(`data:${mimeType};base64,${base64Data}`);
         } else {
           const filename = `temp_video_${Date.now()}.mp4`;
-          const localUri = FileSystem.cacheDirectory + filename;
-          await FileSystem.writeAsStringAsync(localUri, base64Data, {
-            encoding: FileSystem.EncodingType.Base64,
+          const localUri = cacheDirectory + filename;
+          await writeAsStringAsync(localUri, base64Data, {
+            encoding: EncodingType.Base64,
           });
           setUri(localUri);
         }
