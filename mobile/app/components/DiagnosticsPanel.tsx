@@ -212,7 +212,7 @@ export default function DiagnosticsPanel({
     }
   };
 
-  const PanelContent = () => (
+  const renderPanelContent = () => (
     <View style={styles.content}>
       {!isMobile && (
         <View>
@@ -304,7 +304,7 @@ export default function DiagnosticsPanel({
             <Text variant="titleLarge">Diagnostik</Text>
             <IconButton icon="close" onPress={onClose} />
           </View>
-          <PanelContent />
+          {renderPanelContent()}
         </Modal>
       </Portal>
     );
@@ -320,7 +320,7 @@ export default function DiagnosticsPanel({
         },
       ]}
     >
-      <PanelContent />
+      {renderPanelContent()}
     </Surface>
   );
 }
