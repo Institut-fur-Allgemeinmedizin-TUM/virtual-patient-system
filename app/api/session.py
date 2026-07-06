@@ -982,7 +982,6 @@ async def get_feedback(
         session_id=feedback.session_id,
         feedback_score=feedback.feedback_score,
         feedback_comment=feedback.feedback,
-        marker=feedback.marker,
     )
 
 
