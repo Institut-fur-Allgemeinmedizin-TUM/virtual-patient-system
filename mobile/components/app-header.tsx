@@ -64,6 +64,7 @@ export function AppHeader() {
             router.push('/');
           }}
           accessibilityLabel="App logo"
+          color="#C1CBD6"
         />
         <Appbar.Content
           title={
