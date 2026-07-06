@@ -25,7 +25,7 @@ class UserSessionFeedBack(BaseModel):
     session_id: str
     feedback_score: int
     feedback_comment: str
-    marker: FeedBackMarkerType | None = None
+    marker: FeedBackMarkerType = FeedBackMarkerType.NONE
 
 
 class PaginatedFeedbacksResponse(BaseModel):
