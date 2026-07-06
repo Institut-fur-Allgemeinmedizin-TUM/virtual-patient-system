@@ -1,82 +1,158 @@
 {
-  "vital_params": {
-    "display_name": "Vitalparameter",
+  
+  "schnelltests": {
+    "display_name": "Schnelltests",
     "data": {
-      "heart_rate": {
-        "display_name": "Herzfrequenz",
-        "unit": "bpm",
-        "data_type": "integer",
-        "data": 78
-      },
-      "blood_pressure_right": {
-        "display_name": "Blutdruck rechts",
-        "unit": "mmHg",
+      "troponin_i": {
+        "display_name": "Troponin I (semiquant.) [< 40 ng/l]",
+        "unit": "",
         "data_type": "string",
-        "data": "128/82"
+        "data": "negativ"
       },
-      "blood_pressure_left": {
-        "display_name": "Blutdruck links",
-        "unit": "mmHg",
+      "d_dimer": {
+        "display_name": "D-Dimer (semiquant.) [< 0,5 mg/l]",
+        "unit": "",
         "data_type": "string",
-        "data": "126/80"
+        "data": "negativ"
       },
-      "oxygen_saturation": {
-        "display_name": "Sauerstoffsättigung",
-        "unit": "%",
+      "crp": {
+        "display_name": "CRP (semiquant.) [< 5 mg/l]",
+        "unit": "",
+        "data_type": "string",
+        "data": "negativ"
+      },
+      "glukose": {
+        "display_name": "Kapillarblutglukose [70-100 mg/dl]",
+        "unit": "mg/dl",
         "data_type": "integer",
-        "data": 98
-      },
-      "respiratory_rate": {
-        "display_name": "Atemfrequenz",
-        "unit": "Atemzüge pro Minute",
-        "data_type": "integer",
-        "data": 16
-      },
-      "temperature": {
-        "display_name": "Körpertemperatur",
-        "unit": "°C",
+        "data": 94
+      }
+    }
+  },
+  "blutbild_erythrozyten": {
+    "display_name": "Erythrozyten",
+    "data": {
+      "hb": {
+        "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
+        "unit": "g/dl",
         "data_type": "float",
-        "data": 36.7
+        "data": 15.2
+      },
+      "hkt": {
+        "display_name": "Hämatokrit (Hkt) [39 – 50]",
+        "unit": "%",
+        "data_type": "float",
+        "data": 44.8
+      },
+      "erythrozyten": {
+        "display_name": "Erythrozyten [4,5 – 5,9]",
+        "unit": "Mio./µl",
+        "data_type": "float",
+        "data": 4.98
+      },
+      "mcv": {
+        "display_name": "MCV [80 – 100]",
+        "unit": "fl",
+        "data_type": "float",
+        "data": 89.9
+      },
+      "mch": {
+        "display_name": "MCH [27 – 34]",
+        "unit": "pg",
+        "data_type": "float",
+        "data": 30.5
+      },
+      "mchc": {
+        "display_name": "MCHC [31,5 – 36,0]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 33.9
+      }
+    }
+  },
+  "blutbild_leukozyten": {
+    "display_name": "Leukozyten",
+    "data": {
+      "leukozyten_gesamt": {
+        "display_name": "Leukozyten gesamt [4,0 – 10,0]",
+        "unit": "G/l",
+        "data_type": "float",
+        "data": 7.2
+      },
+      "neutrophile_segment": {
+        "display_name": "Neutrophile (segmentkernig) [50 – 70 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "58 % / 4,18 G/l"
+      },
+      "neutrophile_stab": {
+        "display_name": "Neutrophile (stabkernig) [0 – 3 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "1,5 % / 0,11 G/l"
+      },
+      "lymphozyten": {
+        "display_name": "Lymphozyten [20 – 45 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "32 % / 2,30 G/l"
+      },
+      "monozyten": {
+        "display_name": "Monozyten [2 – 10 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "6 % / 0,43 G/l"
+      },
+      "eosinophile": {
+        "display_name": "Eosinophile [0 – 5 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "2 % / 0,14 G/l"
+      },
+      "basophile": {
+        "display_name": "Basophile [0 – 1 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "0,5 % / 0,04 G/l"
+      }
+    }
+  },
+  "blutbild_thrombozyten": {
+    "display_name": "Thrombozyten",
+    "data": {
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 228
       }
     }
   },
   "image_sample": {
-    "display_name": "Image Sample",
+    "display_name": "EKG",
     "data": {
       "ekg": {
-        "display_name": "EKG",
+        "display_name": "EKG Brust",
         "unit": "",
         "data_type": "image/png",
-        "data": "path:app/cases/medical_background/images/sample_image.png"
+        "data": "path:app/cases/medical_background/images/EKG-Brust.png"
       }
     }
   },
   "audio_sample": {
     "display_name": "Auskultation",
     "data": {
-      "auskultation-n": {
-        "display_name": "Auskultation-n",
+      "auskultation-herz": {
+        "display_name": "Auskultation Herz",
         "unit": "",
         "data_type": "audio",
-        "data": "path:app/cases/medical_background/audio/Auskultation-Herz-normal.mp3"
+        "data": "path:app/cases/medical_background/audio/Auskultation Herz - normal.mp3"
       },
-      "auskultation-x": {
-        "display_name": "Auskultation-x",
+      "auskultation-lunge": {
+        "display_name": "Auskultation Lunge",
         "unit": "",
         "data_type": "audio",
-        "data": "path:app/cases/medical_background/audio/Auskultation-Herz-normal.mp3"
-      }
-    }
-  },
-  "video_sample": {
-    "display_name": "Sample Video",
-    "data": {
-      
-      "Vid 1": {
-        "display_name": "Sample",
-        "unit": "",
-        "data_type": "video",
-        "data": "path:app/cases/medical_background/video/sample.mp4"
+        "data": "path:app/cases/medical_background/audio/Auskultation Lunge - normal.mp3"
       }
     }
   }
