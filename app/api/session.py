@@ -660,7 +660,7 @@ async def get_ranking(
 
     user_best_window = func.row_number().over(
         partition_by=Session.user_id,  # Assumes user_id exists on Session or via join
-        order_by=total_score_expr.desc()
+        order_by=total_score_expr.desc(),
     )
 
     base_sessions_subquery = (
@@ -668,7 +668,7 @@ async def get_ranking(
             Session.id.label("session_id"),
             Session.user_id.label("user_id"),
             total_score_expr.label("total_score"),
-            user_best_window.label("user_session_rank")
+            user_best_window.label("user_session_rank"),
         )
         .join(Evaluation, Session.id == Evaluation.session_id)
         .where(Session.case_id == case_id)
@@ -676,13 +676,15 @@ async def get_ranking(
         .subquery()
     )
 
-    global_rank_window = func.rank().over(order_by=desc(base_sessions_subquery.c.total_score))
+    global_rank_window = func.rank().over(
+        order_by=desc(base_sessions_subquery.c.total_score)
+    )
 
     ranked_best_subquery = (
         select(
             base_sessions_subquery.c.session_id,
             base_sessions_subquery.c.total_score,
-            global_rank_window.label("rank")
+            global_rank_window.label("rank"),
         )
         .where(base_sessions_subquery.c.user_session_rank == 1)
         .subquery()
