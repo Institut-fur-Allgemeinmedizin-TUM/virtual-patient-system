@@ -658,13 +658,17 @@ async def get_ranking(
         + Evaluation.criterion8_score
     )
 
-    rank_window = func.rank().over(order_by=desc(total_score_expr)).label("rank")
+    user_best_window = func.row_number().over(
+        partition_by=Session.user_id,  # Assumes user_id exists on Session or via join
+        order_by=total_score_expr.desc()
+    )
 
-    subquery = (
+    base_sessions_subquery = (
         select(
             Session.id.label("session_id"),
+            Session.user_id.label("user_id"),
             total_score_expr.label("total_score"),
-            rank_window.label("rank"),
+            user_best_window.label("user_session_rank")
         )
         .join(Evaluation, Session.id == Evaluation.session_id)
         .where(Session.case_id == case_id)
@@ -672,22 +676,32 @@ async def get_ranking(
         .subquery()
     )
 
-    total_count = (
-        db.query(Session)
-        .join(Evaluation, Session.id == Evaluation.session_id)
-        .filter(Session.case_id == case_id)
-        .filter(Session.started_at >= one_year_ago)
-        .count()
-        or 0
+    global_rank_window = func.rank().over(order_by=desc(base_sessions_subquery.c.total_score))
+
+    ranked_best_subquery = (
+        select(
+            base_sessions_subquery.c.session_id,
+            base_sessions_subquery.c.total_score,
+            global_rank_window.label("rank")
+        )
+        .where(base_sessions_subquery.c.user_session_rank == 1)
+        .subquery()
     )
+
+    total_count_stmt = (
+        select(func.count())
+        .select_from(base_sessions_subquery)
+        .where(base_sessions_subquery.c.user_session_rank == 1)
+    )
+    total_count = db.execute(total_count_stmt).scalar() or 0
 
     if total_count == 0:
         return RankingResponse(
             session_id=session_id, rank=0, top_percentage=0, total_participants=0
         )
 
-    target_stmt = select(subquery.c.rank).where(
-        subquery.columns.session_id == session_id
+    target_stmt = select(ranked_best_subquery.c.rank).where(
+        ranked_best_subquery.c.session_id == session_id
     )
     result = db.execute(target_stmt).first()
     if not result:
