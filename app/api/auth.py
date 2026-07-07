@@ -9,7 +9,8 @@ from fastapi import (
     HTTPException,
     Request,
     Response,
-    APIRouter, Depends,
+    APIRouter,
+    Depends,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
 from jose import jwt, JWTError
@@ -186,12 +187,11 @@ async def auth_me(request: Request, db: OrmSession = Depends(get_db)) -> JSONRes
     # Fallback to sub if tum_id wasn't found during authentication
     tum_id = user.get("tum_id") or user.get("sub")
 
-    db_username : str | None = None
+    db_username: str | None = None
     if tum_id:
         db_user = db.query(User).filter(User.oidc_id == tum_id).first()
         if db_user:
             db_username = str(db_user.preferred_username)
-
 
     return JSONResponse(
         content={

@@ -34,8 +34,7 @@ async def leaderboard(
     )
 
     user_best_window = func.row_number().over(
-        partition_by=User.id,
-        order_by=total_score_exp.desc()
+        partition_by=User.id, order_by=total_score_exp.desc()
     )
 
     subquery = (
@@ -55,7 +54,7 @@ async def leaderboard(
         select(
             subquery.c.preferred_username,
             subquery.c.total_score,
-            func.rank().over(order_by=subquery.c.total_score.desc()).label("rank")
+            func.rank().over(order_by=subquery.c.total_score.desc()).label("rank"),
         )
         .where(subquery.c.user_eval_rank == 1)
         .order_by(subquery.c.total_score.desc())
