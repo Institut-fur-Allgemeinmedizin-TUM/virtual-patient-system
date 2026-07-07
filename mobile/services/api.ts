@@ -395,8 +395,8 @@ export interface LeaderboardEntry {
   rank: number;
   /** Username */
   username: string;
-  /** Total Score */
-  total_score: number;
+  /** Average Points */
+  average_points: number;
 }
 
 /** LeaderboardResponse */
