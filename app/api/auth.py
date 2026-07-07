@@ -9,14 +9,19 @@ from fastapi import (
     HTTPException,
     Request,
     Response,
-    APIRouter,
+    APIRouter, Depends,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
 from jose import jwt, JWTError
 
 from app.auth import auth, oidc
 from app.config.config import settings
+from app.db.db import get_db
 from app.model.auth import VHBLoginRequest, VHBLoginResponse
+
+from sqlalchemy.orm import Session as OrmSession
+
+from app.model.models import User
 
 authRouter = APIRouter()
 
@@ -171,7 +176,7 @@ async def auth_callback(
 
 
 @authRouter.get("/auth/me")
-async def auth_me(request: Request) -> JSONResponse:
+async def auth_me(request: Request, db: OrmSession = Depends(get_db)) -> JSONResponse:
     """Get current user information."""
     user = auth.get_current_user(request)
     if not user:
@@ -181,11 +186,19 @@ async def auth_me(request: Request) -> JSONResponse:
     # Fallback to sub if tum_id wasn't found during authentication
     tum_id = user.get("tum_id") or user.get("sub")
 
+    db_username : str | None = None
+    if tum_id:
+        db_user = db.query(User).filter(User.oidc_id == tum_id).first()
+        if db_user:
+            db_username = str(db_user.preferred_username)
+
+
     return JSONResponse(
         content={
             "sub": user.get("sub"),
             "tum_id": tum_id,
             "roles": user.get("roles", []),
+            "display_name": db_username or "",
         }
     )
 

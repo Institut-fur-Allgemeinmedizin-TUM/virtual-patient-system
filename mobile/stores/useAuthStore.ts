@@ -12,6 +12,7 @@ interface User {
   email?: string;
   name?: string;
   roles?: string[];
+  display_name?: string;
 }
 
 interface AuthState {

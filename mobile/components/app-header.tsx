@@ -28,6 +28,7 @@ export function AppHeader() {
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
   const tumId = useAuthStore((state) => state.user?.tum_id);
   const roles = useAuthStore((state) => state.user?.roles);
+  const preferredUsername = useAuthStore((state) => state.user?.display_name);
   const themeMode = useThemeStore((state) => state.mode);
   const requestScroll = useUIStore((state) => state.requestScroll);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -175,9 +176,21 @@ export function AppHeader() {
               </Appbar.Header>
 
               <Divider />
-
               {tumId ? (
                 <View style={styles.profileIdentityRow}>
+                  {preferredUsername ? (
+                    <Text
+                      style={[
+                        styles.profileTumId,
+                        {
+                          color: colors.onSurfaceVariant,
+                          textDecorationColor: colors.onSurfaceVariant,
+                        },
+                      ]}
+                    >
+                      Username: {preferredUsername}
+                    </Text>
+                  ) : null}
                   <Text
                     style={[
                       styles.profileTumId,
