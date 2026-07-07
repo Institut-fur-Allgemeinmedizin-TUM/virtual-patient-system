@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class LeaderboardEntry(BaseModel):
     rank: int
     username: str
-    total_score: int
+    average_points: float
 
 
 class LeaderboardResponse(BaseModel):

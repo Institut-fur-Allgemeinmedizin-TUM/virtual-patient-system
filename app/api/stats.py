@@ -14,6 +14,8 @@ from app.model.stats import LeaderboardEntry, LeaderboardResponse
 
 statsRouter = APIRouter()
 
+NUM_CRITERIA = 8
+
 
 @statsRouter.get("/api/stats/leaderboard/{case_id}", response_model=LeaderboardResponse)
 async def leaderboard(
@@ -59,9 +61,10 @@ async def leaderboard(
     top_entries = []
     for row in rows:
         display_name = row.preferred_username or "Anon"
+        calculated_average = round(float(row.total_score) / NUM_CRITERIA, 4)
         top_entries.append(
             LeaderboardEntry(
-                rank=row.rank, username=display_name, total_score=row.total_score
+                rank=row.rank, username=display_name, average_points=calculated_average
             )
         )
 

@@ -46,9 +46,7 @@ export default function LeaderboardModal({ visible, caseId, onClose }: Leaderboa
             >
               <Text style={{ width: 40, fontWeight: '700' }}>#{leaderboardEntry.rank}</Text>
               <Text style={{ flex: 1 }}>{leaderboardEntry.username}</Text>
-              <Text style={{ fontWeight: '600' }}>
-                {leaderboardEntry.total_score.toFixed(1)} Pts
-              </Text>
+              <Text style={{ fontWeight: '600' }}>{leaderboardEntry.average_points} / 5 Pts</Text>
             </View>
           ))
         )}
