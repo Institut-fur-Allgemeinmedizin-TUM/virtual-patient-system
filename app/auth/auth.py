@@ -10,6 +10,7 @@ from app.auth import oidc
 from app.config.config import settings
 from app.db.db import SessionLocal
 from app.model.models import User, Role, DefaultRoles
+from app.util.usernames import generate_single_username
 
 
 def sync_user_to_db(claims: dict) -> None:
@@ -23,7 +24,7 @@ def sync_user_to_db(claims: dict) -> None:
         user = db.query(User).filter(User.oidc_id == oidc_id).first()
         if not user:
             # Create new user
-            user = User(oidc_id=oidc_id)
+            user = User(oidc_id=oidc_id, preferred_username=generate_single_username())
             db.add(user)
 
             # Assign default role if it exists

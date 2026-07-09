@@ -14,7 +14,7 @@ from app.util.usernames import generate_single_username
 
 # revision identifiers, used by Alembic.
 revision: str = '17912d7fd666'
-down_revision: Union[str, Sequence[str], None] = '2017f96d954c'
+down_revision: Union[str, Sequence[str], None] = '544f139ee69d'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
