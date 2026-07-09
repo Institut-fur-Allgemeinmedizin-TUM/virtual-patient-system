@@ -456,13 +456,19 @@ export default function LandingPage() {
               const diffStyle = getDifficultyStyle(mockDifficulty);
 
               const sessionInfo: {
+               
                 sessionId: string;
+               
                 score: number;
+                bestSessionId?: string | null;
+                bestScore?: number | null;
+             ;
                 rank: number;
                 topPercentage: number;
               } = sessionScores[item.id];
               const score = sessionInfo ? sessionInfo.score : null;
               const hasScore = typeof score === 'number';
+              const bestScore = sessionInfo ? sessionInfo.bestScore : null;
               const rank = sessionInfo ? sessionInfo.rank : null;
               const hasRank = typeof rank === 'number';
               const topPercentage = sessionInfo ? sessionInfo.topPercentage : null;
@@ -542,17 +548,30 @@ export default function LandingPage() {
                             ]}
                           >
                             <Icon source="check-circle" color={getScoreColor(score)} size={14} />
-                            <Text
-                              variant="bodySmall"
-                              style={{
-                                color: getScoreColor(score),
-                                marginLeft: 6,
-                                fontWeight: '600',
-                                marginTop: Platform.OS === 'web' ? 0 : 4,
-                              }}
-                            >
-                              Absolviert • Letzter Score: {score.toFixed(2)}
-                            </Text>
+                            <View style={{ flex: 1, marginLeft: 6 }}>
+                              <Text
+                                variant="bodySmall"
+                                style={{
+                                  color: getScoreColor(score),
+                                  fontWeight: '600',
+                                  marginTop: Platform.OS === 'web' ? 0 : 4,
+                                }}
+                              >
+                                Absolviert • Letzter Score: {score.toFixed(2)}
+                              </Text>
+                              {bestScore != null && (
+                                <Text
+                                  variant="bodySmall"
+                                  style={{
+                                    color: getScoreColor(bestScore),
+                                    fontWeight: '600',
+                                    marginTop: 2,
+                                  }}
+                                >
+                                  Bester Score: {bestScore.toFixed(2)}
+                                </Text>
+                              )}
+                            </View>
                           </View>
                         )}
 

@@ -45,18 +45,23 @@ export enum SessionHistoryColumn {
   ImprovementSuggestions = "improvement_suggestions",
 }
 
-/** MedicalBackgroundResponseType */
-export enum MedicalBackgroundResponseType {
-  Value1 = 1,
-  Value2 = 2,
-}
-
 /** FeedBackMarkerType */
 export enum FeedBackMarkerType {
   None = "none",
   Read = "read",
   Important = "important",
   LookAgain = "look_again",
+}
+
+/** DataType */
+export enum DataType {
+  Integer = "integer",
+  String = "string",
+  Float = "float",
+  ImagePng = "image/png",
+  ImageJpeg = "image/jpeg",
+  Video = "video",
+  Audio = "audio",
 }
 
 /** AggregationFunction */
@@ -127,6 +132,29 @@ export interface DiagnosisUpdate {
   diagnosis: string;
 }
 
+/** DiagnosticGroup */
+export interface DiagnosticGroup {
+  /** Name */
+  name: string;
+  /** Display Name */
+  display_name: string;
+  /** Data */
+  data?: DiagnosticValue[] | null;
+}
+
+/** DiagnosticValue */
+export interface DiagnosticValue {
+  /** Name */
+  name: string;
+  /** Display Name */
+  display_name: string;
+  /** Unit */
+  unit: string;
+  data_type: DataType;
+  /** Data */
+  data: any;
+}
+
 /** EvaluationCriterion */
 export interface EvaluationCriterion {
   /** Name */
@@ -152,9 +180,9 @@ export interface EvaluationResponse {
   criteria: EvaluationCriterion[];
   /** Improvement Suggestions */
   improvement_suggestions: string[];
-
+  /** Rank */
   rank: number;
-
+  /** Top Percentage */
   top_percentage: number;
 }
 
@@ -228,13 +256,28 @@ export interface HTTPValidationError {
   detail?: ValidationError[];
 }
 
-/** MedicalBackgroundResponse */
-export interface MedicalBackgroundResponse {
-  type: MedicalBackgroundResponseType;
+/** LeaderboardEntry */
+export interface LeaderboardEntry {
+  /** Rank */
+  rank: number;
+  /** Username */
+  username: string;
+  /** Average Points */
+  average_points: number;
+}
+
+/** LeaderboardResponse */
+export interface LeaderboardResponse {
+  /** Case Id */
+  case_id: string;
+  /** Top Entries */
+  top_entries: LeaderboardEntry[];
+}
+
+/** MedicalBackgroundsAvailableResponse */
+export interface MedicalBackgroundsAvailableResponse {
   /** Diagnostics Available */
-  diagnostics_available?: string[] | null;
-  /** Diagnostic Data */
-  diagnostic_data?: null;
+  diagnostics_available: DiagnosticGroup[];
 }
 
 /** PaginatedFeedbacksResponse */
@@ -243,6 +286,18 @@ export interface PaginatedFeedbacksResponse {
   feedbacks: UserSessionFeedBack[];
   /** Total */
   total: number;
+}
+
+/** RankingResponse */
+export interface RankingResponse {
+  /** Session Id */
+  session_id: string;
+  /** Rank */
+  rank: number;
+  /** Top Percentage */
+  top_percentage: number;
+  /** Total Participants */
+  total_participants: number;
 }
 
 /** SessionHistoryFilter */
@@ -343,17 +398,14 @@ export interface SessionSummaryData {
   sessionId: string;
   /** Score */
   score: number;
-<<<<<<< HEAD
+  /** Bestsessionid */
+  bestSessionId?: string | null;
+  /** Bestscore */
+  bestScore?: number | null;
   /** Rank */
   rank: number;
-  /** Top Percentage */
+  /** Toppercentage */
   topPercentage: number;
-=======
-  /** BestSessionid */
-  bestSessionId?: string | null;
-  /** BestScore */
-  bestScore?: number | null;
->>>>>>> ac00a68 (feat(session): enhance session summary to include best session and score)
 }
 
 /** SessionsSummaryResponse */
@@ -365,6 +417,12 @@ export interface SessionsSummaryResponse {
 /** UpdateFeedbackMarkerRequest */
 export interface UpdateFeedbackMarkerRequest {
   marker: FeedBackMarkerType;
+}
+
+/** UsedDiagnosticsResponse */
+export interface UsedDiagnosticsResponse {
+  /** Diagnostics Used */
+  diagnostics_used: string[];
 }
 
 /** UserProfileResponse */
@@ -393,25 +451,8 @@ export interface UserSessionFeedBack {
   feedback_score: number;
   /** Feedback Comment */
   feedback_comment: string;
-  marker?: FeedBackMarkerType | null;
-}
-
-/** LeaderboardEntry */
-export interface LeaderboardEntry {
-  /** Rank */
-  rank: number;
-  /** Username */
-  username: string;
-  /** Average Points */
-  average_points: number;
-}
-
-/** LeaderboardResponse */
-export interface LeaderboardResponse {
-  /** Case Id */
-  case_id: string;
-  /** Top Entries */
-  top_entries: LeaderboardEntry[];
+  /** @default "none" */
+  marker?: FeedBackMarkerType;
 }
 
 /** VHBLoginRequest */
@@ -760,6 +801,24 @@ export class Api<
       }),
 
     /**
+     * No description
+     *
+     * @name GetUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet
+     * @summary Get Used Diagnostics
+     * @request GET:/api/sessions/{session_id}/diagnostics
+     */
+    getUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet: (
+      sessionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<UsedDiagnosticsResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/diagnostics`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
      * @description Get all messages for a specific session.
      *
      * @name GetSessionMessagesApiSessionsSessionIdMessagesGet
@@ -772,6 +831,24 @@ export class Api<
     ) =>
       this.request<SessionMessagesResponse, HTTPValidationError>({
         path: `/api/sessions/${sessionId}/messages`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name GetRankingApiSessionsSessionIdRankingGet
+     * @summary Get Ranking
+     * @request GET:/api/sessions/{session_id}/ranking
+     */
+    getRankingApiSessionsSessionIdRankingGet: (
+      sessionId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<RankingResponse, HTTPValidationError>({
+        path: `/api/sessions/${sessionId}/ranking`,
         method: "GET",
         format: "json",
         ...params,
@@ -1077,30 +1154,47 @@ export class Api<
       }),
 
     /**
-     * @description Retrieve available diagnostics for a case or specific diagnostic data. Supports both database sessions and VHB sessions.
+     * No description
      *
-     * @tags Medical Background
+     * @name GetMedicalBackgroundAvailableApiDiagnosticsCaseIdAvailableGet
+     * @summary Get Medical Background Available
+     * @request GET:/api/diagnostics/{case_id}/available
+     */
+    getMedicalBackgroundAvailableApiDiagnosticsCaseIdAvailableGet: (
+      caseId: string,
+      params: RequestParams = {},
+    ) =>
+      this.request<MedicalBackgroundsAvailableResponse, HTTPValidationError>({
+        path: `/api/diagnostics/${caseId}/available`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @name GetMedicalBackgroundApiDiagnosticsCaseIdGet
-     * @summary Get medical background diagnostics
+     * @summary Get Medical Background
      * @request GET:/api/diagnostics/{case_id}
      */
     getMedicalBackgroundApiDiagnosticsCaseIdGet: (
       caseId: string,
       query?: {
         /**
-         * Session Id
-         * The session ID for tracking diagnostic usage. Required when requesting specific diagnostic data.
-         */
-        session_id?: string | null;
-        /**
          * Diagnostic
          * The specific diagnostic to retrieve. If not provided, returns list of available diagnostics for the case.
          */
-        diagnostic?: string | null;
+        diagnostic?: string;
+        /**
+         * Session Id
+         * The session ID for tracking diagnostic usage. Required when requesting specific diagnostic data.
+         */
+        session_id?: string;
       },
       params: RequestParams = {},
     ) =>
-      this.request<MedicalBackgroundResponse, void | HTTPValidationError>({
+      this.request<DiagnosticGroup, HTTPValidationError>({
         path: `/api/diagnostics/${caseId}`,
         method: "GET",
         query: query,
@@ -1108,16 +1202,23 @@ export class Api<
         ...params,
       }),
 
-    getLeaderboard: (
-        caseId: string,
-        params: RequestParams = {},
+    /**
+     * No description
+     *
+     * @name LeaderboardApiStatsLeaderboardCaseIdGet
+     * @summary Leaderboard
+     * @request GET:/api/stats/leaderboard/{case_id}
+     */
+    leaderboardApiStatsLeaderboardCaseIdGet: (
+      caseId: string,
+      params: RequestParams = {},
     ) =>
-        this.request<LeaderboardResponse, void | HTTPValidationError>({
-          path: `/api/stats/leaderboard/${caseId}`,
-          method: "GET",
-          format: "json",
-          ...params
-        }),
+      this.request<LeaderboardResponse, HTTPValidationError>({
+        path: `/api/stats/leaderboard/${caseId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
   };
   health = {
     /**
