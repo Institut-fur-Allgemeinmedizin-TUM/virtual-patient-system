@@ -175,22 +175,41 @@ export function AppHeader() {
                 />
               </Appbar.Header>
 
-              <Divider />
-              {tumId ? (
-                <View style={styles.profileIdentityRow}>
-                  {preferredUsername ? (
+              {preferredUsername ? (
+                <>
+                  <View style={[styles.profileIdentityRow, { flexDirection: 'row' }]}>
                     <Text
                       style={[
-                        styles.profileTumId,
+                        styles.profileName,
+                        {
+                          color: colors.onSurfaceVariant,
+                          textDecorationColor: colors.onSurfaceVariant,
+                          paddingRight: 5,
+                          fontWeight: 'bold',
+                        },
+                      ]}
+                    >
+                      Username:
+                    </Text>
+                    <Text
+                      style={[
+                        styles.profileName,
                         {
                           color: colors.onSurfaceVariant,
                           textDecorationColor: colors.onSurfaceVariant,
                         },
                       ]}
                     >
-                      Username: {preferredUsername}
+                      {preferredUsername}
                     </Text>
-                  ) : null}
+                  </View>
+                  <Divider />
+                </>
+              ) : null}
+
+              <Divider />
+              {tumId ? (
+                <View style={styles.profileIdentityRow}>
                   <Text
                     style={[
                       styles.profileTumId,
@@ -360,6 +379,9 @@ const styles = StyleSheet.create({
   },
   profileTumId: {
     fontSize: 12,
+  },
+  profileName: {
+    fontSize: 15,
   },
   profileRoles: {
     fontSize: 12,
