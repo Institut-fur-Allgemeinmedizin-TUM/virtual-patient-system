@@ -958,41 +958,70 @@ async def get_last_session_summary(
             status_code=403, detail="Session summary not available for VHB users"
         )
     tum_id = user.get("tum_id") or user.get("sub")
-    last_sessions = (
-        db.query(ChatSession)
+
+    score_expr = (
+        Evaluation.criterion1_score
+        + Evaluation.criterion2_score
+        + Evaluation.criterion3_score
+        + Evaluation.criterion4_score
+        + Evaluation.criterion5_score
+        + Evaluation.criterion6_score
+        + Evaluation.criterion7_score
+        + Evaluation.criterion8_score
+    ) / 8.0
+
+    session_data_subq = (
+        db.query(
+            ChatSession.id,
+            ChatSession.case_id,
+            score_expr.label("score"),
+            func.row_number()
+            .over(
+                partition_by=ChatSession.case_id, order_by=ChatSession.started_at.desc()
+            )
+            .label("rn_last"),
+            func.row_number()
+            .over(partition_by=ChatSession.case_id, order_by=score_expr.desc())
+            .label("rn_best"),
+        )
+        .join(Evaluation, ChatSession.id == Evaluation.session_id)
         .filter(ChatSession.user_id == tum_id)
-        .filter(ChatSession.evaluation != None)
-        .distinct(ChatSession.case_id)
-        .order_by(ChatSession.case_id, desc(ChatSession.started_at))
+        .subquery()
+    )
+
+    query_results = (
+        db.query(session_data_subq)
+        .filter((session_data_subq.c.rn_last == 1) | (session_data_subq.c.rn_best == 1))
         .all()
     )
-    session_summary = SessionsSummaryResponse(sessions={})
-    for session in last_sessions:
-        evaluation = (
-            db.query(Evaluation).filter(Evaluation.session_id == session.id).first()
-        )
-        if evaluation:
-            ranking_response: RankingResponse = await get_ranking(
-                str(session.id), request, db
-            )
 
-            summary = SessionSummaryData(
-                sessionId=session.id,
-                score=(
-                    evaluation.criterion1_score
-                    + evaluation.criterion2_score
-                    + evaluation.criterion3_score
-                    + evaluation.criterion4_score
-                    + evaluation.criterion5_score
-                    + evaluation.criterion6_score
-                    + evaluation.criterion7_score
-                    + evaluation.criterion8_score
-                )
-                / 8.0,
-                rank=ranking_response.rank,
-                topPercentage=ranking_response.top_percentage,
-            )
-            session_summary.sessions[session.case_id] = summary
+    session_summary = SessionsSummaryResponse(sessions={})
+    case_summaries = {}
+
+    for row in query_results:
+        case_id = row.case_id
+        if case_id not in case_summaries:
+            case_summaries[case_id] = {}
+
+        if row.rn_last == 1:
+            case_summaries[case_id]["sessionId"] = row.id
+            case_summaries[case_id]["score"] = row.score
+
+        if row.rn_best == 1:
+            case_summaries[case_id]["bestSessionId"] = row.id
+            case_summaries[case_id]["bestScore"] = row.score
+
+    for case_id, data in case_summaries.items():
+        ranking_response = await get_ranking(str(data["sessionId"]), request, db)
+        summary = SessionSummaryData(
+            sessionId=data["sessionId"],
+            score=data["score"],
+            bestSessionId=data.get("bestSessionId"),
+            bestScore=data.get("bestScore"),
+            rank=ranking_response.rank,
+            topPercentage=ranking_response.top_percentage,
+        )
+        session_summary.sessions[case_id] = summary
 
     return session_summary
 

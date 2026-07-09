@@ -299,6 +299,8 @@ class SessionMessagesResponse(BaseModel):
 class SessionSummaryData(BaseModel):
     sessionId: str
     score: float
+    bestSessionId: Optional[str] = None
+    bestScore: Optional[float] = None
     rank: int
     topPercentage: float | int
 
