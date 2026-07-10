@@ -456,13 +456,11 @@ export default function LandingPage() {
               const diffStyle = getDifficultyStyle(mockDifficulty);
 
               const sessionInfo: {
-               
                 sessionId: string;
-               
+
                 score: number;
                 bestSessionId?: string | null;
                 bestScore?: number | null;
-             ;
                 rank: number;
                 topPercentage: number;
               } = sessionScores[item.id];

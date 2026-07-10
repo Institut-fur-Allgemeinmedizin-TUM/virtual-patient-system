@@ -10,7 +10,14 @@ interface CasesState {
   cases: Case[];
   sessionScores: Record<
     string,
-    { sessionId: string; score: number; bestSessionId?: string | null; bestScore?: number | null; rank: number; topPercentage: number }
+    {
+      sessionId: string;
+      score: number;
+      bestSessionId?: string | null;
+      bestScore?: number | null;
+      rank: number;
+      topPercentage: number;
+    }
   >;
   error: boolean;
   summaryError: boolean;
@@ -78,7 +85,8 @@ export const useCasesStore = create<CasesState>((set, get) => ({
           score: number;
           bestSessionId?: string | null;
           bestScore?: number | null;
-          rank: number; topPercentage: number
+          rank: number;
+          topPercentage: number;
         }
       > = {};
       for (const [caseId, sD] of Object.entries(data.sessions)) {
