@@ -25,7 +25,3 @@ export function getMarkdownContent(docType: keyof typeof MARKDOWN_CONTENT): stri
     return 'Error loading content. Please try again later.';
   }
 }
-
-
-
-
