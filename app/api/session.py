@@ -130,10 +130,13 @@ async def chat(
         vhb_session = vhb_sessions[req.session_id]
         case_id = vhb_session["case_id"]
 
-        pronouns = "sie/ihr"
+        pronouns_prompt = (
+            "\nSprich den Nutzer immer direkt und formal mit 'Sie' und 'Ihr' an. "
+            "Vermeide es, in der dritten Person über den Arzt zu sprechen."
+        )
         persona = (
             chat_functions.load_case_prompt(case_id)
-            + f"\nDie Pronomen des Nutzers (Arztes) sind: {pronouns}."
+            + pronouns_prompt
         )
 
         # Build messages from in-memory storage
@@ -180,18 +183,22 @@ async def chat(
 
     case_id = chat_session.case_id
 
-    pronouns = "sie/ihr"
     if (
         chat_session.user
         and chat_session.user.pronouns
         and chat_session.user.pronouns != "not_specified"
     ):
-        pronouns = chat_session.user.pronouns
+        pronouns_prompt = f"\nDie Pronomen des Nutzers (Arztes) sind: {chat_session.user.pronouns}."
+    else:
+        pronouns_prompt = (
+            "\nSprich den Nutzer immer direkt und formal mit 'Sie' und 'Ihr' an. "
+            "Vermeide es, in der dritten Person über den Arzt zu sprechen."
+        )
 
     persona = (
         chat_functions.load_case_prompt(case_id)
         + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX
-        + f"\nDie Pronomen des Nutzers (Arztes) sind: {pronouns}."
+        + pronouns_prompt
     )
 
     messages_to_send = [{"role": "system", "content": persona}]
@@ -308,19 +315,23 @@ async def live_websocket(
 
     case_id = chat_session.case_id
 
-    pronouns = "sie/ihr"
     if (
         chat_session.user
         and chat_session.user.pronouns
         and chat_session.user.pronouns != "not_specified"
     ):
-        pronouns = chat_session.user.pronouns
+        pronouns_prompt = f"\nDie Pronomen des Nutzers (Arztes) sind: {chat_session.user.pronouns}."
+    else:
+        pronouns_prompt = (
+            "\nSprich den Nutzer immer direkt und formal mit 'Sie' und 'Ihr' an. "
+            "Vermeide es, in der dritten Person über den Arzt zu sprechen."
+        )
 
     system_prompt = (
         chat_functions.load_case_prompt(case_id)
         + NON_SPECIFIC_QUESTION_PROMPT_SUFFIX
         + MEDICAL_DISCLAIMER
-        + f"\nDie Pronomen des Nutzers (Arztes) sind: {pronouns}."
+        + pronouns_prompt
     )
 
     await websocket.accept()
