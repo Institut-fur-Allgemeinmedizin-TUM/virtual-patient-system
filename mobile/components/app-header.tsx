@@ -36,7 +36,7 @@ export function AppHeader() {
   const pronouns = useAuthStore((state) => state.user?.pronouns);
   const updatePronouns = useAuthStore((state) => state.updatePronouns);
 
-  const getDisplayPronouns = (p?: string) => (p && p !== 'not_specified' ? p : 'sie/ihr');
+  const getDisplayPronouns = (p?: string) => (p && p !== 'not_specified' ? p : '');
 
   const [localPronouns, setLocalPronouns] = useState(getDisplayPronouns(pronouns));
 
@@ -46,9 +46,9 @@ export function AppHeader() {
 
   const handlePronounsBlur = () => {
     if (localPronouns !== getDisplayPronouns(pronouns)) {
-      updatePronouns(localPronouns || 'sie/ihr');
+      updatePronouns(localPronouns || 'not_specified');
       if (!localPronouns) {
-        setLocalPronouns('sie/ihr');
+        setLocalPronouns('');
       }
     }
   };
