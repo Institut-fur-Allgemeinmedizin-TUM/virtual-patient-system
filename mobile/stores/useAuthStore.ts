@@ -194,7 +194,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   updatePronouns: async (pronouns: string) => {
     try {
-      const res = await apiClient.user.updateUserProfileApiUserProfilePut({ pronouns });
+      const res = await apiClient.api.updateUserProfileApiUserProfilePut({ pronouns });
       if (res.status === 200) {
         set((state) => ({
           user: state.user ? { ...state.user, pronouns: res.data.pronouns } : undefined,

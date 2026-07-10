@@ -23,7 +23,7 @@ export const useLeaderboardStore = create<LeaderboardState>((set) => ({
   fetchLeaderboard: async (caseId: string) => {
     set({ isLeaderboardLoading: true, leaderboardError: undefined });
     try {
-      const resp = await apiClient.api.getLeaderboard(caseId);
+      const resp = await apiClient.api.leaderboardApiStatsLeaderboardCaseIdGet(caseId);
 
       if (resp.status === 200 && resp.data) {
         const entries = resp.data.top_entries || [];

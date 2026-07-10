@@ -259,6 +259,7 @@ export function AppHeader() {
                     value={localPronouns}
                     onChangeText={setLocalPronouns}
                     onBlur={handlePronounsBlur}
+                    onSubmitEditing={handlePronounsBlur}
                     style={styles.pronounsInput}
                     dense
                   />
