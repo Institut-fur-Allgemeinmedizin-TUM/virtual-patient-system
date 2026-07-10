@@ -134,10 +134,7 @@ async def chat(
             "\nSprich den Nutzer immer direkt und formal mit 'Sie' und 'Ihr' an. "
             "Vermeide es, in der dritten Person über den Arzt zu sprechen."
         )
-        persona = (
-            chat_functions.load_case_prompt(case_id)
-            + pronouns_prompt
-        )
+        persona = chat_functions.load_case_prompt(case_id) + pronouns_prompt
 
         # Build messages from in-memory storage
         messages_to_send = [{"role": "system", "content": persona}]
@@ -188,7 +185,9 @@ async def chat(
         and chat_session.user.pronouns
         and chat_session.user.pronouns != "not_specified"
     ):
-        pronouns_prompt = f"\nDie Pronomen des Nutzers (Arztes) sind: {chat_session.user.pronouns}."
+        pronouns_prompt = (
+            f"\nDie Pronomen des Nutzers (Arztes) sind: {chat_session.user.pronouns}."
+        )
     else:
         pronouns_prompt = (
             "\nSprich den Nutzer immer direkt und formal mit 'Sie' und 'Ihr' an. "
@@ -320,7 +319,9 @@ async def live_websocket(
         and chat_session.user.pronouns
         and chat_session.user.pronouns != "not_specified"
     ):
-        pronouns_prompt = f"\nDie Pronomen des Nutzers (Arztes) sind: {chat_session.user.pronouns}."
+        pronouns_prompt = (
+            f"\nDie Pronomen des Nutzers (Arztes) sind: {chat_session.user.pronouns}."
+        )
     else:
         pronouns_prompt = (
             "\nSprich den Nutzer immer direkt und formal mit 'Sie' und 'Ihr' an. "
