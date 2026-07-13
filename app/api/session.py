@@ -1012,7 +1012,7 @@ async def get_last_session_summary(
             case_summaries[case_id]["bestScore"] = row.score
 
     for case_id, data in case_summaries.items():
-        ranking_response = await get_ranking(str(data["sessionId"]), request, db)
+        ranking_response = await get_ranking(str(data["bestSessionId"]), request, db)
         summary = SessionSummaryData(
             sessionId=data["sessionId"],
             score=data["score"],
