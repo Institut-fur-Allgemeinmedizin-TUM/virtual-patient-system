@@ -26,6 +26,7 @@ from sqlalchemy import func, select, desc
 from sqlalchemy.orm import Session as OrmSession
 from starlette.responses import JSONResponse
 
+from app.api.medical_background import get_medical_background_available, BACKGROUNDS
 from app.api.memory import vhb_sessions, logger
 from app.auth import auth
 from app.config.config import settings
@@ -50,6 +51,8 @@ from app.model.models import (
     SessionUserFeedback,
     FeedBackMarkerType,
     Session,
+    Diagnostic,
+    session_diagnostics,
 )
 from app.model.models import (
     SessionLiveDefaultTime,
@@ -846,7 +849,27 @@ async def evaluate_session(
 
     conversation_text = "\n\n".join(conversation)
 
-    evaluation_prompt = get_evaluation_prompt(conversation_text)
+    if not chat_session.case_id in BACKGROUNDS:
+        # Return json of background
+        raise HTTPException(
+            status_code=404, detail=f"Case '{chat_session}' not found during evaluation"
+        )
+
+    available_diagnostics = BACKGROUNDS[str(chat_session.case_id)]
+
+    used_diagnostics = (
+        db.query(Diagnostic.name)
+        .join(session_diagnostics, Diagnostic.id == session_diagnostics.c.diagnostic_id)
+        .filter(session_diagnostics.c.session_id == session_id)
+        .all()
+    )
+
+    used_diagnostics_names = [str(row[0]) for row in used_diagnostics]
+    used_diagnostics_text = ", ".join(used_diagnostics_names)
+
+    evaluation_prompt = get_evaluation_prompt(
+        conversation_text, available_diagnostics, used_diagnostics_text
+    )
 
     # Call OpenAI to generate evaluation (or simulate in test mode)
     try:
