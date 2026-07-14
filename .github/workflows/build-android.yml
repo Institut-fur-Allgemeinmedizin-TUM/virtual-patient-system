@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - fe-mobile-app
+      - test/mobile-app
     paths:
       - "mobile/**"
       - ".github/workflows/build-android.yml"
@@ -17,6 +17,7 @@ jobs:
     env:
       # Matches your local variable usage
       ANDROID_HOME: /usr/local/lib/android/sdk
+      EXPO_PUBLIC_BACKEND_URL: https://beta.virtual-patients-tum.com
 
     steps:
       - name: Checkout
@@ -42,13 +43,23 @@ jobs:
         working-directory: mobile
         run: npm ci
 
+      - name: Cache Gradle wrapper and caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('mobile/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Expo prebuild (Android)
         working-directory: mobile
         run: npx expo prebuild --platform android --non-interactive
 
       - name: Build release APK
         working-directory: mobile/android
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --build-cache
 
       - name: Upload APK as GitHub artifact
         uses: actions/upload-artifact@v4

@@ -46,7 +46,7 @@ function readApiErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   authError: '',
   authChecked: false,
   isAuthenticated: false,
@@ -140,7 +140,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
 
       await saveAccessToken(token);
-      set({ isAuthenticated: true });
+      await get().checkStoredToken();
       return true;
     } catch (error) {
       console.error('Login error:', error);
@@ -166,7 +166,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         if (data?.token && typeof data.token === 'string') {
           await saveAccessToken(data.token);
         }
-        set({ isAuthenticated: true, vhbLoading: false });
+        await get().checkStoredToken();
+        set({ vhbLoading: false });
         return true;
       }
 

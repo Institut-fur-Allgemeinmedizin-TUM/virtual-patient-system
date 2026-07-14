@@ -43,3 +43,7 @@ clean:
 	rm -rf __pycache__
 	rm -rf .pytest_cache
 	rm -rf mobile/node_modules
+
+build-apk: setup-frontend
+	cd mobile && EXPO_PUBLIC_BACKEND_URL=$(EXPO_PUBLIC_BACKEND_URL) npx expo prebuild -p android --clean
+	cd mobile/android && EXPO_PUBLIC_BACKEND_URL=$(EXPO_PUBLIC_BACKEND_URL) ./gradlew assembleRelease
