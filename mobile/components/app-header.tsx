@@ -463,6 +463,7 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     bottom: 0,
+    flex: 1,
   },
   profileIdentityRow: {
     paddingHorizontal: 16,
