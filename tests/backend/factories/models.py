@@ -1,7 +1,7 @@
 from app.model.models import Case, Evaluation, Message, Session, SessionUserFeedback
 
 
-def create_case(db, case_id: str = "bauchschmerzen") -> Case:
+def create_case(db, case_id: str = "brustschmerzen") -> Case:
     case = Case(id=case_id, title=f"Case {case_id}", language="de")
     db.add(case)
     db.commit()
@@ -9,7 +9,7 @@ def create_case(db, case_id: str = "bauchschmerzen") -> Case:
 
 
 def create_session(
-    db, session_id: str, case_id: str = "bauchschmerzen", user_id: str = "ge38qap"
+    db, session_id: str, case_id: str = "brustschmerzen", user_id: str = "ge38qap"
 ) -> Session:
     session = Session(id=session_id, case_id=case_id, user_id=user_id)
     db.add(session)
