@@ -1,9 +1,19 @@
-def get_evaluation_prompt(conversation_text: str) -> str:
+def get_evaluation_prompt(
+    conversation_text: str, available_diagnostics: str, used_diagnostics: str
+) -> str:
     return f"""Sie sind ein medizinischer Ausbilder, der die Anamnese-Fähigkeiten eines Arztes bewertet.
 
 Analysieren Sie das folgende Gespräch zwischen einem Arzt (User) und einem Patienten (Assistant):
 
 {conversation_text}
+
+Im folgenden finden Sie alle diagnostischen Informationen, die dem Arzt (User) zur Verfügung gestanden wären:
+
+{available_diagnostics}
+
+Der Arzt (User) nutzte dabei nur die folgenden und hat auch nur diese gesehen: {used_diagnostics}
+
+Nutzen Sie diese Information und beziehen Sie sich auch in der Bewertung darauf, ob diese diagnostischen Informationen korrekt verwendet wurden oder gegebenenfalls Mittel der Praxis / des Labors  oder Zeit verschwendet wurden. Beziehen Sie sich nicht darauf, wann diese verwendet wurden, da Sie diese Information nicht haben.
 
 Geben Sie strukturiertes Feedback dazu, wie der Nutzer in seiner Rolle als Arzt die Anamnese verbessern könnte. Das Feedback basiert auf den Kriterien der CRI-HTS (Clinical Rating Interview – History Taking Scale). 
 
