@@ -75,7 +75,6 @@ BACKGROUNDS: dict[str, dict[str, DiagnosticGroup]] = _load_backgrounds_from_disk
 
 @diagnostics_router.get("/api/diagnostics/{case_id}/available")
 async def get_medical_background_available(
-    request: Request,
     case_id: str = Path(description="The case to retrieve from the backend."),
 ) -> MedicalBackgroundsAvailableResponse:
     if not case_id in BACKGROUNDS:
