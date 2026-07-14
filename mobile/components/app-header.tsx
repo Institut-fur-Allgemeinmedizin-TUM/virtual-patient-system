@@ -388,9 +388,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   sidebarModalContainer: {
-    flex: 1,
     margin: 0,
-    opacity: 100,
+    opacity: 1,
+    width: '100%',
+    height: '100%',
   },
   sidebarLayout: {
     flex: 1,
@@ -401,7 +402,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sidebarPanel: {
-    height: '100%',
+    flex: 1,
   },
   profileIdentityRow: {
     paddingHorizontal: 16,
