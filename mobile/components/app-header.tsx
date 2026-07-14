@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import {
   Appbar,
   Button,
   Dialog,
   Divider,
   Drawer,
-  Modal,
   Portal,
   Surface,
   TextInput,
@@ -26,7 +25,7 @@ export function AppHeader() {
   const { width } = useWindowDimensions();
   const { colors } = useTheme();
   const pathname = usePathname();
-  const sidebarWidth = Math.min(Math.max(width * 0.78, 260), 340);
+  const sidebarWidth = Platform.OS === 'ios' ? width : Math.min(Math.max(width * 0.78, 260), 340);
   const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
   const tumId = useAuthStore((state) => state.user?.tum_id);
   const roles = useAuthStore((state) => state.user?.roles);
@@ -186,14 +185,8 @@ export function AppHeader() {
       </Appbar.Header>
 
       <Portal>
-        <Modal
-          visible={profileSidebarOpen}
-          onDismiss={() => setProfileSidebarOpen(false)}
-          dismissable
-          dismissableBackButton
-          contentContainerStyle={styles.sidebarModalContainer}
-        >
-          <View style={styles.sidebarLayout}>
+        {profileSidebarOpen ? (
+          <View style={styles.sidebarOverlay}>
             <Pressable
               style={styles.sidebarBackdropTouchZone}
               onPress={() => setProfileSidebarOpen(false)}
@@ -361,7 +354,7 @@ export function AppHeader() {
               </View>
             </Surface>
           </View>
-        </Modal>
+        ) : null}
 
         <MarkdownModal
           visible={imprintModalOpen}
@@ -458,21 +451,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 13,
   },
-  sidebarModalContainer: {
-    flex: 1,
-    margin: 0,
-    opacity: 100,
-  },
-  sidebarLayout: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+  sidebarOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1000,
   },
   sidebarBackdropTouchZone: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
   },
   sidebarPanel: {
-    height: '100%',
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
   },
   profileIdentityRow: {
     paddingHorizontal: 16,
