@@ -451,7 +451,7 @@ export default function SessionScreen() {
               style={styles.footerHint}
               labelStyle={{ textAlign: 'left' }}
             >
-              Antworten sind KI generiert!
+              Antworten sind KI generiert. Geben Sie keine sensiblen Daten ein!
             </Button>
           </Surface>
 
