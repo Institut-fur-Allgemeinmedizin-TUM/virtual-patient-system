@@ -14,6 +14,7 @@ import {
   Dialog,
   TextInput,
   IconButton,
+  ProgressBar,
 } from 'react-native-paper';
 import { useSessionStore } from '@/stores/useSessionStore';
 import DiagnosticsPanel from './DiagnosticsPanel';
@@ -39,6 +40,35 @@ export default function EvaluationModal() {
 
   const [showTranscript, setShowTranscript] = useState(false);
   const [isDiagnosticsVisible, setIsDiagnosticsVisible] = useState(false);
+  const [fakeProgress, setFakeProgress] = useState(0);
+
+  useEffect(() => {
+    if (!loading) {
+      setFakeProgress(0);
+      return;
+    }
+
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = (Date.now() - startTime) / 1000;
+      let newProgress;
+      
+      if (elapsed <= 39) {
+        // Reach exactly 95% at 39s. 
+        // Using exponent 0.9 makes it start a bit slower than a steep curve,
+        // and maintains a healthy speed so it doesn't stagnate at the end.
+        newProgress = 0.95 * Math.pow(elapsed / 39, 0.9);
+      } else {
+        // After 35s, keep creeping forward slowly so it never fully stops.
+        const extraTime = elapsed - 35;
+        newProgress = 0.95 + (0.03 * (extraTime / 20));
+      }
+
+      setFakeProgress(Math.min(newProgress, 0.98));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const handleOpenDiagnostics = () => {
     if (evaluation?.session_id && sessionCase?.id) {
@@ -151,9 +181,26 @@ export default function EvaluationModal() {
             {loading ? (
               <View style={styles.loadingWrap}>
                 <ActivityIndicator size="large" color={theme.colors.primary} />
-                <Text style={{ marginTop: 12, color: theme.colors.onSurface }}>
+                <Text style={{ marginTop: 16, color: theme.colors.onSurface, fontWeight: 'bold' }}>
                   Evaluation läuft …
                 </Text>
+                <View style={{ width: '100%', marginTop: 24, maxWidth: 400 }}>
+                  <ProgressBar
+                    progress={fakeProgress}
+                    color={theme.colors.primary}
+                    style={{ height: 8, borderRadius: 4 }}
+                  />
+                  <Text
+                    style={{
+                      marginTop: 12,
+                      color: theme.colors.onSurfaceVariant,
+                      textAlign: 'center',
+                      fontSize: 13,
+                    }}
+                  >
+                    Bitte haben Sie einen Moment Geduld.{'\n'}Dies kann bis zu 2 Minuten dauern.
+                  </Text>
+                </View>
               </View>
             ) : evaluation ? (
               <>
