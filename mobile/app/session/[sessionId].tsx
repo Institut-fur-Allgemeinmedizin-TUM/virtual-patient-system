@@ -109,9 +109,9 @@ export default function SessionScreen() {
       sendMessage();
     }
   };
+  const messagesLeft = Math.max(0, 10 - (session.chatHistory?.length || 0));
   const canEvaluate =
-    session.chatHistory &&
-    session.chatHistory.length >= 10 &&
+    messagesLeft === 0 &&
     !session.waitingForEvaluationResponse &&
     !isBotTyping;
   const evaluate = () => {
@@ -223,17 +223,29 @@ export default function SessionScreen() {
                   accessibilityLabel="Diagnostik"
                 />
               )}
-              <Button
-                icon="chart-box-outline"
-                style={styles.evaluateButton}
-                compact={true}
-                mode="outlined"
-                onPress={() => evaluate()}
-                disabled={!canEvaluate}
-                loading={session.waitingForEvaluationResponse}
-              >
-                Evaluate
-              </Button>
+              <View style={[styles.evaluateButton, { alignItems: 'center' }]}>
+                <Button
+                  icon="chart-box-outline"
+                  compact={true}
+                  mode="outlined"
+                  onPress={() => evaluate()}
+                  disabled={!canEvaluate}
+                  loading={session.waitingForEvaluationResponse}
+                >
+                  Evaluate
+                </Button>
+                {messagesLeft > 0 && (
+                  <Text
+                    style={{
+                      fontSize: 10,
+                      color: theme.colors.onSurfaceVariant,
+                      marginTop: 2,
+                    }}
+                  >
+                    Noch {messagesLeft}
+                  </Text>
+                )}
+              </View>
             </View>
 
             <View style={styles.chatBody}>
