@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import copy
 
 from fastapi import APIRouter, HTTPException, Request, Depends, Query, Path
 from sqlalchemy.orm import Session as OrmSession
@@ -118,7 +119,7 @@ async def get_medical_background(
     if not diagnostic in BACKGROUNDS[case_id]:
         raise HTTPException(status_code=404, detail="Diagnostic not found")
 
-    diagnostic_ret = BACKGROUNDS[case_id][diagnostic]
+    diagnostic_ret = copy.deepcopy(BACKGROUNDS[case_id][diagnostic])
     if diagnostic_ret.data is not None:
         for i in range(len(diagnostic_ret.data)):
             is_large_data = (

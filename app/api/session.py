@@ -852,7 +852,7 @@ async def evaluate_session(
     if not chat_session.case_id in BACKGROUNDS:
         # Return json of background
         raise HTTPException(
-            status_code=404, detail=f"Case '{chat_session}' not found during evaluation"
+            status_code=404, detail=f"Case '{chat_session.case_id}' not found during evaluation"
         )
 
     available_diagnostics = BACKGROUNDS[str(chat_session.case_id)]
