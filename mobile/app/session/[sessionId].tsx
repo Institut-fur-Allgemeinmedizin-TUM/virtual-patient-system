@@ -449,7 +449,7 @@ export default function SessionScreen() {
               icon="information-outline"
               compact
               style={styles.footerHint}
-              labelStyle={{ textAlign: 'left' }}
+              labelStyle={{ textAlign: 'left', color: '#ea0606' }}
             >
               Antworten sind KI generiert. Geben Sie keine sensiblen Daten ein!
             </Button>
