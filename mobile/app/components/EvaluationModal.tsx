@@ -52,16 +52,16 @@ export default function EvaluationModal() {
     const interval = setInterval(() => {
       const elapsed = (Date.now() - startTime) / 1000;
       let newProgress;
-      
+
       if (elapsed <= 39) {
-        // Reach exactly 95% at 39s. 
+        // Reach exactly 95% at 39s.
         // Using exponent 0.9 makes it start a bit slower than a steep curve,
         // and maintains a healthy speed so it doesn't stagnate at the end.
         newProgress = 0.95 * Math.pow(elapsed / 39, 0.9);
       } else {
         // After 35s, keep creeping forward slowly so it never fully stops.
         const extraTime = elapsed - 35;
-        newProgress = 0.95 + (0.03 * (extraTime / 20));
+        newProgress = 0.95 + 0.03 * (extraTime / 20);
       }
 
       setFakeProgress(Math.min(newProgress, 0.98));
