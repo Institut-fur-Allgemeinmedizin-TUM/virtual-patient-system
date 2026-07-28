@@ -14,21 +14,17 @@ import {
   Button,
   Searchbar,
   Snackbar,
+  SegmentedButtons,
 } from 'react-native-paper';
-import Svg, { Path } from 'react-native-svg';
-import Animated, {
-  useAnimatedProps,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-  Easing,
-  interpolate,
-} from 'react-native-reanimated';
 import { useAnalyticsStore } from '@/stores/useAnalyticsStore';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { mapEvaluationKeyToLabel } from '@/lib/evaluations';
 import EvaluationModal from '@/app/components/EvaluationModal';
+import { EvaluationBarChart } from '@/app/components/EvaluationBarChart';
+import { EvaluationRadarChart } from '@/app/components/EvaluationRadarChart';
+import { CorrelationScatterPlot } from '@/app/components/CorrelationScatterPlot';
+import { ScoreDistributionChart } from '@/app/components/ScoreDistributionChart';
 import {
   SortDirection,
   SessionHistoryOrderBy,
@@ -37,160 +33,8 @@ import {
 } from '@/services/api';
 import { useAuthStore } from '@/stores/useAuthStore';
 
-const AnimatedPath = Animated.createAnimatedComponent(Path);
-
 // ==========================================
-// WAVE ANIMATION CONSTANTS & UTILITIES
-// ==========================================
-
-// Fine-tuned wave parameters for optimal visual appearance
-const WAVE_CONFIG = {
-  AMPLITUDE: 20, // Height of each wave peak in pixels
-  FREQUENCY: 100, // Horizontal distance between wave peaks
-  SEGMENTS: 28, // Number of wave segments (higher = smoother but more compute)
-  OFFSET_MULTIPLIER: 100, // Amount to shift wave per cycle
-  FILL_DURATION: 1500, // Duration of score fill animation (ms)
-  WAVE_DURATION: 2800, // Duration of wave cycle (slower = more elegant)
-  CARD_HEIGHT: 160,
-  PADDING_BOTTOM: 20, // Minimum padding from top when score is at max
-};
-
-/**
- * Generates an optimized SVG wave path with smooth cubic bezier curves.
- * Uses memoized calculations to reduce computation overhead per frame.
- */
-const generateWavePath = (
-  startX: number,
-  baseY: number,
-  amplitude: number,
-  frequency: number,
-  segments: number,
-  cardHeight: number,
-): string => {
-  let path = `M ${startX} ${baseY}`;
-
-  // Generate wave segments with optimized control points
-  for (let i = 0; i < segments; i++) {
-    const segmentX = startX + i * frequency;
-    // Control points create smooth wave peaks and troughs
-    const cp1X = segmentX + frequency * 0.25;
-    const cp1Y = baseY - amplitude;
-    const cp2X = segmentX + frequency * 0.75;
-    const cp2Y = baseY + amplitude;
-    const endX = segmentX + frequency;
-
-    path += ` C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${endX} ${baseY}`;
-  }
-
-  // Close the path to fill the area below the wave
-  path += ` V ${cardHeight} H ${startX} Z`;
-  return path;
-};
-
-// ==========================================
-// 1. WAVE SCORE CARD COMPONENT (TYPESCRIPT)
-// ==========================================
-
-interface WaveScoreCardProps {
-  score: number;
-  maxScore: number;
-  label: string;
-}
-
-const WaveScoreCard: React.FC<WaveScoreCardProps> = ({ score, maxScore, label }) => {
-  const theme = useTheme();
-
-  const fillLevel = useSharedValue<number>(0);
-  const waveOffset = useSharedValue<number>(0);
-
-  useEffect(() => {
-    // Smooth fill animation with elegant easing
-    fillLevel.value = withTiming(score / maxScore, {
-      duration: WAVE_CONFIG.FILL_DURATION,
-      easing: Easing.out(Easing.cubic),
-    });
-
-    // Continuous, smooth wave motion
-    waveOffset.value = withRepeat(
-      withTiming(1, {
-        duration: WAVE_CONFIG.WAVE_DURATION,
-        easing: Easing.linear,
-      }),
-      -1,
-      false,
-    );
-  }, [score, maxScore, fillLevel, waveOffset]);
-
-  const animatedProps = useAnimatedProps(() => {
-    // Shift wave horizontally for continuous motion effect
-    const moveX = interpolate(waveOffset.value, [0, 1], [0, -WAVE_CONFIG.FREQUENCY]);
-
-    // Invert Y: higher score moves wave up (lower Y value)
-    const moveY = interpolate(
-      fillLevel.value,
-      [0, 1],
-      [WAVE_CONFIG.CARD_HEIGHT, WAVE_CONFIG.PADDING_BOTTOM],
-    );
-
-    // Generate optimized wave path
-    const d = generateWavePath(
-      moveX,
-      moveY,
-      WAVE_CONFIG.AMPLITUDE,
-      WAVE_CONFIG.FREQUENCY,
-      WAVE_CONFIG.SEGMENTS,
-      WAVE_CONFIG.CARD_HEIGHT,
-    );
-
-    return { d };
-  });
-
-  // Enhanced color scheme for better visual appeal
-  const cardBackgroundColor = theme.dark ? theme.colors.surfaceVariant : theme.colors.surface;
-  const cardBorderColor = theme.colors.outlineVariant;
-  const waveFillColor = theme.dark ? theme.colors.primaryContainer : theme.colors.primary;
-  // Increased opacity for better visibility and elegance
-  const waveOpacity = theme.dark ? 0.85 : 0.24;
-
-  return (
-    <Surface
-      style={[
-        styles.card,
-        {
-          height: WAVE_CONFIG.CARD_HEIGHT,
-          backgroundColor: cardBackgroundColor,
-          borderColor: cardBorderColor,
-        },
-      ]}
-      elevation={3}
-    >
-      <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        <Svg width="100%" height="100%">
-          <AnimatedPath
-            animatedProps={animatedProps}
-            fill={waveFillColor}
-            fillOpacity={waveOpacity}
-            strokeWidth={0}
-          />
-        </Svg>
-      </View>
-      <View style={styles.cardContent}>
-        <Text variant="displaySmall" style={[styles.scoreText, { color: theme.colors.onSurface }]}>
-          {Number(score).toFixed(2)}/{maxScore}
-        </Text>
-        <Text
-          variant="labelLarge"
-          style={[styles.labelText, { color: theme.colors.onSurfaceVariant }]}
-        >
-          {label}
-        </Text>
-      </View>
-    </Surface>
-  );
-};
-
-// ==========================================
-// 2. DYNAMIC TABLE TYPES & DATA
+// 1. DYNAMIC TABLE TYPES & DATA
 // ==========================================
 
 type ColumnId = SessionHistoryColumn;
@@ -265,6 +109,9 @@ const AnalyticsDashboard = () => {
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [searchColumn, setSearchColumn] = useState<ColumnId>(SessionHistoryColumn.Id);
+
+  // Toggle for top overview chart
+  const [overviewChartType, setOverviewChartType] = useState<'radar' | 'bar'>('radar');
 
   const dashboardOverview = useAnalyticsStore((state) => state.dashboardOverview);
   const loadDashboardOverview = useAnalyticsStore((state) => state.loadDashboardOverview);
@@ -451,49 +298,35 @@ const AnalyticsDashboard = () => {
         />
       </View>
 
-      {/* --- Top Section: The Grid Boxes remain unchanged --- */}
-      <View style={styles.gridContainer}>
-        <WaveScoreCard
-          score={dashboardOverview?.avg_scores?.avg_criterion1_score ?? 0}
-          maxScore={5}
-          label={mapEvaluationKeyToLabel('criterion1')}
-        />
-        <WaveScoreCard
-          score={dashboardOverview?.avg_scores?.avg_criterion2_score ?? 0}
-          maxScore={5}
-          label={mapEvaluationKeyToLabel('criterion2')}
-        />
-        <WaveScoreCard
-          score={dashboardOverview?.avg_scores?.avg_criterion3_score ?? 0}
-          maxScore={5}
-          label={mapEvaluationKeyToLabel('criterion3')}
-        />
-        <WaveScoreCard
-          score={dashboardOverview?.avg_scores?.avg_criterion4_score ?? 0}
-          maxScore={5}
-          label={mapEvaluationKeyToLabel('criterion4')}
-        />
-        <WaveScoreCard
-          score={dashboardOverview?.avg_scores?.avg_criterion5_score ?? 0}
-          maxScore={5}
-          label={mapEvaluationKeyToLabel('criterion5')}
-        />
-        <WaveScoreCard
-          score={dashboardOverview?.avg_scores?.avg_criterion6_score ?? 0}
-          maxScore={5}
-          label={mapEvaluationKeyToLabel('criterion6')}
-        />
-        <WaveScoreCard
-          score={dashboardOverview?.avg_scores?.avg_criterion7_score ?? 0}
-          maxScore={5}
-          label={mapEvaluationKeyToLabel('criterion7')}
-        />
-        <WaveScoreCard
-          score={dashboardOverview?.avg_scores?.avg_criterion8_score ?? 0}
-          maxScore={5}
-          label={mapEvaluationKeyToLabel('criterion8')}
-        />
-      </View>
+      {/* --- Top Section: Overview Charts --- */}
+      {dashboardOverview?.avg_scores && (
+        <View style={{ marginBottom: 8 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 16 }}>
+            <SegmentedButtons
+              value={overviewChartType}
+              onValueChange={(val) => setOverviewChartType(val as 'radar' | 'bar')}
+              buttons={[
+                { value: 'radar', label: 'Skills Web', icon: 'spider-web' },
+                { value: 'bar', label: 'Bar Chart', icon: 'chart-bar' },
+              ]}
+              style={{ maxWidth: 350 }}
+            />
+          </View>
+          {overviewChartType === 'radar' ? (
+            <EvaluationRadarChart scores={dashboardOverview.avg_scores as Record<string, number>} maxScore={5} />
+          ) : (
+            <EvaluationBarChart scores={dashboardOverview.avg_scores as Record<string, number>} maxScore={5} />
+          )}
+        </View>
+      )}
+
+      {/* --- Middle Section: Advanced Analytics --- */}
+      {sessionRecords && sessionRecords.length > 0 && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
+          <CorrelationScatterPlot records={sessionRecords} />
+          <ScoreDistributionChart records={sessionRecords} />
+        </View>
+      )}
 
       {/* --- Bottom Section: Column-Oriented Data Table --- */}
       <View
@@ -828,38 +661,7 @@ const styles = StyleSheet.create({
   scrollContent: { padding: 16 },
   pageTitle: { fontWeight: 'bold', marginBottom: 20 },
   sectionTitle: { fontWeight: 'bold', marginTop: 10, marginBottom: 12 },
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  card: {
-    width: '48%',
-    borderRadius: 24,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  cardContent: {
-    alignItems: 'center',
-    zIndex: 2,
-    // Enhanced shadow effect for depth
-    elevation: 1,
-  },
-  scoreText: {
-    fontWeight: '900',
-    marginBottom: 6,
-    letterSpacing: 0.5,
-  },
-  labelText: {
-    opacity: 0.8,
-    textTransform: 'uppercase',
-    letterSpacing: 1.2,
-    fontSize: 11,
-  },
+
   timeRangeDropdown: {
     borderRadius: 12,
     borderWidth: StyleSheet.hairlineWidth,
