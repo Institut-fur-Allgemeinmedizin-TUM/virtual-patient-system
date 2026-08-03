@@ -259,15 +259,19 @@ export default function DiagnosticsPanel({
                   style={styles.diagButton}
                   disabled={isLoading || (!isLoaded && readOnly)}
                   loading={isLoading}
-                  icon={isLoaded ? (hiddenDiagnostics[diag.name] ? 'chevron-down' : 'chevron-up') : undefined}
-                  contentStyle={isLoaded ? { flexDirection: 'row-reverse', justifyContent: 'space-between' } : undefined}
-                  textColor={
-                    theme.dark
-                      ? '#FFFFFF'
-                      : isLoaded
-                        ? undefined
-                        : theme.colors.primary
+                  icon={
+                    isLoaded
+                      ? hiddenDiagnostics[diag.name]
+                        ? 'chevron-down'
+                        : 'chevron-up'
+                      : undefined
                   }
+                  contentStyle={
+                    isLoaded
+                      ? { flexDirection: 'row-reverse', justifyContent: 'space-between' }
+                      : undefined
+                  }
+                  textColor={theme.dark ? '#FFFFFF' : isLoaded ? undefined : theme.colors.primary}
                 >
                   {diag.display_name}
                 </Button>
