@@ -60,7 +60,9 @@ export const ScoreDistributionChart: React.FC<ScoreDistributionChartProps> = ({ 
   const graphHeight = height - padding.top - padding.bottom;
 
   // Ensure the scale handles at least 5 so the chart doesn't look weird when empty or low counts
-  const maxCount = Math.max(...buckets.map((b) => b.count), 5);
+  // Add 1 to the actual max so the peak data label isn't clipped by the top of the graph
+  const actualMax = Math.max(...buckets.map((b) => b.count));
+  const maxCount = Math.max(actualMax > 0 ? actualMax + 1 : 5, 5);
 
   const renderSvg = (width: number) => {
     const graphWidth = width - padding.left - padding.right;
