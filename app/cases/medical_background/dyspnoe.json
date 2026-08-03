@@ -1,6 +1,6 @@
 {
-  "schnelltests": {
-    "display_name": "Schnelltests",
+  "troponin_i": {
+    "display_name": "Troponin I",
     "data": {
       "troponin_i": {
         "display_name": "Troponin I (semiquant.) [< 40 ng/l]",
@@ -8,28 +8,126 @@
         "data_type": "string",
         "data": "negativ"
       },
+      "troponin_befund": {
+        "display_name": "Troponin negativ",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein Hinweis auf einen akuten Myokardschaden."
+      }
+    }
+  },
+  "d_dimer": {
+    "display_name": "D-Dimer",
+    "data": {
       "d_dimer": {
         "display_name": "D-Dimer (semiquant.) [< 0,5 mg/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ"
       },
+      "d_dimer_befund": {
+        "display_name": "D-Dimer negativ",
+        "unit": "",
+        "data_type": "string",
+        "data": "Spricht gegen eine Lungenembolie als Ursache der Dyspnoe."
+      }
+    }
+  },
+  "crp": {
+    "display_name": "CRP",
+    "data": {
       "crp": {
         "display_name": "CRP (semiquant.) [< 5 mg/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ (4 mg/l)"
       },
+      "crp_befund": {
+        "display_name": "CRP negativ (4 mg/l)",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein Hinweis auf eine pneumonische oder sonstige floride Infektion."
+      }
+    }
+  },
+  "kapillarblutglukose": {
+    "display_name": "Kapillarblutglukose",
+    "data": {
       "glukose": {
         "display_name": "Kapillarblutglukose [70-100 mg/dl]",
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 138
+      },
+      "glukose_befund": {
+        "display_name": "Glukose erhöht (138 mg/dl)",
+        "unit": "",
+        "data_type": "string",
+        "data": "Erhöhter Wert im Rahmen des bekannten Diabetes mellitus Typ 2."
       }
     }
   },
-  "differentialblutbild": {
-    "display_name": "Differentialblutbild",
+  "kleines_blutbild": {
+    "display_name": "kleines Blutbild",
+    "data": {
+      "hb": {
+        "display_name": "Hämoglobin (Hb) [12,0 – 16,0]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 12.6
+      },
+      "hkt": {
+        "display_name": "Hämatokrit (Hkt) [36 – 46]",
+        "unit": "%",
+        "data_type": "integer",
+        "data": 38
+      },
+      "erythrozyten": {
+        "display_name": "Erythrozyten [4,0 – 5,2]",
+        "unit": "Mio./µl",
+        "data_type": "float",
+        "data": 4.3
+      },
+      "mcv": {
+        "display_name": "MCV [80 – 100]",
+        "unit": "fl",
+        "data_type": "integer",
+        "data": 88
+      },
+      "mch": {
+        "display_name": "MCH [27 – 34]",
+        "unit": "pg",
+        "data_type": "integer",
+        "data": 29
+      },
+      "mchc": {
+        "display_name": "MCHC [31,5 – 36,0]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 33.0
+      },
+      "leukozyten_gesamt": {
+        "display_name": "Leukozyten gesamt [4,0 – 10,0]",
+        "unit": "G/l",
+        "data_type": "float",
+        "data": 7.8
+      },
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 210
+      },
+      "hb_befund": {
+        "display_name": "Hb niedrig-normal (12,6 g/dl)",
+        "unit": "",
+        "data_type": "string",
+        "data": "Eine Anämie als (Mit-)Ursache der Dyspnoe ist damit weitgehend ausgeschlossen."
+      }
+    }
+  },
+  "grosses_blutbild": {
+    "display_name": "großes Blutbild",
     "data": {
       "hb": {
         "display_name": "Hämoglobin (Hb) [12,0 – 16,0]",
@@ -117,188 +215,26 @@
       }
     }
   },
-  "labor_bewertung": {
-    "display_name": "Bewertung",
+  "auskultation": {
+    "display_name": "Auskultation",
     "data": {
-      "troponin_befund": {
-        "display_name": "Troponin negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf einen akuten Myokardschaden."
-      },
-      "d_dimer_befund": {
-        "display_name": "D-Dimer negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Spricht gegen eine Lungenembolie als Ursache der Dyspnoe."
-      },
-      "crp_befund": {
-        "display_name": "CRP negativ (4 mg/l)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine pneumonische oder sonstige floride Infektion."
-      },
-      "hb_befund": {
-        "display_name": "Hb niedrig-normal (12,6 g/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Eine Anämie als (Mit-)Ursache der Dyspnoe ist damit weitgehend ausgeschlossen."
-      },
-      "glukose_befund": {
-        "display_name": "Glukose erhöht (138 mg/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Erhöhter Wert im Rahmen des bekannten Diabetes mellitus Typ 2."
-      },
-      "gesamtbeurteilung": {
-        "display_name": "Gesamtbeurteilung",
-        "unit": "",
-        "data_type": "string",
-        "data": "Die Laborwerte schliessen Lungenembolie, akutes Koronarsyndrom, Pneumonie und Anämie als Ursache der Dyspnoe weitgehend aus und stützen in Zusammenschau mit der Klinik die Verdachtsdiagnose einer chronischen Linksherzinsuffizienz (NYHA II–III)."
-      }
-    }
-  },
-  "vitalparameter": {
-    "display_name": "Vitalparameter",
-    "data": {
-      "rr": {
-        "display_name": "RR",
-        "unit": "mmHg",
-        "data_type": "string",
-        "data": "144/86"
-      },
-      "puls": {
-        "display_name": "Puls",
-        "unit": "/min",
-        "data_type": "string",
-        "data": "88, regelmaessig"
-      },
-      "atemfrequenz": {
-        "display_name": "Atemfrequenz",
-        "unit": "/min",
-        "data_type": "integer",
-        "data": 20
-      },
-      "spo2": {
-        "display_name": "SpO2",
-        "unit": "%",
-        "data_type": "string",
-        "data": "94 (Raumluft)"
-      },
-      "temperatur": {
-        "display_name": "Temperatur",
-        "unit": "°C",
-        "data_type": "string",
-        "data": "36,6 (aurikulaer)"
-      }
-    }
-  },
-  "allgemeinzustand": {
-    "display_name": "Allgemeinzustand (Erstblick)",
-    "data": {
-      "allgemeinzustand": {
-        "display_name": "Allgemeinzustand",
-        "unit": "",
-        "data_type": "string",
-        "data": "reduzierter AZ fuer das Alter; spricht in kurzen Sätzen bei Belastung, sitzt aufrecht, keine Ruhedyspnoe im Sitzen"
-      },
-      "hautkolorit": {
-        "display_name": "Hautkolorit",
-        "unit": "",
-        "data_type": "string",
-        "data": "leicht blass, keine Zyanose unter Raumluft"
-      },
-      "haltung_gangbild": {
-        "display_name": "Haltung & Gangbild",
-        "unit": "",
-        "data_type": "string",
-        "data": "verlangsamtes Gangbild, Pause nach wenigen Schritten"
-      },
-      "bewusstsein": {
-        "display_name": "Bewusstsein",
-        "unit": "",
-        "data_type": "string",
-        "data": "wach, voll orientiert"
-      }
-    }
-  },
-  "herz": {
-    "display_name": "Herz",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "Halsvenen leicht gestaut im Sitzen; Herzspitzenstoss nach lateral verlagert tastbar"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "herz_auskultation": {
+        "display_name": "Herz Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Herztoene rein, regelmaessig, kein Systolikum; diskreter 3. Herzton auskultierbar"
       },
-      "peripherer_puls": {
-        "display_name": "Peripherer Puls",
-        "unit": "",
-        "data_type": "string",
-        "data": "A. radialis beidseits kraeftig und seitengleich tastbar"
-      }
-    }
-  },
-  "lunge": {
-    "display_name": "Lunge",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "leicht erhoehte Atemfrequenz (20/min), keine Einziehungen, kein Einsatz der Atemhilfsmuskulatur"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "lunge_auskultation": {
+        "display_name": "Lunge Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "beidseitig feinblasige Rasselgeraeusche; sonst Vesikulaeratmen, kein Giemen"
       },
-      "perkussion": {
-        "display_name": "Perkussion",
-        "unit": "",
-        "data_type": "string",
-        "data": "beidseitig leicht gedaempfter Klopfschall"
-      }
-    }
-  },
-  "abdomen": {
-    "display_name": "Abdomen",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig, kein sichtbarer Aszites, keine Narben"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "abdomen_auskultation": {
+        "display_name": "Abdomen Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
-      },
-      "palpation": {
-        "display_name": "Palpation",
-        "unit": "",
-        "data_type": "string",
-        "data": "weich, kein Druckschmerz, keine Abwehrspannung, Leber am Rippenbogen tastbar, nicht sicher vergroessert, kein Aszites, Nierenlager beidseits nicht klopfschmerzhaft"
-      }
-    }
-  },
-  "beine": {
-    "display_name": "Beine",
-    "data": {
-      "befund": {
-        "display_name": "Befund",
-        "unit": "",
-        "data_type": "string",
-        "data": "symmetrische, eindrueckbare Unterschenkel-/Knoecheloedeme beidseits, kein Wadendruckschmerz, kein Homans-Zeichen, Hautkolorit livide-blass"
       }
     }
   }
