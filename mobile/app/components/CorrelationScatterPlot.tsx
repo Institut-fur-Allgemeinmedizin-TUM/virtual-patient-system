@@ -1,15 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, Platform, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Surface, Text, useTheme, IconButton } from 'react-native-paper';
-import Svg, {
-  Circle,
-  G,
-  Text as SvgText,
-  Line,
-  Defs,
-  LinearGradient,
-  Stop,
-} from 'react-native-svg';
+import Svg, { Circle, G, Text as SvgText, Line } from 'react-native-svg';
 
 interface SessionData {
   id: string;

@@ -19,7 +19,6 @@ import {
 import { useAnalyticsStore } from '@/stores/useAnalyticsStore';
 import { useCasesStore } from '@/stores/useCasesStore';
 import { useSessionStore } from '@/stores/useSessionStore';
-import { mapEvaluationKeyToLabel } from '@/lib/evaluations';
 import EvaluationModal from '@/app/components/EvaluationModal';
 import { EvaluationBarChart } from '@/app/components/EvaluationBarChart';
 import { EvaluationRadarChart } from '@/app/components/EvaluationRadarChart';

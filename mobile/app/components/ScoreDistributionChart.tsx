@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, Platform, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Surface, Text, useTheme } from 'react-native-paper';
 import Svg, {
-  Rect,
   G,
   Text as SvgText,
   Line,
@@ -66,7 +65,6 @@ export const ScoreDistributionChart: React.FC<ScoreDistributionChartProps> = ({ 
   const renderSvg = (width: number) => {
     const graphWidth = width - padding.left - padding.right;
     const barSpace = graphWidth / buckets.length;
-    const barWidth = Math.min(barSpace * 0.7, 60);
 
     return (
       <Svg width={width} height={height}>

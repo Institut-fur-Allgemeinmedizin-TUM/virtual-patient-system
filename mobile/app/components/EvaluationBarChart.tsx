@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Platform, Pressable } from 'react-native';
-import { Surface, Text, useTheme, IconButton, Button, Snackbar, Portal } from 'react-native-paper';
+import { Surface, Text, useTheme, Button, Snackbar, Portal } from 'react-native-paper';
 import Svg, {
   Rect,
   G,
@@ -11,7 +11,7 @@ import Svg, {
   Line,
   Circle,
 } from 'react-native-svg';
-import * as FileSystem from 'expo-file-system';
+import { documentDirectory, EncodingType, writeAsStringAsync } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { mapEvaluationKeyToLabel } from '@/lib/evaluations';
 
@@ -107,9 +107,9 @@ export const EvaluationBarChart: React.FC<EvaluationBarChartProps> = ({ scores, 
         link.click();
         document.body.removeChild(link);
       } else {
-        const fileUri = FileSystem.documentDirectory + 'evaluation_chart.svg';
-        await FileSystem.writeAsStringAsync(fileUri, svgXml, {
-          encoding: FileSystem.EncodingType.UTF8,
+        const fileUri = documentDirectory + 'evaluation_chart.svg';
+        await writeAsStringAsync(fileUri, svgXml, {
+          encoding: EncodingType.UTF8,
         });
         const canShare = await Sharing.isAvailableAsync();
         if (canShare) {
