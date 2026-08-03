@@ -178,8 +178,8 @@ export const EvaluationRadarChart: React.FC<EvaluationRadarChartProps> = ({
               const radius = Math.min(cx, cy) - 40;
               const angle = (Math.PI * 2 * i) / criteriaCount - Math.PI / 2;
 
-              // Map hover targets to slightly past the center of each axis
-              const rHover = radius * 0.75;
+              // Map hover targets to cover the labels and outer edge
+              const rHover = radius + 20;
               const hoverX = cx + rHover * Math.cos(angle);
               const hoverY = cy + rHover * Math.sin(angle);
 
@@ -188,10 +188,10 @@ export const EvaluationRadarChart: React.FC<EvaluationRadarChartProps> = ({
                   key={`press-${i}`}
                   style={{
                     position: 'absolute',
-                    left: hoverX - 35,
-                    top: hoverY - 35,
-                    width: 70,
-                    height: 70,
+                    left: hoverX - 45,
+                    top: hoverY - 45,
+                    width: 90,
+                    height: 90,
                     zIndex: 10,
                   }}
                   // @ts-ignore
