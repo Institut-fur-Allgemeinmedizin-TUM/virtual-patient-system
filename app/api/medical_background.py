@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import copy
+from json import JSONDecodeError
 
 from fastapi import APIRouter, HTTPException, Request, Depends, Query, Path
 from sqlalchemy.orm import Session as OrmSession
@@ -37,22 +38,27 @@ def _load_background_data_from_disk(case_id: str) -> dict[str, list[DiagnosticGr
     with open(case_file, "r", encoding="utf-8") as f:
         background_data = {}
 
-        json_data = json.load(f)
-        for key, value in json_data.items():
-            diag_group = DiagnosticGroup(
-                name=key, display_name=value["display_name"], data=[]
-            )
-            for subkey, subvalue in value["data"].items():
-                diag_data = DiagnosticValue(
-                    name=subkey,
-                    display_name=subvalue["display_name"],
-                    unit=subvalue["unit"],
-                    data_type=subvalue["data_type"],
-                    data=subvalue["data"],
+        try:
+            json_data = json.load(f)
+            for key, value in json_data.items():
+                diag_group = DiagnosticGroup(
+                    name=key, display_name=value["display_name"], data=[]
                 )
-                diag_group.data.append(diag_data)
+                for subkey, subvalue in value["data"].items():
+                    diag_data = DiagnosticValue(
+                        name=subkey,
+                        display_name=subvalue.get("display_name"),
+                        unit=subvalue.get("unit", ""),
+                        data_type=subvalue.get("data_type", "string"),
+                        data=subvalue.get("data", "N/A"),
+                    )
+                    diag_group.data.append(diag_data)
 
-            background_data[key] = diag_group
+                background_data[key] = diag_group
+        except JSONDecodeError:
+            print(f"Error during JSON load for file {f}")
+        #except Exception:
+        #    print(f"Some other error during loading for file {f}")
         return background_data
 
 

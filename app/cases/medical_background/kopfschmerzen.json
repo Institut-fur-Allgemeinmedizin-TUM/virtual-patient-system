@@ -1,6 +1,6 @@
 {
-  "schnelltests": {
-    "display_name": "Schnelltests",
+  "troponin_i": {
+    "display_name": "Troponin I",
     "data": {
       "troponin_i": {
         "display_name": "Troponin I (semiquant.) [< 40 ng/l]",
@@ -8,28 +8,67 @@
         "data_type": "string",
         "data": "negativ"
       },
+      "bewertung": {
+        "display_name": "Troponin negativ",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein Hinweis auf eine kardiale Ursache."
+      }
+    }
+  },
+  "d_dimer": {
+    "display_name": "D-Dimer",
+    "data": {
       "d_dimer": {
         "display_name": "D-Dimer (semiquant.) [< 0,5 mg/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ"
       },
+      "bewertung": {
+        "display_name": "D-Dimer negativ",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein Hinweis auf eine venöse Thromboembolie."
+      }
+    }
+  },
+  "crp": {
+    "display_name": "CRP",
+    "data": {
       "crp": {
         "display_name": "CRP (semiquant.) [< 5 mg/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ (2 mg/l)"
       },
+      "bewertung": {
+        "display_name": "CRP negativ (2 mg/l)",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein Hinweis auf eine entzündliche oder infektiöse Ursache der Kopfschmerzen."
+      }
+    }
+  },
+  "kapillarblutglukose": {
+    "display_name": "Kapillarblutglukose",
+    "data": {
       "glukose": {
         "display_name": "Kapillarblutglukose [70–100 mg/dl]",
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 95
+      },
+      "bewertung": {
+        "display_name": "Glukose normal (95 mg/dl)",
+        "unit": "",
+        "data_type": "string",
+        "data": "Unauffälliger Zufallswert."
       }
     }
   },
-  "blutbild_erythrozyten": {
-    "display_name": "Erythrozyten",
+  "kleines_blutbild": {
+    "display_name": "Kleines Blutbild",
     "data": {
       "hb": {
         "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
@@ -66,17 +105,71 @@
         "unit": "g/dl",
         "data_type": "float",
         "data": 34.5
-      }
-    }
-  },
-  "blutbild_leukozyten": {
-    "display_name": "Leukozyten",
-    "data": {
+      },
       "leukozyten_gesamt": {
         "display_name": "Leukozyten gesamt [4,0 – 10,0]",
         "unit": "G/l",
         "data_type": "float",
         "data": 6.5
+      },
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 250
+      }
+    }
+  },
+  "grosses_blutbild": {
+    "display_name": "Großes Blutbild",
+    "data": {
+      "hb": {
+        "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 15.0
+      },
+      "hkt": {
+        "display_name": "Hämatokrit (Hkt) [39 – 50]",
+        "unit": "%",
+        "data_type": "integer",
+        "data": 44
+      },
+      "erythrozyten": {
+        "display_name": "Erythrozyten [4,5 – 5,9]",
+        "unit": "Mio./µl",
+        "data_type": "float",
+        "data": 5.0
+      },
+      "mcv": {
+        "display_name": "MCV [80 – 100]",
+        "unit": "fl",
+        "data_type": "integer",
+        "data": 90
+      },
+      "mch": {
+        "display_name": "MCH [27 – 34]",
+        "unit": "pg",
+        "data_type": "integer",
+        "data": 31
+      },
+      "mchc": {
+        "display_name": "MCHC [31,5 – 36,0]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 34.5
+      },
+      "leukozyten_gesamt": {
+        "display_name": "Leukozyten gesamt [4,0 – 10,0]",
+        "unit": "G/l",
+        "data_type": "float",
+        "data": 6.5
+      },
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 250
       },
       "neutrophile_segment": {
         "display_name": "Neutrophile (segmentkernig) [50 – 70 %]",
@@ -113,231 +206,35 @@
         "unit": "",
         "data_type": "string",
         "data": "1 % / 0,07 G/l"
-      }
-    }
-  },
-  "blutbild_thrombozyten": {
-    "display_name": "Thrombozyten",
-    "data": {
-      "thrombozyten": {
-        "display_name": "Thrombozyten [150 – 400]",
-        "unit": "G/l",
-        "data_type": "integer",
-        "data": 250
-      }
-    }
-  },
-  "bewertung": {
-    "display_name": "Bewertung",
-    "data": {
-      "troponin": {
-        "display_name": "Troponin negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine kardiale Ursache."
       },
-      "d_dimer": {
-        "display_name": "D-Dimer negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine venöse Thromboembolie."
-      },
-      "crp": {
-        "display_name": "CRP negativ (2 mg/l)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine entzündliche oder infektiöse Ursache der Kopfschmerzen."
-      },
-      "diff_bb": {
+      "bewertung": {
         "display_name": "Diff.-BB unauffällig",
         "unit": "",
         "data_type": "string",
         "data": "Kein Hinweis auf Anämie oder entzündliches Blutbild."
-      },
-      "glukose": {
-        "display_name": "Glukose normal (95 mg/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Unauffälliger Zufallswert."
-      },
-      "gesamtbeurteilung": {
-        "display_name": "Gesamtbeurteilung",
-        "unit": "",
-        "data_type": "string",
-        "data": "Die unauffälligen Laborwerte sprechen gegen eine sekundäre (organische) Kopfschmerzursache und stützen die Verdachtsdiagnose eines episodischen Spannungskopfschmerzes."
       }
     }
   },
-  "vitalparameter": {
-    "display_name": "Vitalparameter",
+  "auskultation": {
+    "display_name": "Auskultation",
     "data": {
-      "rr": {
-        "display_name": "Blutdruck (RR)",
-        "unit": "mmHg",
-        "data_type": "string",
-        "data": "126/78"
-      },
-      "puls": {
-        "display_name": "Puls",
-        "unit": "/min",
-        "data_type": "string",
-        "data": "80, regelmaessig"
-      },
-      "atemfrequenz": {
-        "display_name": "Atemfrequenz",
-        "unit": "/min",
-        "data_type": "integer",
-        "data": 14
-      },
-      "spo2": {
-        "display_name": "SpO2",
-        "unit": "%",
-        "data_type": "string",
-        "data": "99 (Raumluft)"
-      },
-      "temperatur": {
-        "display_name": "Temperatur",
-        "unit": "°C",
-        "data_type": "string",
-        "data": "36,5 (aurikulaer)"
-      }
-    }
-  },
-  "allgemeinzustand": {
-    "display_name": "Allgemeinzustand (Erstblick)",
-    "data": {
-      "allgemeinzustand": {
-        "display_name": "Allgemeinzustand",
-        "unit": "",
-        "data_type": "string",
-        "data": "guter AZ, leicht angespannte Stirn-/Nackenmuskulatur, kein Distress"
-      },
-      "hautkolorit": {
-        "display_name": "Hautkolorit",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig"
-      },
-      "haltung_gangbild": {
-        "display_name": "Haltung / Gangbild",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig"
-      },
-      "bewusstsein": {
-        "display_name": "Bewusstsein",
-        "unit": "",
-        "data_type": "string",
-        "data": "wach, voll orientiert"
-      }
-    }
-  },
-  "herz": {
-    "display_name": "Herz",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig, keine gestauten Halsvenen, keine Oedeme"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "herz": {
+        "display_name": "Herz (Auskultation)",
         "unit": "",
         "data_type": "string",
         "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
       },
-      "peripherer_puls": {
-        "display_name": "Peripherer Puls",
-        "unit": "",
-        "data_type": "string",
-        "data": "A. radialis beidseits kraeftig und seitengleich tastbar"
-      }
-    }
-  },
-  "lunge": {
-    "display_name": "Lunge",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig, seitengleiche Atemexkursion"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "lunge": {
+        "display_name": "Lunge (Auskultation)",
         "unit": "",
         "data_type": "string",
         "data": "Vesikulaeratmen seitengleich, keine Nebengeraeusche"
       },
-      "perkussion": {
-        "display_name": "Perkussion",
-        "unit": "",
-        "data_type": "string",
-        "data": "Klopfschall sonor, seitengleich"
-      }
-    }
-  },
-  "neurologischer_status": {
-    "display_name": "Neurologischer Status / Meningismus",
-    "data": {
-      "meningismus": {
-        "display_name": "Meningismus",
-        "unit": "",
-        "data_type": "string",
-        "data": "kein Meningismus (Kernig/Brudzinski negativ, keine Nackensteife)"
-      },
-      "hirnnerven_pupillen": {
-        "display_name": "Hirnnerven / Pupillen",
-        "unit": "",
-        "data_type": "string",
-        "data": "Hirnnerven grob unauffaellig, Pupillen isokor und prompt lichtreagibel"
-      },
-      "motorik_sensibilitaet_koordination": {
-        "display_name": "Motorik / Sensibilität / Koordination",
-        "unit": "",
-        "data_type": "string",
-        "data": "seitengleich unauffaellig, Finger-Nase-Versuch sicher, Gangbild unauffaellig"
-      },
-      "perikranielle_muskulatur": {
-        "display_name": "Perikranielle Muskulatur",
-        "unit": "",
-        "data_type": "string",
-        "data": "Nacken-/Schlaefenmuskulatur beidseits leicht druckschmerzhaft (myogen); Temporalarterien unauffaellig, nicht druckschmerzhaft"
-      }
-    }
-  },
-  "abdomen": {
-    "display_name": "Abdomen",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig, keine Narben"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "abdomen": {
+        "display_name": "Abdomen (Auskultation)",
         "unit": "",
         "data_type": "string",
         "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
-      },
-      "palpation": {
-        "display_name": "Palpation",
-        "unit": "",
-        "data_type": "string",
-        "data": "weich, kein Druckschmerz, keine Abwehrspannung, keine Resistenzen, Nierenlager beidseits nicht klopfschmerzhaft"
-      }
-    }
-  },
-  "beine": {
-    "display_name": "Beine",
-    "data": {
-      "befund": {
-        "display_name": "Befund",
-        "unit": "",
-        "data_type": "string",
-        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen"
       }
     }
   }
