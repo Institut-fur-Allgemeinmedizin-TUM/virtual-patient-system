@@ -1,35 +1,74 @@
 {
-  "schnelltests": {
-    "display_name": "Schnelltests",
+  "troponin_i": {
+    "display_name": "Troponin I",
     "data": {
-      "troponin_i": {
+      "wert": {
         "display_name": "Troponin I (semiquant.) [< 40 ng/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ"
       },
-      "d_dimer": {
+      "bewertung": {
+        "display_name": "Bewertung",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein laborchemischer Hinweis auf einen akuten Myokardschaden; ein ACS ist damit allein nicht sicher ausgeschlossen und muss im Zusammenhang mit Klinik, EKG, Beschwerdebeginn und ggf. Verlaufskontrollen beurteilt werden."
+      }
+    }
+  },
+  "d_dimer": {
+    "display_name": "D-Dimer",
+    "data": {
+      "wert": {
         "display_name": "D-Dimer (semiquant.) [< 0,5 mg/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ"
       },
-      "crp": {
+      "bewertung": {
+        "display_name": "Bewertung",
+        "unit": "",
+        "data_type": "string",
+        "data": "Eine Lungenembolie ist damit nicht generell ausgeschlossen; bei niedriger klinischer Wahrscheinlichkeit kann der Befund gegen eine LE sprechen."
+      }
+    }
+  },
+  "crp": {
+    "display_name": "CRP",
+    "data": {
+      "wert": {
         "display_name": "CRP (semiquant.) [< 5 mg/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ"
       },
-      "glukose": {
+      "bewertung": {
+        "display_name": "Bewertung",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein laborchemischer Hinweis auf eine relevante systemische Entzündung."
+      }
+    }
+  },
+  "kapillarblutglukose": {
+    "display_name": "Kapillarblutglukose",
+    "data": {
+      "wert": {
         "display_name": "Kapillarblutglukose [70-100 mg/dl]",
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 94
+      },
+      "bewertung": {
+        "display_name": "Bewertung",
+        "unit": "",
+        "data_type": "string",
+        "data": "Normwertige Momentaufnahme, kein Hinweis auf akute Stoffwechselentgleisung."
       }
     }
   },
-  "blutbild_erythrozyten": {
-    "display_name": "Erythrozyten",
+  "kleines_blutbild": {
+    "display_name": "Kleines Blutbild",
     "data": {
       "hb": {
         "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
@@ -66,17 +105,71 @@
         "unit": "g/dl",
         "data_type": "float",
         "data": 33.9
-      }
-    }
-  },
-  "blutbild_leukozyten": {
-    "display_name": "Leukozyten",
-    "data": {
+      },
       "leukozyten_gesamt": {
         "display_name": "Leukozyten gesamt [4,0 – 10,0]",
         "unit": "G/l",
         "data_type": "float",
         "data": 7.2
+      },
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 228
+      }
+    }
+  },
+  "grosses_blutbild": {
+    "display_name": "Großes Blutbild",
+    "data": {
+      "hb": {
+        "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 15.2
+      },
+      "hkt": {
+        "display_name": "Hämatokrit (Hkt) [39 – 50]",
+        "unit": "%",
+        "data_type": "float",
+        "data": 44.8
+      },
+      "erythrozyten": {
+        "display_name": "Erythrozyten [4,5 – 5,9]",
+        "unit": "Mio./µl",
+        "data_type": "float",
+        "data": 4.98
+      },
+      "mcv": {
+        "display_name": "MCV [80 – 100]",
+        "unit": "fl",
+        "data_type": "float",
+        "data": 89.9
+      },
+      "mch": {
+        "display_name": "MCH [27 – 34]",
+        "unit": "pg",
+        "data_type": "float",
+        "data": 30.5
+      },
+      "mchc": {
+        "display_name": "MCHC [31,5 – 36,0]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 33.9
+      },
+      "leukozyten_gesamt": {
+        "display_name": "Leukozyten gesamt [4,0 – 10,0]",
+        "unit": "G/l",
+        "data_type": "float",
+        "data": 7.2
+      },
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 228
       },
       "neutrophile_segment": {
         "display_name": "Neutrophile (segmentkernig) [50 – 70 %]",
@@ -113,220 +206,29 @@
         "unit": "",
         "data_type": "string",
         "data": "0,5 % / 0,04 G/l"
-      }
-    }
-  },
-  "blutbild_thrombozyten": {
-    "display_name": "Thrombozyten",
-    "data": {
-      "thrombozyten": {
-        "display_name": "Thrombozyten [150 – 400]",
-        "unit": "G/l",
-        "data_type": "integer",
-        "data": 228
-      }
-    }
-  },
-  "bewertung_labor": {
-    "display_name": "Bewertung Labor",
-    "data": {
-      "troponin_bewertung": {
-        "display_name": "Troponin negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein laborchemischer Hinweis auf einen akuten Myokardschaden; ein ACS ist damit allein nicht sicher ausgeschlossen und muss im Zusammenhang mit Klinik, EKG, Beschwerdebeginn und ggf. Verlaufskontrollen beurteilt werden."
       },
-      "d_dimer_bewertung": {
-        "display_name": "D-Dimer negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Eine Lungenembolie ist damit nicht generell ausgeschlossen; bei niedriger klinischer Wahrscheinlichkeit kann der Befund gegen eine LE sprechen."
-      },
-      "crp_bewertung": {
-        "display_name": "CRP < 5 mg/l",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein laborchemischer Hinweis auf eine relevante systemische Entzündung."
-      },
-      "diff_bb_bewertung": {
-        "display_name": "Diff.-BB unauffällig",
+      "bewertung": {
+        "display_name": "Bewertung Diff.-BB",
         "unit": "",
         "data_type": "string",
         "data": "Kein Hinweis auf Anämie oder ausgeprägtes entzündliches Blutbild."
-      },
-      "glukose_bewertung": {
-        "display_name": "Glukose normal",
-        "unit": "",
-        "data_type": "string",
-        "data": "Normwertige Momentaufnahme, kein Hinweis auf akute Stoffwechselentgleisung."
-      },
-      "gesamtbeurteilung": {
-        "display_name": "Gesamtbeurteilung",
-        "unit": "",
-        "data_type": "string",
-        "data": "Die POCT-Diagnostik ist insgesamt unauffällig und mit der Verdachtsdiagnose Brustwandsyndrom vereinbar. Gefährliche Differenzialdiagnosen sind hierdurch jedoch nicht allein sicher ausgeschlossen; entscheidend bleibt die klinische Gesamteinschätzung."
       }
     }
   },
-  "vitalparameter": {
-    "display_name": "Vitalparameter",
+  "auskultation": {
+    "display_name": "Auskultation",
     "data": {
-      "rr_rechts": {
-        "display_name": "RR rechts",
-        "unit": "",
-        "data_type": "string",
-        "data": "128/82 mmHg"
-      },
-      "rr_links": {
-        "display_name": "RR links",
-        "unit": "",
-        "data_type": "string",
-        "data": "126/80 mmHg"
-      },
-      "puls": {
-        "display_name": "Puls",
-        "unit": "",
-        "data_type": "string",
-        "data": "78/min, regelmäßig"
-      },
-      "atemfrequenz": {
-        "display_name": "Atemfrequenz",
-        "unit": "",
-        "data_type": "string",
-        "data": "16/min"
-      },
-      "spo2": {
-        "display_name": "SpO2",
-        "unit": "",
-        "data_type": "string",
-        "data": "98 % (Raumluft)"
-      },
-      "temperatur": {
-        "display_name": "Temperatur",
-        "unit": "",
-        "data_type": "string",
-        "data": "36,7 °C (aurikulär)"
-      }
-    }
-  },
-  "allgemeinzustand": {
-    "display_name": "Allgemeinzustand (Erstblick)",
-    "data": {
-      "allgemeinzustand": {
-        "display_name": "Allgemeinzustand",
-        "unit": "",
-        "data_type": "string",
-        "data": "gut; Patient betritt die Praxis selbstständig gehend, wach, leicht besorgt, aber kooperativ; kein Distress, keine Ruhedyspnoe, kein Kaltschweiß"
-      },
-      "hautkolorit": {
-        "display_name": "Hautkolorit",
-        "unit": "",
-        "data_type": "string",
-        "data": "rosig, keine Blässe, keine Zyanose"
-      },
-      "haltung_mimik": {
-        "display_name": "Haltung & Mimik",
-        "unit": "",
-        "data_type": "string",
-        "data": "leichte Schonhaltung des Oberkörpers nach links beim Hinsetzen; leichte Anspannung im Gesicht bei Rumpfbewegung"
-      },
-      "bewusstsein": {
-        "display_name": "Bewusstsein",
-        "unit": "",
-        "data_type": "string",
-        "data": "wach, orientiert, adäquater Kontakt, flüssige Sprache"
-      }
-    }
-  },
-  "herz": {
-    "display_name": "Herz",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "keine gestauten Halsvenen, keine peripheren Ödeme, kein sichtbarer Herzspitzenstoß"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "herz_auskultation": {
+        "display_name": "Auskultation Herz",
         "unit": "",
         "data_type": "string",
         "data": "Herztöne rein und regelmäßig, keine Herzgeräusche, kein Perikardreiben, keine Extratöne"
       },
-      "peripherer_puls": {
-        "display_name": "Peripherer Puls",
-        "unit": "",
-        "data_type": "string",
-        "data": "A. radialis beidseits kräftig und seitengleich tastbar"
-      },
-      "blutdruck": {
-        "display_name": "Blutdruck",
-        "unit": "",
-        "data_type": "string",
-        "data": "128/82 mmHg rechts, 126/80 mmHg links"
-      }
-    }
-  },
-  "lunge": {
-    "display_name": "Lunge",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "Atemfrequenz 16/min, seitengleiche Atemexkursion, keine Einziehungen, kein Einsatz der Atemhilfsmuskulatur"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "lunge_auskultation": {
+        "display_name": "Auskultation Lunge",
         "unit": "",
         "data_type": "string",
         "data": "Vesikuläratmen seitengleich über allen Lungenfeldern; keine Nebengeräusche (kein Giemen, keine Rasselgeräusche, kein Pleurareiben)"
-      },
-      "perkussion": {
-        "display_name": "Perkussion",
-        "unit": "",
-        "data_type": "string",
-        "data": "Klopfschall seitengleich sonor; kein Hinweis auf Erguss oder Pneumothorax"
-      }
-    }
-  },
-  "brustwand": {
-    "display_name": "Brustwand",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "keine Rötung, keine Schwellung, keine Hämatome im Bereich der linken anterioren Brustwand"
-      },
-      "palpation": {
-        "display_name": "Palpation",
-        "unit": "",
-        "data_type": "string",
-        "data": "ausgeprägter, punktförmiger und reproduzierbarer Druckschmerz über dem 3.–4. Kostochondralgelenk links parasternal; Patient zeigt spontan auf den Schmerzpunkt; kein Krepitieren, keine Schwellung, keine Frakturzeichen"
-      },
-      "thoraxkompression": {
-        "display_name": "Thoraxkompression",
-        "unit": "",
-        "data_type": "string",
-        "data": "laterale Kompression provoziert leichten Schmerz links, sonst schmerzfrei"
-      },
-      "atem_bewegungsabhaengigkeit": {
-        "display_name": "Atem- & Bewegungsabhängigkeit",
-        "unit": "",
-        "data_type": "string",
-        "data": "Schmerzverstärkung bei tiefer Inspiration und Rumpfrotation nach links, nicht belastungsabhängig"
-      }
-    }
-  },
-  "beine": {
-    "display_name": "Beine",
-    "data": {
-      "befund": {
-        "display_name": "Befund",
-        "unit": "",
-        "data_type": "string",
-        "data": "keine Beinschwellung, kein Wadendruckschmerz, keine Überwärmung, kein Meyer-/Homans-Zeichen, seitengleiches Hautkolorit"
       }
     }
   }

@@ -1,35 +1,74 @@
 {
-  "schnelltests": {
-    "display_name": "Schnelltests",
+  "troponin_i": {
+    "display_name": "Troponin I",
     "data": {
-      "troponin_i": {
+      "messwert": {
         "display_name": "Troponin I (semiquant.) [< 40 ng/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ"
       },
-      "d_dimer": {
+      "bewertung": {
+        "display_name": "Troponin negativ",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein Hinweis auf eine kardiale Ursache."
+      }
+    }
+  },
+  "d_dimer": {
+    "display_name": "D-Dimer",
+    "data": {
+      "messwert": {
         "display_name": "D-Dimer (semiquant.) [< 0,5 mg/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ"
       },
-      "crp": {
+      "bewertung": {
+        "display_name": "D-Dimer negativ",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein Hinweis auf eine venöse Thromboembolie."
+      }
+    }
+  },
+  "crp": {
+    "display_name": "CRP",
+    "data": {
+      "messwert": {
         "display_name": "CRP (semiquant.) [< 5 mg/l]",
         "unit": "",
         "data_type": "string",
         "data": "negativ (3 mg/l)"
       },
-      "glukose": {
+      "bewertung": {
+        "display_name": "CRP negativ (3 mg/l)",
+        "unit": "",
+        "data_type": "string",
+        "data": "Kein Hinweis auf eine entzündliche oder infektiöse Ursache (z. B. Spondylodiszitis)."
+      }
+    }
+  },
+  "kapillarblutglukose": {
+    "display_name": "Kapillarblutglukose",
+    "data": {
+      "messwert": {
         "display_name": "Kapillarblutglukose [70-100 mg/dl]",
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 90
+      },
+      "bewertung": {
+        "display_name": "Glukose normal (90 mg/dl)",
+        "unit": "",
+        "data_type": "string",
+        "data": "Unauffälliger Zufallswert."
       }
     }
   },
-  "blutbild_erythrozyten": {
-    "display_name": "Erythrozyten",
+  "kleines_blutbild": {
+    "display_name": "Kleines Blutbild",
     "data": {
       "hb": {
         "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
@@ -66,17 +105,71 @@
         "unit": "g/dl",
         "data_type": "float",
         "data": 34.0
-      }
-    }
-  },
-  "blutbild_leukozyten": {
-    "display_name": "Leukozyten",
-    "data": {
+      },
       "leukozyten_gesamt": {
         "display_name": "Leukozyten gesamt [4,0 – 10,0]",
         "unit": "G/l",
         "data_type": "string",
         "data": "7,0"
+      },
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 230
+      }
+    }
+  },
+  "grosses_blutbild": {
+    "display_name": "Großes Blutbild",
+    "data": {
+      "hb": {
+        "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 15.2
+      },
+      "hkt": {
+        "display_name": "Hämatokrit (Hkt) [39 – 50]",
+        "unit": "%",
+        "data_type": "integer",
+        "data": 45
+      },
+      "erythrozyten": {
+        "display_name": "Erythrozyten [4,5 – 5,9]",
+        "unit": "Mio./µl",
+        "data_type": "float",
+        "data": 5.1
+      },
+      "mcv": {
+        "display_name": "MCV [80 – 100]",
+        "unit": "fl",
+        "data_type": "integer",
+        "data": 88
+      },
+      "mch": {
+        "display_name": "MCH [27 – 34]",
+        "unit": "pg",
+        "data_type": "integer",
+        "data": 30
+      },
+      "mchc": {
+        "display_name": "MCHC [31,5 – 36,0]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 34.0
+      },
+      "leukozyten_gesamt": {
+        "display_name": "Leukozyten gesamt [4,0 – 10,0]",
+        "unit": "G/l",
+        "data_type": "string",
+        "data": "7,0"
+      },
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 230
       },
       "neutrophile_segment": {
         "display_name": "Neutrophile (segmentkernig) [50 – 70 %]",
@@ -113,231 +206,35 @@
         "unit": "",
         "data_type": "string",
         "data": "1 % / 0,07 G/l"
-      }
-    }
-  },
-  "blutbild_thrombozyten": {
-    "display_name": "Thrombozyten",
-    "data": {
-      "thrombozyten": {
-        "display_name": "Thrombozyten [150 – 400]",
-        "unit": "G/l",
-        "data_type": "integer",
-        "data": 230
-      }
-    }
-  },
-  "labor_bewertung": {
-    "display_name": "Bewertung",
-    "data": {
-      "troponin": {
-        "display_name": "Troponin negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine kardiale Ursache."
       },
-      "d_dimer": {
-        "display_name": "D-Dimer negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine venöse Thromboembolie."
-      },
-      "crp": {
-        "display_name": "CRP negativ (3 mg/l)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine entzündliche oder infektiöse Ursache (z. B. Spondylodiszitis)."
-      },
-      "diff_bb": {
+      "bewertung": {
         "display_name": "Diff.-BB unauffällig",
         "unit": "",
         "data_type": "string",
         "data": "Kein Hinweis auf Anämie oder entzündliches Blutbild."
-      },
-      "glukose": {
-        "display_name": "Glukose normal (90 mg/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Unauffälliger Zufallswert."
-      },
-      "gesamtbeurteilung": {
-        "display_name": "Gesamtbeurteilung",
-        "unit": "",
-        "data_type": "string",
-        "data": "Die unauffälligen Entzündungsparameter sprechen gegen eine entzündliche oder infektiöse Genese der Rückenschmerzen und stützen die Verdachtsdiagnose eines mechanisch bedingten Bandscheibenvorfalls ohne Nervenkompression."
       }
     }
   },
-  "vitalparameter": {
-    "display_name": "Vitalparameter",
+  "auskultation": {
+    "display_name": "Auskultation",
     "data": {
-      "rr": {
-        "display_name": "RR",
-        "unit": "",
-        "data_type": "string",
-        "data": "132/84 mmHg"
-      },
-      "puls": {
-        "display_name": "Puls",
-        "unit": "",
-        "data_type": "string",
-        "data": "74/min, regelmaessig"
-      },
-      "atemfrequenz": {
-        "display_name": "Atemfrequenz",
-        "unit": "",
-        "data_type": "string",
-        "data": "14/min"
-      },
-      "spo2": {
-        "display_name": "SpO2",
-        "unit": "",
-        "data_type": "string",
-        "data": "98 % (Raumluft)"
-      },
-      "temperatur": {
-        "display_name": "Temperatur",
-        "unit": "",
-        "data_type": "string",
-        "data": "36,6 °C (aurikulaer)"
-      }
-    }
-  },
-  "allgemeinzustand": {
-    "display_name": "Allgemeinzustand (Erstblick)",
-    "data": {
-      "allgemeinzustand": {
-        "display_name": "Allgemeinzustand",
-        "unit": "",
-        "data_type": "string",
-        "data": "reduzierter AZ durch Schmerzen, deutliche Schonhaltung, kein Distress in Ruhe"
-      },
-      "hautkolorit": {
-        "display_name": "Hautkolorit",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig, ggf. leicht schweissig durch Schmerzreiz"
-      },
-      "haltung_gangbild": {
-        "display_name": "Haltung / Gangbild",
-        "unit": "",
-        "data_type": "string",
-        "data": "vorsichtiges, kleinschrittiges Gangbild; haelt sich beim Aufstehen ab; Ausweichhaltung des Rumpfes nach rechts"
-      },
-      "bewusstsein": {
-        "display_name": "Bewusstsein",
-        "unit": "",
-        "data_type": "string",
-        "data": "wach, voll orientiert"
-      }
-    }
-  },
-  "herz": {
-    "display_name": "Herz",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig, keine gestauten Halsvenen, keine Oedeme"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "herz": {
+        "display_name": "Herz",
         "unit": "",
         "data_type": "string",
         "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
       },
-      "peripherer_puls": {
-        "display_name": "Peripherer Puls",
-        "unit": "",
-        "data_type": "string",
-        "data": "A. radialis beidseits kraeftig und seitengleich tastbar"
-      }
-    }
-  },
-  "lunge": {
-    "display_name": "Lunge",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig, seitengleiche Atemexkursion"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "lunge": {
+        "display_name": "Lunge",
         "unit": "",
         "data_type": "string",
         "data": "Vesikulaeratmen seitengleich, keine Nebengeraeusche"
       },
-      "perkussion": {
-        "display_name": "Perkussion",
-        "unit": "",
-        "data_type": "string",
-        "data": "Klopfschall sonor, seitengleich"
-      }
-    }
-  },
-  "wirbelsaeule_neurologie_bein": {
-    "display_name": "Wirbelsaeule & Neurologie Bein",
-    "data": {
-      "palpation_wirbelsaeule": {
-        "display_name": "Palpation Wirbelsaeule",
-        "unit": "",
-        "data_type": "string",
-        "data": "Klopf-/Druckschmerz ueber LWK 4/5 paravertebral links, Hartspann paravertebral links"
-      },
-      "beweglichkeit": {
-        "display_name": "Beweglichkeit",
-        "unit": "",
-        "data_type": "string",
-        "data": "schmerzhaft eingeschraenkt bei Flexion/Rotation, deutliche Besserung in Ruhe/Liegen"
-      },
-      "lasegue_kraft_sensibilitaet": {
-        "display_name": "Lasègue / Kraft / Sensibilität",
-        "unit": "",
-        "data_type": "string",
-        "data": "Lasegue links positiv bei ca. 40°, rechts negativ; Kraft der Kennmuskulatur beidseits 5/5, Sensibilitaet seitengleich unauffaellig"
-      },
-      "reflexe_kauda_screening": {
-        "display_name": "Reflexe / Kauda Screening",
-        "unit": "",
-        "data_type": "string",
-        "data": "PSR/ASR seitengleich normal ausloesbar; Reithosensensibilitaet unauffaellig, keine Blasen-/Mastdarmstoerung"
-      }
-    }
-  },
-  "abdomen": {
-    "display_name": "Abdomen",
-    "data": {
-      "inspektion": {
-        "display_name": "Inspektion",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffaellig, keine Narben"
-      },
-      "auskultation": {
-        "display_name": "Auskultation",
+      "abdomen": {
+        "display_name": "Abdomen",
         "unit": "",
         "data_type": "string",
         "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
-      },
-      "palpation": {
-        "display_name": "Palpation",
-        "unit": "",
-        "data_type": "string",
-        "data": "weich, kein Druckschmerz, keine Abwehrspannung, keine Resistenzen, Nierenlager beidseits nicht klopfschmerzhaft"
-      }
-    }
-  },
-  "beine": {
-    "display_name": "Beine",
-    "data": {
-      "befund": {
-        "display_name": "Befund",
-        "unit": "",
-        "data_type": "string",
-        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen"
       }
     }
   }
