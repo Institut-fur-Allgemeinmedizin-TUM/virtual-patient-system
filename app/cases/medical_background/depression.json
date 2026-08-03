@@ -18,10 +18,10 @@
         "display_name": "CRP (semiquant.) [< 5 mg/l]",
         "unit": "",
         "data_type": "string",
-        "data": "negativ"
+        "data": "negativ (3 mg/l)"
       },
       "glukose": {
-        "display_name": "Kapillarblutglukose [70-100 mg/dl]",
+        "display_name": "Kapillarblutglukose [70–100 mg/dl]",
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 94
@@ -35,37 +35,37 @@
         "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
         "unit": "g/dl",
         "data_type": "float",
-        "data": 15.2
+        "data": 15.4
       },
       "hkt": {
         "display_name": "Hämatokrit (Hkt) [39 – 50]",
         "unit": "%",
         "data_type": "float",
-        "data": 44.8
+        "data": 46.0
       },
       "erythrozyten": {
         "display_name": "Erythrozyten [4,5 – 5,9]",
         "unit": "Mio./µl",
         "data_type": "float",
-        "data": 4.98
+        "data": 5.0
       },
       "mcv": {
         "display_name": "MCV [80 – 100]",
         "unit": "fl",
         "data_type": "float",
-        "data": 89.9
+        "data": 90.0
       },
       "mch": {
         "display_name": "MCH [27 – 34]",
         "unit": "pg",
         "data_type": "float",
-        "data": 30.5
+        "data": 31.0
       },
       "mchc": {
         "display_name": "MCHC [31,5 – 36,0]",
         "unit": "g/dl",
         "data_type": "float",
-        "data": 33.9
+        "data": 34.0
       }
     }
   },
@@ -76,31 +76,31 @@
         "display_name": "Leukozyten gesamt [4,0 – 10,0]",
         "unit": "G/l",
         "data_type": "float",
-        "data": 7.2
+        "data": 6.8
       },
       "neutrophile_segment": {
         "display_name": "Neutrophile (segmentkernig) [50 – 70 %]",
         "unit": "",
         "data_type": "string",
-        "data": "58 % / 4,18 G/l"
+        "data": "58 % / 3,94 G/l"
       },
       "neutrophile_stab": {
         "display_name": "Neutrophile (stabkernig) [0 – 3 %]",
         "unit": "",
         "data_type": "string",
-        "data": "1,5 % / 0,11 G/l"
+        "data": "1 % / 0,07 G/l"
       },
       "lymphozyten": {
         "display_name": "Lymphozyten [20 – 45 %]",
         "unit": "",
         "data_type": "string",
-        "data": "32 % / 2,30 G/l"
+        "data": "32 % / 2,18 G/l"
       },
       "monozyten": {
         "display_name": "Monozyten [2 – 10 %]",
         "unit": "",
         "data_type": "string",
-        "data": "6 % / 0,43 G/l"
+        "data": "6 % / 0,41 G/l"
       },
       "eosinophile": {
         "display_name": "Eosinophile [0 – 5 %]",
@@ -112,7 +112,7 @@
         "display_name": "Basophile [0 – 1 %]",
         "unit": "",
         "data_type": "string",
-        "data": "0,5 % / 0,04 G/l"
+        "data": "1 % / 0,07 G/l"
       }
     }
   },
@@ -123,89 +123,83 @@
         "display_name": "Thrombozyten [150 – 400]",
         "unit": "G/l",
         "data_type": "integer",
-        "data": 228
+        "data": 265
       }
     }
   },
-  "bewertung_labor": {
-    "display_name": "Bewertung Labor",
+  "labor_bewertung": {
+    "display_name": "Bewertung",
     "data": {
-      "troponin_bewertung": {
+      "troponin": {
         "display_name": "Troponin negativ",
         "unit": "",
         "data_type": "string",
-        "data": "Kein laborchemischer Hinweis auf einen akuten Myokardschaden; ein ACS ist damit allein nicht sicher ausgeschlossen und muss im Zusammenhang mit Klinik, EKG, Beschwerdebeginn und ggf. Verlaufskontrollen beurteilt werden."
+        "data": "Kein Hinweis auf eine kardiale Ursache."
       },
-      "d_dimer_bewertung": {
+      "d_dimer": {
         "display_name": "D-Dimer negativ",
         "unit": "",
         "data_type": "string",
-        "data": "Eine Lungenembolie ist damit nicht generell ausgeschlossen; bei niedriger klinischer Wahrscheinlichkeit kann der Befund gegen eine LE sprechen."
+        "data": "Kein Hinweis auf eine venöse Thromboembolie."
       },
-      "crp_bewertung": {
-        "display_name": "CRP < 5 mg/l",
+      "crp": {
+        "display_name": "CRP negativ (3 mg/l)",
         "unit": "",
         "data_type": "string",
-        "data": "Kein laborchemischer Hinweis auf eine relevante systemische Entzündung."
+        "data": "Kein Hinweis auf eine floride Infektion oder Entzündung."
       },
-      "diff_bb_bewertung": {
+      "diff_bb": {
         "display_name": "Diff.-BB unauffällig",
         "unit": "",
         "data_type": "string",
-        "data": "Kein Hinweis auf Anämie oder ausgeprägtes entzündliches Blutbild."
+        "data": "Kein Hinweis auf Anämie oder entzündliches Blutbild."
       },
-      "glukose_bewertung": {
-        "display_name": "Glukose normal",
+      "glukose": {
+        "display_name": "Glukose normal (94 mg/dl)",
         "unit": "",
         "data_type": "string",
-        "data": "Normwertige Momentaufnahme, kein Hinweis auf akute Stoffwechselentgleisung."
+        "data": "Unauffälliger Zufallswert."
       },
       "gesamtbeurteilung": {
         "display_name": "Gesamtbeurteilung",
         "unit": "",
         "data_type": "string",
-        "data": "Die POCT-Diagnostik ist insgesamt unauffällig und mit der Verdachtsdiagnose Brustwandsyndrom vereinbar. Gefährliche Differenzialdiagnosen sind hierdurch jedoch nicht allein sicher ausgeschlossen; entscheidend bleibt die klinische Gesamteinschätzung."
+        "data": "Die Laborwerte sind – wie im Fall beschrieben – unauffällig; sie liefern keinen Hinweis auf eine somatische Ursache der Beschwerden und stützen damit die Einordnung als depressive Episode mit Verdacht auf komorbides Schlafapnoesyndrom."
       }
     }
   },
   "vitalparameter": {
     "display_name": "Vitalparameter",
     "data": {
-      "rr_rechts": {
-        "display_name": "RR rechts",
-        "unit": "",
+      "rr": {
+        "display_name": "RR",
+        "unit": "mmHg",
         "data_type": "string",
-        "data": "128/82 mmHg"
-      },
-      "rr_links": {
-        "display_name": "RR links",
-        "unit": "",
-        "data_type": "string",
-        "data": "126/80 mmHg"
+        "data": "128/82"
       },
       "puls": {
         "display_name": "Puls",
-        "unit": "",
+        "unit": "/min",
         "data_type": "string",
-        "data": "78/min, regelmäßig"
+        "data": "76, regelmaessig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
-        "unit": "",
-        "data_type": "string",
-        "data": "16/min"
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 14
       },
       "spo2": {
         "display_name": "SpO2",
-        "unit": "",
+        "unit": "%",
         "data_type": "string",
-        "data": "98 % (Raumluft)"
+        "data": "98 (Raumluft)"
       },
       "temperatur": {
         "display_name": "Temperatur",
-        "unit": "",
+        "unit": "°C",
         "data_type": "string",
-        "data": "36,7 °C (aurikulär)"
+        "data": "36,6 (aurikulaer)"
       }
     }
   },
@@ -216,25 +210,25 @@
         "display_name": "Allgemeinzustand",
         "unit": "",
         "data_type": "string",
-        "data": "gut; Patient betritt die Praxis selbstständig gehend, wach, leicht besorgt, aber kooperativ; kein Distress, keine Ruhedyspnoe, kein Kaltschweiß"
+        "data": "reduzierter Antrieb, verlangsamte Psychomotorik, insgesamt kooperativ, kein akuter Distress"
       },
       "hautkolorit": {
         "display_name": "Hautkolorit",
         "unit": "",
         "data_type": "string",
-        "data": "rosig, keine Blässe, keine Zyanose"
+        "data": "unauffaellig"
       },
-      "haltung_mimik": {
-        "display_name": "Haltung & Mimik",
+      "haltung_gangbild": {
+        "display_name": "Haltung / Gangbild",
         "unit": "",
         "data_type": "string",
-        "data": "leichte Schonhaltung des Oberkörpers nach links beim Hinsetzen; leichte Anspannung im Gesicht bei Rumpfbewegung"
+        "data": "gebeugte Haltung, wenig Blickkontakt; Gangbild selbst unauffaellig"
       },
       "bewusstsein": {
         "display_name": "Bewusstsein",
         "unit": "",
         "data_type": "string",
-        "data": "wach, orientiert, adäquater Kontakt, flüssige Sprache"
+        "data": "wach, voll orientiert, kein Anhalt fuer kognitive Einschraenkung im Gespraech"
       }
     }
   },
@@ -245,25 +239,19 @@
         "display_name": "Inspektion",
         "unit": "",
         "data_type": "string",
-        "data": "keine gestauten Halsvenen, keine peripheren Ödeme, kein sichtbarer Herzspitzenstoß"
+        "data": "unauffaellig, keine gestauten Halsvenen, keine Oedeme"
       },
       "auskultation": {
         "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
-        "data": "Herztöne rein und regelmäßig, keine Herzgeräusche, kein Perikardreiben, keine Extratöne"
+        "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
       },
       "peripherer_puls": {
         "display_name": "Peripherer Puls",
         "unit": "",
         "data_type": "string",
-        "data": "A. radialis beidseits kräftig und seitengleich tastbar"
-      },
-      "blutdruck": {
-        "display_name": "Blutdruck",
-        "unit": "",
-        "data_type": "string",
-        "data": "128/82 mmHg rechts, 126/80 mmHg links"
+        "data": "A. radialis beidseits kraeftig und seitengleich tastbar"
       }
     }
   },
@@ -274,48 +262,76 @@
         "display_name": "Inspektion",
         "unit": "",
         "data_type": "string",
-        "data": "Atemfrequenz 16/min, seitengleiche Atemexkursion, keine Einziehungen, kein Einsatz der Atemhilfsmuskulatur"
+        "data": "unauffaellig, seitengleiche Atemexkursion"
       },
       "auskultation": {
         "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
-        "data": "Vesikuläratmen seitengleich über allen Lungenfeldern; keine Nebengeräusche (kein Giemen, keine Rasselgeräusche, kein Pleurareiben)"
+        "data": "Vesikulaeratmen seitengleich, keine Nebengeraeusche"
       },
       "perkussion": {
         "display_name": "Perkussion",
         "unit": "",
         "data_type": "string",
-        "data": "Klopfschall seitengleich sonor; kein Hinweis auf Erguss oder Pneumothorax"
+        "data": "Klopfschall sonor, seitengleich"
       }
     }
   },
-  "brustwand": {
-    "display_name": "Brustwand",
+  "hno": {
+    "display_name": "HNO (V. a. Schlafapnoe)",
+    "data": {
+      "befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "Oropharynx unauffaellig, Tonsillen nicht vergroessert, Nasenatmung frei, Halsumfang unauffaellig - kein anatomisches Korrelat fuer das berichtete Schnarchen erkennbar"
+      }
+    }
+  },
+  "psychiatrischer_kurzbefund": {
+    "display_name": "Psychiatrischer Kurzbefund",
+    "data": {
+      "stimmung_antrieb": {
+        "display_name": "Stimmung und Antrieb",
+        "unit": "",
+        "data_type": "string",
+        "data": "gedrueckte Stimmung, deutlich reduzierter Antrieb, verlangsamte Psychomotorik, eingeengter Affekt"
+      },
+      "denken_wahrnehmung": {
+        "display_name": "Denken und Wahrnehmung",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine formalen oder inhaltlichen Denkstoerungen, keine Halluzinationen"
+      },
+      "suizidalitaet": {
+        "display_name": "Suizidalität",
+        "unit": "",
+        "data_type": "string",
+        "data": "im Gespraech keine akute Selbst-/Fremdgefaehrdung feststellbar (PHQ-9 Frage 9 verneint)"
+      }
+    }
+  },
+  "abdomen": {
+    "display_name": "Abdomen",
     "data": {
       "inspektion": {
         "display_name": "Inspektion",
         "unit": "",
         "data_type": "string",
-        "data": "keine Rötung, keine Schwellung, keine Hämatome im Bereich der linken anterioren Brustwand"
+        "data": "unauffaellig, keine Narben"
+      },
+      "auskultation": {
+        "display_name": "Auskultation",
+        "unit": "",
+        "data_type": "string",
+        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
       },
       "palpation": {
         "display_name": "Palpation",
         "unit": "",
         "data_type": "string",
-        "data": "ausgeprägter, punktförmiger und reproduzierbarer Druckschmerz über dem 3.–4. Kostochondralgelenk links parasternal; Patient zeigt spontan auf den Schmerzpunkt; kein Krepitieren, keine Schwellung, keine Frakturzeichen"
-      },
-      "thoraxkompression": {
-        "display_name": "Thoraxkompression",
-        "unit": "",
-        "data_type": "string",
-        "data": "laterale Kompression provoziert leichten Schmerz links, sonst schmerzfrei"
-      },
-      "atem_bewegungsabhaengigkeit": {
-        "display_name": "Atem- & Bewegungsabhängigkeit",
-        "unit": "",
-        "data_type": "string",
-        "data": "Schmerzverstärkung bei tiefer Inspiration und Rumpfrotation nach links, nicht belastungsabhängig"
+        "data": "weich, kein Druckschmerz, keine Abwehrspannung, keine Resistenzen, Nierenlager beidseits nicht klopfschmerzhaft"
       }
     }
   },
@@ -326,7 +342,7 @@
         "display_name": "Befund",
         "unit": "",
         "data_type": "string",
-        "data": "keine Beinschwellung, kein Wadendruckschmerz, keine Überwärmung, kein Meyer-/Homans-Zeichen, seitengleiches Hautkolorit"
+        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen"
       }
     }
   }
