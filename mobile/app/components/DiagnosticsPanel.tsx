@@ -134,6 +134,8 @@ export default function DiagnosticsPanel({
     fetchDiagnosticResult,
   } = useDiagnosticStore();
 
+  const [hiddenDiagnostics, setHiddenDiagnostics] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     if (sessionCase?.id) {
       fetchAvailableDiagnostics(sessionCase.id);
@@ -141,8 +143,18 @@ export default function DiagnosticsPanel({
   }, [sessionCase?.id, fetchAvailableDiagnostics]);
 
   const handleDiagnosticPress = (diagnosticName: string) => {
-    if (sessionCase?.id && sessionId) {
+    const isLoaded = !!diagnosticResults[diagnosticName];
+    if (isLoaded) {
+      setHiddenDiagnostics((prev) => ({
+        ...prev,
+        [diagnosticName]: !prev[diagnosticName],
+      }));
+    } else if (sessionCase?.id && sessionId) {
       fetchDiagnosticResult(sessionCase.id, diagnosticName, sessionId);
+      setHiddenDiagnostics((prev) => ({
+        ...prev,
+        [diagnosticName]: false,
+      }));
     }
   };
 
@@ -245,19 +257,21 @@ export default function DiagnosticsPanel({
                   mode={isLoaded ? 'contained-tonal' : 'outlined'}
                   onPress={() => handleDiagnosticPress(diag.name)}
                   style={styles.diagButton}
-                  disabled={isLoaded || isLoading || readOnly}
+                  disabled={isLoading || (!isLoaded && readOnly)}
                   loading={isLoading}
+                  icon={isLoaded ? (hiddenDiagnostics[diag.name] ? 'chevron-down' : 'chevron-up') : undefined}
+                  contentStyle={isLoaded ? { flexDirection: 'row-reverse', justifyContent: 'space-between' } : undefined}
                   textColor={
                     theme.dark
                       ? '#FFFFFF'
                       : isLoaded
-                        ? theme.colors.onPrimary
+                        ? undefined
                         : theme.colors.primary
                   }
                 >
                   {diag.display_name}
                 </Button>
-                {isLoaded && diagnosticResults[diag.name].data && (
+                {isLoaded && !hiddenDiagnostics[diag.name] && diagnosticResults[diag.name].data && (
                   <View>
                     <Surface
                       style={[
