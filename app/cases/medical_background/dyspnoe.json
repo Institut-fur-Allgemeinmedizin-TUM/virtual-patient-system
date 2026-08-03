@@ -18,194 +18,178 @@
         "display_name": "CRP (semiquant.) [< 5 mg/l]",
         "unit": "",
         "data_type": "string",
-        "data": "negativ"
+        "data": "negativ (4 mg/l)"
       },
       "glukose": {
         "display_name": "Kapillarblutglukose [70-100 mg/dl]",
         "unit": "mg/dl",
         "data_type": "integer",
-        "data": 94
+        "data": 138
       }
     }
   },
-  "blutbild_erythrozyten": {
-    "display_name": "Erythrozyten",
+  "differentialblutbild": {
+    "display_name": "Differentialblutbild",
     "data": {
       "hb": {
-        "display_name": "Hämoglobin (Hb) [13,5 – 17,5]",
+        "display_name": "Hämoglobin (Hb) [12,0 – 16,0]",
         "unit": "g/dl",
         "data_type": "float",
-        "data": 15.2
+        "data": 12.6
       },
       "hkt": {
-        "display_name": "Hämatokrit (Hkt) [39 – 50]",
+        "display_name": "Hämatokrit (Hkt) [36 – 46]",
         "unit": "%",
-        "data_type": "float",
-        "data": 44.8
+        "data_type": "integer",
+        "data": 38
       },
       "erythrozyten": {
-        "display_name": "Erythrozyten [4,5 – 5,9]",
+        "display_name": "Erythrozyten [4,0 – 5,2]",
         "unit": "Mio./µl",
         "data_type": "float",
-        "data": 4.98
+        "data": 4.3
       },
       "mcv": {
         "display_name": "MCV [80 – 100]",
         "unit": "fl",
-        "data_type": "float",
-        "data": 89.9
+        "data_type": "integer",
+        "data": 88
       },
       "mch": {
         "display_name": "MCH [27 – 34]",
         "unit": "pg",
-        "data_type": "float",
-        "data": 30.5
+        "data_type": "integer",
+        "data": 29
       },
       "mchc": {
         "display_name": "MCHC [31,5 – 36,0]",
         "unit": "g/dl",
         "data_type": "float",
-        "data": 33.9
-      }
-    }
-  },
-  "blutbild_leukozyten": {
-    "display_name": "Leukozyten",
-    "data": {
+        "data": 33.0
+      },
       "leukozyten_gesamt": {
         "display_name": "Leukozyten gesamt [4,0 – 10,0]",
         "unit": "G/l",
         "data_type": "float",
-        "data": 7.2
+        "data": 7.8
       },
       "neutrophile_segment": {
         "display_name": "Neutrophile (segmentkernig) [50 – 70 %]",
         "unit": "",
         "data_type": "string",
-        "data": "58 % / 4,18 G/l"
+        "data": "60 % / 4,68 G/l"
       },
       "neutrophile_stab": {
         "display_name": "Neutrophile (stabkernig) [0 – 3 %]",
         "unit": "",
         "data_type": "string",
-        "data": "1,5 % / 0,11 G/l"
+        "data": "2 % / 0,16 G/l"
       },
       "lymphozyten": {
         "display_name": "Lymphozyten [20 – 45 %]",
         "unit": "",
         "data_type": "string",
-        "data": "32 % / 2,30 G/l"
+        "data": "28 % / 2,18 G/l"
       },
       "monozyten": {
         "display_name": "Monozyten [2 – 10 %]",
         "unit": "",
         "data_type": "string",
-        "data": "6 % / 0,43 G/l"
+        "data": "7 % / 0,55 G/l"
       },
       "eosinophile": {
         "display_name": "Eosinophile [0 – 5 %]",
         "unit": "",
         "data_type": "string",
-        "data": "2 % / 0,14 G/l"
+        "data": "2 % / 0,16 G/l"
       },
       "basophile": {
         "display_name": "Basophile [0 – 1 %]",
         "unit": "",
         "data_type": "string",
-        "data": "0,5 % / 0,04 G/l"
-      }
-    }
-  },
-  "blutbild_thrombozyten": {
-    "display_name": "Thrombozyten",
-    "data": {
+        "data": "1 % / 0,08 G/l"
+      },
       "thrombozyten": {
         "display_name": "Thrombozyten [150 – 400]",
         "unit": "G/l",
         "data_type": "integer",
-        "data": 228
+        "data": 210
       }
     }
   },
-  "bewertung_labor": {
-    "display_name": "Bewertung Labor",
+  "labor_bewertung": {
+    "display_name": "Bewertung",
     "data": {
-      "troponin_bewertung": {
+      "troponin_befund": {
         "display_name": "Troponin negativ",
         "unit": "",
         "data_type": "string",
-        "data": "Kein laborchemischer Hinweis auf einen akuten Myokardschaden; ein ACS ist damit allein nicht sicher ausgeschlossen und muss im Zusammenhang mit Klinik, EKG, Beschwerdebeginn und ggf. Verlaufskontrollen beurteilt werden."
+        "data": "Kein Hinweis auf einen akuten Myokardschaden."
       },
-      "d_dimer_bewertung": {
+      "d_dimer_befund": {
         "display_name": "D-Dimer negativ",
         "unit": "",
         "data_type": "string",
-        "data": "Eine Lungenembolie ist damit nicht generell ausgeschlossen; bei niedriger klinischer Wahrscheinlichkeit kann der Befund gegen eine LE sprechen."
+        "data": "Spricht gegen eine Lungenembolie als Ursache der Dyspnoe."
       },
-      "crp_bewertung": {
-        "display_name": "CRP < 5 mg/l",
+      "crp_befund": {
+        "display_name": "CRP negativ (4 mg/l)",
         "unit": "",
         "data_type": "string",
-        "data": "Kein laborchemischer Hinweis auf eine relevante systemische Entzündung."
+        "data": "Kein Hinweis auf eine pneumonische oder sonstige floride Infektion."
       },
-      "diff_bb_bewertung": {
-        "display_name": "Diff.-BB unauffällig",
+      "hb_befund": {
+        "display_name": "Hb niedrig-normal (12,6 g/dl)",
         "unit": "",
         "data_type": "string",
-        "data": "Kein Hinweis auf Anämie oder ausgeprägtes entzündliches Blutbild."
+        "data": "Eine Anämie als (Mit-)Ursache der Dyspnoe ist damit weitgehend ausgeschlossen."
       },
-      "glukose_bewertung": {
-        "display_name": "Glukose normal",
+      "glukose_befund": {
+        "display_name": "Glukose erhöht (138 mg/dl)",
         "unit": "",
         "data_type": "string",
-        "data": "Normwertige Momentaufnahme, kein Hinweis auf akute Stoffwechselentgleisung."
+        "data": "Erhöhter Wert im Rahmen des bekannten Diabetes mellitus Typ 2."
       },
       "gesamtbeurteilung": {
         "display_name": "Gesamtbeurteilung",
         "unit": "",
         "data_type": "string",
-        "data": "Die POCT-Diagnostik ist insgesamt unauffällig und mit der Verdachtsdiagnose Brustwandsyndrom vereinbar. Gefährliche Differenzialdiagnosen sind hierdurch jedoch nicht allein sicher ausgeschlossen; entscheidend bleibt die klinische Gesamteinschätzung."
+        "data": "Die Laborwerte schliessen Lungenembolie, akutes Koronarsyndrom, Pneumonie und Anämie als Ursache der Dyspnoe weitgehend aus und stützen in Zusammenschau mit der Klinik die Verdachtsdiagnose einer chronischen Linksherzinsuffizienz (NYHA II–III)."
       }
     }
   },
   "vitalparameter": {
     "display_name": "Vitalparameter",
     "data": {
-      "rr_rechts": {
-        "display_name": "RR rechts",
-        "unit": "",
+      "rr": {
+        "display_name": "RR",
+        "unit": "mmHg",
         "data_type": "string",
-        "data": "128/82 mmHg"
-      },
-      "rr_links": {
-        "display_name": "RR links",
-        "unit": "",
-        "data_type": "string",
-        "data": "126/80 mmHg"
+        "data": "144/86"
       },
       "puls": {
         "display_name": "Puls",
-        "unit": "",
+        "unit": "/min",
         "data_type": "string",
-        "data": "78/min, regelmäßig"
+        "data": "88, regelmaessig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
-        "unit": "",
-        "data_type": "string",
-        "data": "16/min"
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 20
       },
       "spo2": {
         "display_name": "SpO2",
-        "unit": "",
+        "unit": "%",
         "data_type": "string",
-        "data": "98 % (Raumluft)"
+        "data": "94 (Raumluft)"
       },
       "temperatur": {
         "display_name": "Temperatur",
-        "unit": "",
+        "unit": "°C",
         "data_type": "string",
-        "data": "36,7 °C (aurikulär)"
+        "data": "36,6 (aurikulaer)"
       }
     }
   },
@@ -216,25 +200,25 @@
         "display_name": "Allgemeinzustand",
         "unit": "",
         "data_type": "string",
-        "data": "gut; Patient betritt die Praxis selbstständig gehend, wach, leicht besorgt, aber kooperativ; kein Distress, keine Ruhedyspnoe, kein Kaltschweiß"
+        "data": "reduzierter AZ fuer das Alter; spricht in kurzen Sätzen bei Belastung, sitzt aufrecht, keine Ruhedyspnoe im Sitzen"
       },
       "hautkolorit": {
         "display_name": "Hautkolorit",
         "unit": "",
         "data_type": "string",
-        "data": "rosig, keine Blässe, keine Zyanose"
+        "data": "leicht blass, keine Zyanose unter Raumluft"
       },
-      "haltung_mimik": {
-        "display_name": "Haltung & Mimik",
+      "haltung_gangbild": {
+        "display_name": "Haltung & Gangbild",
         "unit": "",
         "data_type": "string",
-        "data": "leichte Schonhaltung des Oberkörpers nach links beim Hinsetzen; leichte Anspannung im Gesicht bei Rumpfbewegung"
+        "data": "verlangsamtes Gangbild, Pause nach wenigen Schritten"
       },
       "bewusstsein": {
         "display_name": "Bewusstsein",
         "unit": "",
         "data_type": "string",
-        "data": "wach, orientiert, adäquater Kontakt, flüssige Sprache"
+        "data": "wach, voll orientiert"
       }
     }
   },
@@ -245,25 +229,19 @@
         "display_name": "Inspektion",
         "unit": "",
         "data_type": "string",
-        "data": "keine gestauten Halsvenen, keine peripheren Ödeme, kein sichtbarer Herzspitzenstoß"
+        "data": "Halsvenen leicht gestaut im Sitzen; Herzspitzenstoss nach lateral verlagert tastbar"
       },
       "auskultation": {
         "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
-        "data": "Herztöne rein und regelmäßig, keine Herzgeräusche, kein Perikardreiben, keine Extratöne"
+        "data": "Herztoene rein, regelmaessig, kein Systolikum; diskreter 3. Herzton auskultierbar"
       },
       "peripherer_puls": {
         "display_name": "Peripherer Puls",
         "unit": "",
         "data_type": "string",
-        "data": "A. radialis beidseits kräftig und seitengleich tastbar"
-      },
-      "blutdruck": {
-        "display_name": "Blutdruck",
-        "unit": "",
-        "data_type": "string",
-        "data": "128/82 mmHg rechts, 126/80 mmHg links"
+        "data": "A. radialis beidseits kraeftig und seitengleich tastbar"
       }
     }
   },
@@ -274,48 +252,42 @@
         "display_name": "Inspektion",
         "unit": "",
         "data_type": "string",
-        "data": "Atemfrequenz 16/min, seitengleiche Atemexkursion, keine Einziehungen, kein Einsatz der Atemhilfsmuskulatur"
+        "data": "leicht erhoehte Atemfrequenz (20/min), keine Einziehungen, kein Einsatz der Atemhilfsmuskulatur"
       },
       "auskultation": {
         "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
-        "data": "Vesikuläratmen seitengleich über allen Lungenfeldern; keine Nebengeräusche (kein Giemen, keine Rasselgeräusche, kein Pleurareiben)"
+        "data": "beidseitig feinblasige Rasselgeraeusche; sonst Vesikulaeratmen, kein Giemen"
       },
       "perkussion": {
         "display_name": "Perkussion",
         "unit": "",
         "data_type": "string",
-        "data": "Klopfschall seitengleich sonor; kein Hinweis auf Erguss oder Pneumothorax"
+        "data": "beidseitig leicht gedaempfter Klopfschall"
       }
     }
   },
-  "brustwand": {
-    "display_name": "Brustwand",
+  "abdomen": {
+    "display_name": "Abdomen",
     "data": {
       "inspektion": {
         "display_name": "Inspektion",
         "unit": "",
         "data_type": "string",
-        "data": "keine Rötung, keine Schwellung, keine Hämatome im Bereich der linken anterioren Brustwand"
+        "data": "unauffaellig, kein sichtbarer Aszites, keine Narben"
+      },
+      "auskultation": {
+        "display_name": "Auskultation",
+        "unit": "",
+        "data_type": "string",
+        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
       },
       "palpation": {
         "display_name": "Palpation",
         "unit": "",
         "data_type": "string",
-        "data": "ausgeprägter, punktförmiger und reproduzierbarer Druckschmerz über dem 3.–4. Kostochondralgelenk links parasternal; Patient zeigt spontan auf den Schmerzpunkt; kein Krepitieren, keine Schwellung, keine Frakturzeichen"
-      },
-      "thoraxkompression": {
-        "display_name": "Thoraxkompression",
-        "unit": "",
-        "data_type": "string",
-        "data": "laterale Kompression provoziert leichten Schmerz links, sonst schmerzfrei"
-      },
-      "atem_bewegungsabhaengigkeit": {
-        "display_name": "Atem- & Bewegungsabhängigkeit",
-        "unit": "",
-        "data_type": "string",
-        "data": "Schmerzverstärkung bei tiefer Inspiration und Rumpfrotation nach links, nicht belastungsabhängig"
+        "data": "weich, kein Druckschmerz, keine Abwehrspannung, Leber am Rippenbogen tastbar, nicht sicher vergroessert, kein Aszites, Nierenlager beidseits nicht klopfschmerzhaft"
       }
     }
   },
@@ -326,7 +298,7 @@
         "display_name": "Befund",
         "unit": "",
         "data_type": "string",
-        "data": "keine Beinschwellung, kein Wadendruckschmerz, keine Überwärmung, kein Meyer-/Homans-Zeichen, seitengleiches Hautkolorit"
+        "data": "symmetrische, eindrueckbare Unterschenkel-/Knoecheloedeme beidseits, kein Wadendruckschmerz, kein Homans-Zeichen, Hautkolorit livide-blass"
       }
     }
   }
