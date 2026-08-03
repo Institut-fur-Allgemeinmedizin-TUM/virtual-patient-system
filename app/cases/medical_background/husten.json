@@ -1,0 +1,332 @@
+{
+  "vitalparameter": {
+    "display_name": "Vitalparameter",
+    "data": {
+      "rr": {
+        "display_name": "RR",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "118/76"
+      },
+      "puls": {
+        "display_name": "Puls",
+        "unit": "/min",
+        "data_type": "string",
+        "data": "76, regelmaessig"
+      },
+      "atemfrequenz": {
+        "display_name": "Atemfrequenz",
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 16
+      },
+      "spo2": {
+        "display_name": "SpO2",
+        "unit": "%",
+        "data_type": "string",
+        "data": "97 (Raumluft)"
+      },
+      "temperatur": {
+        "display_name": "Temperatur",
+        "unit": "°C",
+        "data_type": "string",
+        "data": "36,6 (aurikulaer)"
+      }
+    }
+  },
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand (Erstblick)",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand",
+        "unit": "",
+        "data_type": "string",
+        "data": "guter AZ, wach, kooperativ; gelegentlicher Raeusperzwang/Hustenreiz im Gespraech, kein Distress"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "rosig, keine Blaesse, keine Zyanose"
+      },
+      "haltung_gangbild": {
+        "display_name": "Haltung & Gangbild",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffaellig, sicheres Gangbild"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, voll orientiert, fluessige Sprache"
+      }
+    }
+  },
+  "herz": {
+    "display_name": "Herz",
+    "data": {
+      "inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine gestauten Halsvenen, keine Oedeme, Herzspitzenstoss nicht sichtbar"
+      },
+      "auskultation": {
+        "display_name": "Auskultation",
+        "unit": "",
+        "data_type": "string",
+        "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
+      },
+      "peripherer_puls": {
+        "display_name": "Peripherer Puls",
+        "unit": "",
+        "data_type": "string",
+        "data": "A. radialis kraeftig, seitengleich tastbar"
+      }
+    }
+  },
+  "lunge": {
+    "display_name": "Lunge",
+    "data": {
+      "inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "seitengleiche Atemexkursion, kein Einsatz der Atemhilfsmuskulatur"
+      },
+      "auskultation": {
+        "display_name": "Auskultation",
+        "unit": "",
+        "data_type": "string",
+        "data": "Vesikulaeratmen seitengleich, kein Giemen in Ruhe, keine Rasselgeraeusche"
+      },
+      "auskultation_forciert": {
+        "display_name": "Auskultation (forciert)",
+        "unit": "",
+        "data_type": "string",
+        "data": "nach forciertem Hustenstoss vereinzelt exspiratorisches Giemen, sonst kein pathologisches Nebengeraeusch"
+      },
+      "perkussion": {
+        "display_name": "Perkussion",
+        "unit": "",
+        "data_type": "string",
+        "data": "Klopfschall sonor, seitengleich"
+      }
+    }
+  },
+  "hno_rachen": {
+    "display_name": "HNO / Rachen",
+    "data": {
+      "befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "Rachenring reizlos, keine Roetung/Belaege, keine zervikale Lymphadenopathie, Nasenatmung frei"
+      }
+    }
+  },
+  "abdomen": {
+    "display_name": "Abdomen",
+    "data": {
+      "inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffaellig, kein Meteorismus, keine Narben"
+      },
+      "auskultation": {
+        "display_name": "Auskultation",
+        "unit": "",
+        "data_type": "string",
+        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
+      },
+      "palpation": {
+        "display_name": "Palpation",
+        "unit": "",
+        "data_type": "string",
+        "data": "weich, kein Druckschmerz, keine Abwehrspannung, keine Resistenzen, Leber/Milz nicht vergroessert tastbar, Nierenlager beidseits nicht klopfschmerzhaft"
+      }
+    }
+  },
+  "beine": {
+    "display_name": "Beine",
+    "data": {
+      "befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen, seitengleiches Hautkolorit"
+      }
+    }
+  },
+  "schnelltests": {
+    "display_name": "Schnelltests",
+    "data": {
+      "troponin_i": {
+        "display_name": "Troponin I (semiquant.) [< 40 ng/l]",
+        "unit": "",
+        "data_type": "string",
+        "data": "negativ"
+      },
+      "d_dimer": {
+        "display_name": "D-Dimer (semiquant.) [< 0,5 mg/l]",
+        "unit": "",
+        "data_type": "string",
+        "data": "negativ"
+      },
+      "crp": {
+        "display_name": "CRP (semiquant.) [< 5 mg/l]",
+        "unit": "",
+        "data_type": "string",
+        "data": "negativ (4 mg/l)"
+      },
+      "glukose": {
+        "display_name": "Kapillarblutglukose [70-100 mg/dl]",
+        "unit": "mg/dl",
+        "data_type": "integer",
+        "data": 92
+      }
+    }
+  },
+  "blutbild_erythrozyten": {
+    "display_name": "Erythrozyten",
+    "data": {
+      "hb": {
+        "display_name": "Hämoglobin (Hb) [12,0 – 16,0]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 13.8
+      },
+      "hkt": {
+        "display_name": "Hämatokrit (Hkt) [36 – 46]",
+        "unit": "%",
+        "data_type": "integer",
+        "data": 41
+      },
+      "erythrozyten": {
+        "display_name": "Erythrozyten [4,0 – 5,2]",
+        "unit": "Mio./µl",
+        "data_type": "float",
+        "data": 4.6
+      },
+      "mcv": {
+        "display_name": "MCV [80 – 100]",
+        "unit": "fl",
+        "data_type": "integer",
+        "data": 89
+      },
+      "mch": {
+        "display_name": "MCH [27 – 34]",
+        "unit": "pg",
+        "data_type": "integer",
+        "data": 30
+      },
+      "mchc": {
+        "display_name": "MCHC [31,5 – 36,0]",
+        "unit": "g/dl",
+        "data_type": "float",
+        "data": 33.5
+      }
+    }
+  },
+  "blutbild_leukozyten": {
+    "display_name": "Leukozyten",
+    "data": {
+      "leukozyten_gesamt": {
+        "display_name": "Leukozyten gesamt [4,0 – 10,0]",
+        "unit": "G/l",
+        "data_type": "float",
+        "data": 7.2
+      },
+      "neutrophile_segment": {
+        "display_name": "Neutrophile (segmentkernig) [50 – 70 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "58 % / 4,18 G/l"
+      },
+      "neutrophile_stab": {
+        "display_name": "Neutrophile (stabkernig) [0 – 3 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "1 % / 0,07 G/l"
+      },
+      "lymphozyten": {
+        "display_name": "Lymphozyten [20 – 45 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "30 % / 2,16 G/l"
+      },
+      "monozyten": {
+        "display_name": "Monozyten [2 – 10 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "6 % / 0,43 G/l"
+      },
+      "eosinophile": {
+        "display_name": "Eosinophile [0 – 5 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "4 % / 0,29 G/l"
+      },
+      "basophile": {
+        "display_name": "Basophile [0 – 1 %]",
+        "unit": "",
+        "data_type": "string",
+        "data": "1 % / 0,07 G/l"
+      }
+    }
+  },
+  "blutbild_thrombozyten": {
+    "display_name": "Thrombozyten",
+    "data": {
+      "thrombozyten": {
+        "display_name": "Thrombozyten [150 – 400]",
+        "unit": "G/l",
+        "data_type": "integer",
+        "data": 245
+      }
+    }
+  },
+  "bewertung": {
+    "display_name": "Bewertung & Beurteilung",
+    "data": {
+      "troponin_interpretation": {
+        "display_name": "Troponin-Interpretation",
+        "unit": "",
+        "data_type": "string",
+        "data": "Troponin negativ: Kein Hinweis auf eine kardiale Ursache der Beschwerden; im Kontext des Falls ohnehin nicht führend."
+      },
+      "d_dimer_interpretation": {
+        "display_name": "D-Dimer-Interpretation",
+        "unit": "",
+        "data_type": "string",
+        "data": "D-Dimer negativ: Kein Hinweis auf eine venöse Thromboembolie."
+      },
+      "crp_interpretation": {
+        "display_name": "CRP-Interpretation",
+        "unit": "",
+        "data_type": "string",
+        "data": "CRP negativ (4 mg/l): Kein Hinweis auf eine floride bakterielle Infektion; passt zum Abklingen der vorausgegangenen Bronchitis."
+      },
+      "diff_bb_interpretation": {
+        "display_name": "Differentialblutbild-Interpretation",
+        "unit": "",
+        "data_type": "string",
+        "data": "Diff.-BB weitgehend unauffällig: Leichte Eosinophilie (4 %) als möglicher Hinweis auf eine atopische Komponente."
+      },
+      "glukose_interpretation": {
+        "display_name": "Glukose-Interpretation",
+        "unit": "",
+        "data_type": "string",
+        "data": "Glukose normal (92 mg/dl): Unauffälliger Zufallswert, kein Hinweis auf eine Stoffwechselstörung."
+      },
+      "gesamtbeurteilung": {
+        "display_name": "Gesamtbeurteilung",
+        "unit": "",
+        "data_type": "string",
+        "data": "Die Laborwerte sind mit einem subakuten postinfektiösen Reizhusten vereinbar; es findet sich kein laborchemischer Hinweis auf eine floride Infektion, Anaemie oder systemische Entzuendung."
+      }
+    }
+  }
+}
