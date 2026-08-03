@@ -57,7 +57,7 @@ def _load_background_data_from_disk(case_id: str) -> dict[str, list[DiagnosticGr
                 background_data[key] = diag_group
         except JSONDecodeError:
             print(f"Error during JSON load for file {f}")
-        #except Exception:
+        # except Exception:
         #    print(f"Some other error during loading for file {f}")
         return background_data
 
