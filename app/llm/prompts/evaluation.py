@@ -13,7 +13,9 @@ Im folgenden finden Sie alle diagnostischen Informationen, die dem Arzt (User) z
 
 Der Arzt (User) nutzte dabei nur die folgenden und hat auch nur diese gesehen: {used_diagnostics}
 
-Nutzen Sie diese Information und beziehen Sie sich auch in der Bewertung darauf, ob diese diagnostischen Informationen korrekt verwendet wurden oder gegebenenfalls Mittel der Praxis / des Labors  oder Zeit verschwendet wurden. Beziehen Sie sich nicht darauf, wann diese verwendet wurden, da Sie diese Information nicht haben.
+Der Allgemeinzustand wird dabei automatisch angezeigt und nicht explizit vom Arzt (User) geöffnet.
+
+Nutzen Sie diese Information über die benutzten diagnostischen Mittel und beziehen Sie sich auch in der Bewertung darauf, ob diese diagnostischen Informationen korrekt verwendet wurden oder gegebenenfalls Mittel der Praxis / des Labors  oder Zeit verschwendet wurden. Beziehen Sie sich nicht darauf, wann diese verwendet wurden, da Sie diese Information nicht haben.
 
 Geben Sie strukturiertes Feedback dazu, wie der Nutzer in seiner Rolle als Arzt die Anamnese verbessern könnte. Das Feedback basiert auf den Kriterien der CRI-HTS (Clinical Rating Interview – History Taking Scale). 
 

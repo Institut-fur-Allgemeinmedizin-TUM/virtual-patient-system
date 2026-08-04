@@ -1,4 +1,74 @@
 {
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand",
+        "unit": "",
+        "data_type": "string",
+        "data": "gut; Patient betritt die Praxis selbstständig gehend, wach, leicht besorgt, aber kooperativ; kein Distress, keine Ruhedyspnoe, kein Kaltschweiß"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "rosig, keine Blässe, keine Zyanose"
+      },
+      "haltung_mimik": {
+        "display_name": "Haltung / Mimik",
+        "unit": "",
+        "data_type": "string",
+        "data": "leichte Schonhaltung des Oberkörpers nach links beim Hinsetzen; leichte Anspannung im Gesicht bei Rumpfbewegung"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, orientiert, adäquater Kontakt, flüssige Sprache"
+      }
+    }
+  },
+  "vitalparameter": {
+    "display_name": "Vitalparameter",
+    "data": {
+      "rr_rechts": {
+        "display_name": "RR rechts",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "128/82"
+      },
+      "rr_links": {
+        "display_name": "RR links",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "126/80"
+      },
+      "puls": {
+        "display_name": "Puls",
+        "unit": "/min",
+        "data_type": "string",
+        "data": "78, regelmäßig"
+      },
+      "atemfrequenz": {
+        "display_name": "Atemfrequenz",
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 16
+      },
+      "spo2": {
+        "display_name": "SpO2",
+        "unit": "%",
+        "data_type": "string",
+        "data": "98 (Raumluft)"
+      },
+      "temperatur": {
+        "display_name": "Temperatur",
+        "unit": "°C",
+        "data_type": "string",
+        "data": "36,7 (aurikulär)"
+      }
+    }
+  },
   "troponin_i": {
     "display_name": "Troponin I",
     "data": {

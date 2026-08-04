@@ -1,4 +1,68 @@
 {
+  "vitalparameter": {
+    "display_name": "Vitalparameter",
+    "data": {
+      "rr": {
+        "display_name": "RR",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "126/78"
+      },
+      "puls": {
+        "display_name": "Puls",
+        "unit": "/min",
+        "data_type": "string",
+        "data": "80, regelmaessig"
+      },
+      "atemfrequenz": {
+        "display_name": "Atemfrequenz",
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 14
+      },
+      "spo2": {
+        "display_name": "SpO2",
+        "unit": "%",
+        "data_type": "string",
+        "data": "99 (Raumluft)"
+      },
+      "temperatur": {
+        "display_name": "Temperatur",
+        "unit": "°C",
+        "data_type": "string",
+        "data": "36,5 (aurikulaer)"
+      }
+    }
+  },
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand",
+        "unit": "",
+        "data_type": "string",
+        "data": "guter AZ, leicht angespannte Stirn-/Nackenmuskulatur, kein Distress"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffaellig"
+      },
+      "haltung_gangbild": {
+        "display_name": "Haltung/Gangbild",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffaellig"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, voll orientiert"
+      }
+    }
+  },
   "troponin_i": {
     "display_name": "Troponin I",
     "data": {

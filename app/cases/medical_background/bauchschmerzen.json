@@ -1,4 +1,68 @@
 {
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand",
+        "unit": "",
+        "data_type": "string",
+        "data": "guter AZ, leicht angespannt wirkend, kein Distress, keine Schmerzaeusserung in Ruhe"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffaellig, keine Blaesse, kein Ikterus"
+      },
+      "haltung_gangbild": {
+        "display_name": "Haltung / Gangbild",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffaellig"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, voll orientiert"
+      }
+    }
+  },
+  "vitalparameter": {
+    "display_name": "Vitalparameter",
+    "data": {
+      "rr": {
+        "display_name": "Blutdruck (RR)",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "138/88"
+      },
+      "puls": {
+        "display_name": "Puls",
+        "unit": "/min",
+        "data_type": "string",
+        "data": "84/min, regelmaessig"
+      },
+      "atemfrequenz": {
+        "display_name": "Atemfrequenz",
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 14
+      },
+      "spo2": {
+        "display_name": "Sauerstoffsättigung (SpO2)",
+        "unit": "%",
+        "data_type": "string",
+        "data": "98 % (Raumluft)"
+      },
+      "temperatur": {
+        "display_name": "Temperatur",
+        "unit": "°C",
+        "data_type": "string",
+        "data": "36,8 °C (aurikulaer)"
+      }
+    }
+  },
   "troponin_i": {
     "display_name": "Troponin I",
     "data": {
