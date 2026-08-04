@@ -7,12 +7,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "troponin_befund": {
-        "display_name": "Troponin negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf einen akuten Myokardschaden."
       }
     }
   },
@@ -24,12 +18,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "d_dimer_befund": {
-        "display_name": "D-Dimer negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Spricht gegen eine Lungenembolie als Ursache der Dyspnoe."
       }
     }
   },
@@ -41,12 +29,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ (4 mg/l)"
-      },
-      "crp_befund": {
-        "display_name": "CRP negativ (4 mg/l)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine pneumonische oder sonstige floride Infektion."
       }
     }
   },
@@ -58,12 +40,6 @@
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 138
-      },
-      "glukose_befund": {
-        "display_name": "Glukose erhöht (138 mg/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Erhöhter Wert im Rahmen des bekannten Diabetes mellitus Typ 2."
       }
     }
   },
@@ -117,12 +93,6 @@
         "unit": "G/l",
         "data_type": "integer",
         "data": 210
-      },
-      "hb_befund": {
-        "display_name": "Hb niedrig-normal (12,6 g/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Eine Anämie als (Mit-)Ursache der Dyspnoe ist damit weitgehend ausgeschlossen."
       }
     }
   },

@@ -7,12 +7,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "troponin_i_bewertung": {
-        "display_name": "Troponin negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine kardiale Beteiligung."
       }
     }
   },
@@ -24,12 +18,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "d_dimer_bewertung": {
-        "display_name": "D-Dimer negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine venöse Thromboembolie."
       }
     }
   },
@@ -41,12 +29,6 @@
         "unit": "",
         "data_type": "string",
         "data": "leicht erhöht (6 mg/l)"
-      },
-      "crp_bewertung": {
-        "display_name": "CRP leicht erhöht (6 mg/l)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Diskrete Erhöhung vereinbar mit einer chemisch-toxisch bedingten Schleimhautentzündung (NSAR, Nikotin, Kaffee); kein Nachweis einer relevanten systemischen Entzündung."
       }
     }
   },
@@ -58,12 +40,6 @@
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 105
-      },
-      "glukose_bewertung": {
-        "display_name": "Glukose grenzwertig (105 mg/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Leicht erhöhter Zufallswert, am ehesten im Zusammenhang mit unregelmässiger, kohlenhydratreicher Ernährung; kein Hinweis auf manifesten Diabetes."
       }
     }
   },
@@ -117,12 +93,6 @@
         "unit": "G/l",
         "data_type": "integer",
         "data": 260
-      },
-      "hb_bewertung": {
-        "display_name": "Hb grenzwertig niedrig (13,2 g/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Möglicher Hinweis auf einen okkulten, NSAR-assoziierten Blutverlust; sonst unauffälliges Blutbild."
       }
     }
   },
@@ -176,12 +146,6 @@
         "unit": "G/l",
         "data_type": "integer",
         "data": 260
-      },
-      "hb_bewertung": {
-        "display_name": "Hb grenzwertig niedrig (13,2 g/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Möglicher Hinweis auf einen okkulten, NSAR-assoziierten Blutverlust; sonst unauffälliges Blutbild."
       },
       "neutrophile_segment": {
         "display_name": "Neutrophile (segmentkernig) [50 – 70 %]",
