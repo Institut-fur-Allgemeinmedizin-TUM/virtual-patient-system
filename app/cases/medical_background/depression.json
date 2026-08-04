@@ -1,4 +1,68 @@
 {
+  "vitalparameter": {
+    "display_name": "Vitalparameter",
+    "data": {
+      "rr": {
+        "display_name": "RR",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "128/82"
+      },
+      "puls": {
+        "display_name": "Puls",
+        "unit": "/min",
+        "data_type": "string",
+        "data": "76, regelmaessig"
+      },
+      "atemfrequenz": {
+        "display_name": "Atemfrequenz",
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 14
+      },
+      "spo2": {
+        "display_name": "SpO2",
+        "unit": "%",
+        "data_type": "string",
+        "data": "98 (Raumluft)"
+      },
+      "temperatur": {
+        "display_name": "Temperatur",
+        "unit": "°C",
+        "data_type": "string",
+        "data": "36,6 (aurikulaer)"
+      }
+    }
+  },
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand (Erstblick)",
+        "unit": "",
+        "data_type": "string",
+        "data": "reduzierter Antrieb, verlangsamte Psychomotorik, insgesamt kooperativ, kein akuter Distress"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffaellig"
+      },
+      "haltung_gangbild": {
+        "display_name": "Haltung & Gangbild",
+        "unit": "",
+        "data_type": "string",
+        "data": "gebeugte Haltung, wenig Blickkontakt; Gangbild selbst unauffaellig"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, voll orientiert, kein Anhalt fuer kognitive Einschraenkung im Gespraech"
+      }
+    }
+  },
   "troponin_i": {
     "display_name": "Troponin I",
     "data": {

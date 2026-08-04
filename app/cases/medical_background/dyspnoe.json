@@ -1,4 +1,68 @@
 {
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand",
+        "unit": "",
+        "data_type": "string",
+        "data": "reduzierter AZ fuer das Alter; spricht in kurzen Saetzen bei Belastung, sitzt aufrecht, keine Ruhedyspnoe im Sitzen"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "leicht blass, keine Zyanose unter Raumluft"
+      },
+      "haltung_gangbild": {
+        "display_name": "Haltung / Gangbild",
+        "unit": "",
+        "data_type": "string",
+        "data": "verlangsamtes Gangbild, Pause nach wenigen Schritten"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, voll orientiert"
+      }
+    }
+  },
+  "vitalparameter": {
+    "display_name": "Vitalparameter",
+    "data": {
+      "rr": {
+        "display_name": "Blutdruck (RR)",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "144/86"
+      },
+      "puls": {
+        "display_name": "Puls",
+        "unit": "/min",
+        "data_type": "string",
+        "data": "88/min, regelmaessig"
+      },
+      "atemfrequenz": {
+        "display_name": "Atemfrequenz",
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 20
+      },
+      "spo2": {
+        "display_name": "Sauerstoffsättigung (SpO2)",
+        "unit": "%",
+        "data_type": "string",
+        "data": "94 % (Raumluft)"
+      },
+      "temperatur": {
+        "display_name": "Temperatur",
+        "unit": "°C",
+        "data_type": "string",
+        "data": "36,6 °C (aurikulaer)"
+      }
+    }
+  },
   "troponin_i": {
     "display_name": "Troponin I",
     "data": {
