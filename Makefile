@@ -37,6 +37,10 @@ run-test: setup-venv
 	$(PIP) install -r requirements-test.txt
 	$(PYTHON) -m pytest tests/backend --cov=app/api --cov-report=term-missing --cov-report=xml --cov-fail-under=60
 
+build-docs:
+	cd docs && npm ci
+	cd docs && npm run build
+
 # 7. Clean up the environment and cached files
 clean:
 	rm -rf $(VENV)
