@@ -7,12 +7,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "bewertung": {
-        "display_name": "Bewertung",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein laborchemischer Hinweis auf einen akuten Myokardschaden; ein ACS ist damit allein nicht sicher ausgeschlossen und muss im Zusammenhang mit Klinik, EKG, Beschwerdebeginn und ggf. Verlaufskontrollen beurteilt werden."
       }
     }
   },
@@ -24,12 +18,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "bewertung": {
-        "display_name": "Bewertung",
-        "unit": "",
-        "data_type": "string",
-        "data": "Eine Lungenembolie ist damit nicht generell ausgeschlossen; bei niedriger klinischer Wahrscheinlichkeit kann der Befund gegen eine LE sprechen."
       }
     }
   },
@@ -41,12 +29,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "bewertung": {
-        "display_name": "Bewertung",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein laborchemischer Hinweis auf eine relevante systemische Entzündung."
       }
     }
   },
@@ -58,12 +40,6 @@
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 94
-      },
-      "bewertung": {
-        "display_name": "Bewertung",
-        "unit": "",
-        "data_type": "string",
-        "data": "Normwertige Momentaufnahme, kein Hinweis auf akute Stoffwechselentgleisung."
       }
     }
   },
@@ -206,12 +182,6 @@
         "unit": "",
         "data_type": "string",
         "data": "0,5 % / 0,04 G/l"
-      },
-      "bewertung": {
-        "display_name": "Bewertung Diff.-BB",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf Anämie oder ausgeprägtes entzündliches Blutbild."
       }
     }
   },
