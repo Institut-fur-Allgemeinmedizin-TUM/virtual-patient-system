@@ -96,11 +96,11 @@ const config: Config = {
           label: 'Website',
           position: 'right'
         },
-        /*{
-          href: 'https://github.com/facebook/docusaurus',
+        {
+          href: 'https://github.com/Institut-fur-Allgemeinmedizin-TUM/virtual-patient-system/',
           label: 'GitHub',
           position: 'right',
-        },*/
+        },
       ],
     },
     footer: {
