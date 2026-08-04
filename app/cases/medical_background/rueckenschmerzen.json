@@ -1,4 +1,68 @@
 {
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand",
+        "unit": "",
+        "data_type": "string",
+        "data": "reduzierter AZ durch Schmerzen, deutliche Schonhaltung, kein Distress in Ruhe"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffaellig, ggf. leicht schweissig durch Schmerzreiz"
+      },
+      "haltung_gangbild": {
+        "display_name": "Haltung & Gangbild",
+        "unit": "",
+        "data_type": "string",
+        "data": "vorsichtiges, kleinschrittiges Gangbild; haelt sich beim Aufstehen ab; Ausweichhaltung des Rumpfes nach rechts"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, voll orientiert"
+      }
+    }
+  },
+  "vitalparameter": {
+    "display_name": "Vitalparameter",
+    "data": {
+      "rr": {
+        "display_name": "Blutdruck (RR)",
+        "unit": "mmHg",
+        "data_type": "string",
+        "data": "132/84"
+      },
+      "puls": {
+        "display_name": "Puls",
+        "unit": "/min",
+        "data_type": "string",
+        "data": "74, regelmaessig"
+      },
+      "atemfrequenz": {
+        "display_name": "Atemfrequenz",
+        "unit": "/min",
+        "data_type": "integer",
+        "data": 14
+      },
+      "spo2": {
+        "display_name": "Sauerstoffsättigung (SpO2)",
+        "unit": "%",
+        "data_type": "string",
+        "data": "98 (Raumluft)"
+      },
+      "temperatur": {
+        "display_name": "Temperatur",
+        "unit": "°C",
+        "data_type": "string",
+        "data": "36,6 (aurikulaer)"
+      }
+    }
+  },
   "troponin_i": {
     "display_name": "Troponin I",
     "data": {

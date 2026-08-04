@@ -26,7 +26,7 @@ from sqlalchemy import func, select, desc
 from sqlalchemy.orm import Session as OrmSession
 from starlette.responses import JSONResponse
 
-from app.api.medical_background import get_medical_background_available, BACKGROUNDS
+from app.api.medical_background import get_medical_background, BACKGROUNDS
 from app.api.memory import vhb_sessions, logger
 from app.auth import auth
 from app.config.config import settings
@@ -114,6 +114,11 @@ async def create_session(
             )
         )
         db.commit()
+
+    try:
+        await get_medical_background(request, req.case_id, "allgemeinzustand", session_id, db)
+    except HTTPException:
+        logger.Warn("Diagnostic not found during session initialization with medical diagnostic")
 
     return CreateSessionResponse(session_id=session_id, case_id=req.case_id)
 
