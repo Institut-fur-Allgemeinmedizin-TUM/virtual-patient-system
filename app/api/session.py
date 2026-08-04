@@ -116,9 +116,13 @@ async def create_session(
         db.commit()
 
     try:
-        await get_medical_background(request, req.case_id, "allgemeinzustand", session_id, db)
+        await get_medical_background(
+            request, req.case_id, "allgemeinzustand", session_id, db
+        )
     except HTTPException:
-        logger.Warn("Diagnostic not found during session initialization with medical diagnostic")
+        logger.Warn(
+            "Diagnostic not found during session initialization with medical diagnostic"
+        )
 
     return CreateSessionResponse(session_id=session_id, case_id=req.case_id)
 
