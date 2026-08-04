@@ -7,12 +7,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "bewertung": {
-        "display_name": "Troponin negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine kardiale Ursache."
       }
     }
   },
@@ -24,12 +18,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ"
-      },
-      "bewertung": {
-        "display_name": "D-Dimer negativ",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine venöse Thromboembolie."
       }
     }
   },
@@ -41,12 +29,6 @@
         "unit": "",
         "data_type": "string",
         "data": "negativ (3 mg/l)"
-      },
-      "bewertung": {
-        "display_name": "CRP negativ (3 mg/l)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf eine entzündliche oder infektiöse Ursache (z. B. Spondylodiszitis)."
       }
     }
   },
@@ -58,12 +40,6 @@
         "unit": "mg/dl",
         "data_type": "integer",
         "data": 90
-      },
-      "bewertung": {
-        "display_name": "Glukose normal (90 mg/dl)",
-        "unit": "",
-        "data_type": "string",
-        "data": "Unauffälliger Zufallswert."
       }
     }
   },
@@ -206,12 +182,6 @@
         "unit": "",
         "data_type": "string",
         "data": "1 % / 0,07 G/l"
-      },
-      "bewertung": {
-        "display_name": "Diff.-BB unauffällig",
-        "unit": "",
-        "data_type": "string",
-        "data": "Kein Hinweis auf Anämie oder entzündliches Blutbild."
       }
     }
   },
