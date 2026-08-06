@@ -24,7 +24,7 @@ An interactive web application that simulates patient encounters for medical stu
 - **Frontend**: React 19 + React Native + Expo (web, iOS, Android)
 - **Database**: PostgreSQL 17 (Cloud SQL on Google Cloud)
 - **Deployment**: Google Cloud Run (containerized)
-- **AI**: OpenAI GPT-4 mini for patient simulation
+- **AI**: Google Gemini
 
 ## 🚀 Deployment
 
