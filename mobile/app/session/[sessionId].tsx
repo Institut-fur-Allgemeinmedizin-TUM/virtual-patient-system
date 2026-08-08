@@ -109,7 +109,7 @@ export default function SessionScreen() {
       sendMessage();
     }
   };
-  const messagesLeft = Math.max(0, 10 - (session.chatHistory?.length || 0));
+  const messagesLeft = Math.floor(Math.max(0, 10 - (session.chatHistory?.length || 0)) / 2);
   const canEvaluate = messagesLeft === 0 && !session.waitingForEvaluationResponse && !isBotTyping;
   const evaluate = () => {
     if (canEvaluate) {
