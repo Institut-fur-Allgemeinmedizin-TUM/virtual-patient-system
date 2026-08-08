@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-na
 import {
   Appbar,
   Button,
+  Dialog,
   Divider,
   Drawer,
   Modal,
@@ -39,10 +40,24 @@ export function AppHeader() {
   const getDisplayPronouns = (p?: string) => (p && p !== 'not_specified' ? p : '');
 
   const [localPronouns, setLocalPronouns] = useState(getDisplayPronouns(pronouns));
+  const [pronounModalVisible, setPronounModalVisible] = useState(false);
+  const [hasShownPronounModal, setHasShownPronounModal] = useState(false);
 
   useEffect(() => {
     setLocalPronouns(getDisplayPronouns(pronouns));
   }, [pronouns]);
+
+  useEffect(() => {
+    if (isAuthenticated && !hasShownPronounModal && (!pronouns || pronouns === 'not_specified')) {
+      setPronounModalVisible(true);
+      setHasShownPronounModal(true);
+    }
+  }, [isAuthenticated, pronouns, hasShownPronounModal]);
+
+  const handlePronounSelect = (selectedPronoun: string) => {
+    updatePronouns(selectedPronoun);
+    setPronounModalVisible(false);
+  };
 
   const handlePronounsBlur = () => {
     if (localPronouns !== getDisplayPronouns(pronouns)) {
@@ -361,6 +376,62 @@ export function AppHeader() {
           title="Datenschutzerklärung"
           content={getMarkdownContent('datenschutz')}
         />
+
+        <Dialog
+          visible={pronounModalVisible}
+          onDismiss={() => setPronounModalVisible(false)}
+          style={{ backgroundColor: colors.elevation.level3, borderRadius: 12 }}
+        >
+          <Dialog.Title style={{ color: colors.onSurface, textAlign: 'center', fontSize: 22 }}>
+            Pronomen
+          </Dialog.Title>
+          <Dialog.Content>
+            <Text
+              style={{
+                color: colors.onSurfaceVariant,
+                fontSize: 16,
+                lineHeight: 24,
+                textAlign: 'center',
+              }}
+            >
+              Bitte teile uns mit, wie du angesprochen werden möchtest. Für eine neutrale Ansprache
+              kannst du die Angabe einfach leer lassen. Du kannst unten eine Option auswählen oder
+              deine Pronomen später im Profil anpassen.
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions
+            style={{
+              flexDirection: 'column',
+              alignItems: 'stretch',
+              paddingHorizontal: 24,
+              paddingBottom: 24,
+            }}
+          >
+            <Button
+              mode="contained"
+              style={{ marginBottom: 12 }}
+              contentStyle={{ paddingVertical: 4 }}
+              onPress={() => handlePronounSelect('sie/ihr')}
+            >
+              sie/ihr
+            </Button>
+            <Button
+              mode="contained"
+              style={{ marginBottom: 16 }}
+              contentStyle={{ paddingVertical: 4 }}
+              onPress={() => handlePronounSelect('er/ihm')}
+            >
+              er/ihm
+            </Button>
+            <Button
+              mode="outlined"
+              textColor={colors.primary}
+              onPress={() => setPronounModalVisible(false)}
+            >
+              Im Profil anpassen
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
     </>
   );
