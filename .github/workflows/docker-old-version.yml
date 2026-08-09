@@ -1,0 +1,25 @@
+name: Build and Export Old Version Docker Image
+
+on:
+  push:
+    branches:
+      - old-version
+
+jobs:
+  build-and-export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t virtual-patient-system:old-version .
+          docker save virtual-patient-system:old-version -o virtual-patient-system-old-version.tar
+          
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: old-version-docker-image
+          path: virtual-patient-system-old-version.tar
+          retention-days: 7
