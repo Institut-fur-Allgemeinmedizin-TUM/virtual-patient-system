@@ -166,6 +166,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     if (resp.data?.session_id) {
       set({ loaded: true, sessionId: resp.data.session_id, case: caseData, chatHistory: [] });
       useDiagnosticStore.getState().reset();
+      useDiagnosticStore.getState().setActiveContext(resp.data.session_id, caseId);
       return resp.data.session_id;
     } else {
       console.error('startSession failed: No session ID in response');
@@ -193,6 +194,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
             patientOccupation: c.patient_occupation,
           });
           set({ chatHistory: messages, case: caseModel, loaded: true });
+          useDiagnosticStore.getState().setActiveContext(get().sessionId!, caseModel.id);
         });
       });
   },
