@@ -115,6 +115,8 @@ const AnalyticsDashboard = () => {
   const dashboardOverview = useAnalyticsStore((state) => state.dashboardOverview);
   const loadDashboardOverview = useAnalyticsStore((state) => state.loadDashboardOverview);
   const sessionRecords = useAnalyticsStore((state) => state.sessionRecords);
+  const graphRecords = useAnalyticsStore((state) => state.graphRecords);
+  const loadGraphRecords = useAnalyticsStore((state) => state.loadGraphRecords);
   const loadSessionRecords = useAnalyticsStore((state) => state.loadSessionRecords);
   const totalSessionRecords = useAnalyticsStore((state) => state.totalSessionRecords);
   const downloadCSV = useAnalyticsStore((state) => state.downloadCSV);
@@ -168,7 +170,8 @@ const AnalyticsDashboard = () => {
   useEffect(() => {
     const caseId = selectedCase === ALL_CASES_VALUE ? undefined : selectedCase;
     loadDashboardOverview(caseId);
-  }, [selectedCase, loadDashboardOverview]);
+    loadGraphRecords(caseId);
+  }, [selectedCase, loadDashboardOverview, loadGraphRecords]);
 
   useEffect(() => {
     if (analyticsError) {
@@ -326,10 +329,10 @@ const AnalyticsDashboard = () => {
       )}
 
       {/* --- Middle Section: Advanced Analytics --- */}
-      {sessionRecords && sessionRecords.length > 0 && (
+      {graphRecords && graphRecords.length > 0 && (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
-          <CorrelationScatterPlot records={sessionRecords} />
-          <ScoreDistributionChart records={sessionRecords} />
+          <CorrelationScatterPlot records={graphRecords} />
+          <ScoreDistributionChart records={graphRecords} />
         </View>
       )}
 
