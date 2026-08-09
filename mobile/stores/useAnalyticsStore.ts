@@ -38,6 +38,7 @@ type AnalyticsStore = {
     orderBy?: SessionHistoryOrderBy[],
     filters?: SessionHistoryFilter[],
   ) => Promise<void>;
+  loadGraphRecords: (caseId?: string) => Promise<void>;
   downloadCSV: (
     caseId?: string,
     orderBy?: SessionHistoryOrderBy[],
@@ -57,6 +58,7 @@ const getAnalyticsErrorMessage = (error: unknown, fallback: string) => {
 export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
   dashboardOverview: null,
   sessionRecords: [],
+  graphRecords: [],
   totalSessionRecords: 0,
   isLoadingSessions: false,
   isDownloadingCSV: false,
@@ -301,6 +303,73 @@ export const useAnalyticsStore = create<AnalyticsStore>((set, get) => ({
         },
       });
       set({ isLoadingSessions: false });
+    }
+  },
+
+  loadGraphRecords: async (caseId?: string) => {
+    try {
+      const filters: SessionHistoryFilter[] = [];
+      if (caseId && caseId !== '__all__') {
+        filters.push({
+          column: SessionHistoryColumn.Case,
+          value: caseId,
+        });
+      }
+
+      const req: GetSessionsHistoryRequest = {
+        limit: 0,
+        offset: 0,
+        only_evaluated: true,
+        group_by: [],
+        order_by: [],
+        include_messages: false,
+        filters: filters,
+        include_columns: [
+          SessionHistoryColumn.StartedAt,
+          SessionHistoryColumn.Id,
+          SessionHistoryColumn.Case,
+          SessionHistoryColumn.EndedAt,
+          SessionHistoryColumn.Criterion1Score,
+          SessionHistoryColumn.Criterion1Explanation,
+          SessionHistoryColumn.Criterion2Score,
+          SessionHistoryColumn.Criterion2Explanation,
+          SessionHistoryColumn.Criterion3Score,
+          SessionHistoryColumn.Criterion3Explanation,
+          SessionHistoryColumn.Criterion4Score,
+          SessionHistoryColumn.Criterion4Explanation,
+          SessionHistoryColumn.Criterion5Score,
+          SessionHistoryColumn.Criterion5Explanation,
+          SessionHistoryColumn.Criterion6Score,
+          SessionHistoryColumn.Criterion6Explanation,
+          SessionHistoryColumn.Criterion7Score,
+          SessionHistoryColumn.Criterion7Explanation,
+          SessionHistoryColumn.Criterion8Score,
+          SessionHistoryColumn.Criterion8Explanation,
+          SessionHistoryColumn.LiveTimeUsed,
+          SessionHistoryColumn.UserWordCount,
+          SessionHistoryColumn.DurationMinutes,
+        ],
+        aggregations: [],
+      };
+
+      const resp = await apiClient.api.getSessionsStatsApiAnalyticsSessionsStatsPost(req);
+      const records = resp.data.rows.map((row) => row.values);
+      set({
+        graphRecords: records,
+        analyticsError: null,
+      });
+    } catch (error) {
+      console.error('Failed to load graph records:', error);
+      set({
+        analyticsError: {
+          message: getAnalyticsErrorMessage(
+            error,
+            'Failed to load graph records. Please try again.',
+          ),
+          action: 'loadDashboardOverview', // piggyback on this for now or make a new one
+          timestamp: Date.now(),
+        },
+      });
     }
   },
 }));
