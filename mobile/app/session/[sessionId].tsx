@@ -53,7 +53,6 @@ export default function SessionScreen() {
 
   const profile = useMemo(() => getSessionProfile(sessionId), [sessionId]);
   const session = useSessionStore((state) => state);
-  session.sessionId = sessionId; // Ensure session ID is set in store for API calls
   const loadSession = useSessionStore((state) => state.loadSession);
   const fetchUsedDiagnostics = useDiagnosticStore((state) => state.fetchUsedDiagnostics);
 
@@ -64,13 +63,25 @@ export default function SessionScreen() {
   const messageScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    if (!session.loaded) {
+    if (session.sessionId !== sessionId) {
+      useSessionStore.setState({ sessionId, loaded: false });
+      useDiagnosticStore.getState().reset();
+      void useSessionStore.getState().loadSession();
+    } else if (!session.loaded) {
       void loadSession();
     } else if (session.case?.id && sessionId) {
       //Preload used diagnostics for the current session and case
+      useDiagnosticStore.getState().setActiveContext(sessionId, session.case.id);
       void fetchUsedDiagnostics(sessionId, session.case.id);
     }
-  }, [loadSession, session.loaded, session.case?.id, sessionId, fetchUsedDiagnostics]);
+  }, [
+    loadSession,
+    session.loaded,
+    session.case?.id,
+    sessionId,
+    session.sessionId,
+    fetchUsedDiagnostics,
+  ]);
 
   useEffect(() => {
     messageScrollRef.current?.scrollToEnd({ animated: true });
