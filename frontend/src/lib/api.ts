@@ -8,8 +8,8 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // In production (not localhost), use same origin
-  if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+  // If not running on the Vite dev server (port 3000), use same origin
+  if (typeof window !== 'undefined' && window.location.port !== '3000') {
     return window.location.origin;
   }
   
