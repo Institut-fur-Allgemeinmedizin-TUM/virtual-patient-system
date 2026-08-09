@@ -17,10 +17,13 @@ interface DiagnosticState {
     diagnosticName: string,
     sessionId: string,
   ) => Promise<void>;
+  setActiveContext: (sessionId: string, caseId: string) => void;
   reset: () => void;
 }
 
 export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
+  currentSessionId: undefined,
+  currentCaseId: undefined,
   availableDiagnostics: [],
   usedDiagnostics: [],
   diagnosticResults: {},
@@ -28,18 +31,28 @@ export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
   loadingResults: {},
   error: undefined,
 
+  setActiveContext: (sessionId: string, caseId: string) => {
+    set({ currentSessionId: sessionId, currentCaseId: caseId });
+  },
+
   fetchAvailableDiagnostics: async (caseId: string) => {
     set({ loadingAvailable: true, error: undefined });
     try {
       const resp =
         await apiClient.api.getMedicalBackgroundAvailableApiDiagnosticsCaseIdAvailableGet(caseId);
       if (resp.status === 200) {
-        set({
-          availableDiagnostics: resp.data.diagnostics_available,
-          loadingAvailable: false,
+        set((state) => {
+          if (state.currentCaseId && state.currentCaseId !== caseId) return state;
+          return {
+            availableDiagnostics: resp.data.diagnostics_available,
+            loadingAvailable: false,
+          };
         });
       } else {
-        set({ error: 'Failed to fetch available diagnostics', loadingAvailable: false });
+        set((state) => {
+          if (state.currentCaseId && state.currentCaseId !== caseId) return state;
+          return { error: 'Failed to fetch available diagnostics', loadingAvailable: false };
+        });
       }
     } catch (err) {
       set({ error: 'Error fetching available diagnostics', loadingAvailable: false });
@@ -52,7 +65,10 @@ export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
       const resp =
         await apiClient.api.getUsedDiagnosticsApiSessionsSessionIdDiagnosticsGet(sessionId);
       if (resp.status === 200) {
-        set({ usedDiagnostics: resp.data.diagnostics_used });
+        set((state) => {
+          if (state.currentSessionId && state.currentSessionId !== sessionId) return state;
+          return { usedDiagnostics: resp.data.diagnostics_used };
+        });
         resp.data.diagnostics_used.forEach((diagName) => {
           get().fetchDiagnosticResult(caseId, diagName, sessionId);
         });
@@ -73,15 +89,21 @@ export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
         session_id: sessionId,
       });
       if (resp.status === 200) {
-        set((state) => ({
-          diagnosticResults: { ...state.diagnosticResults, [diagnosticName]: resp.data },
-          loadingResults: { ...state.loadingResults, [diagnosticName]: false },
-        }));
+        set((state) => {
+          if (state.currentSessionId && state.currentSessionId !== sessionId) return state;
+          return {
+            diagnosticResults: { ...state.diagnosticResults, [diagnosticName]: resp.data },
+            loadingResults: { ...state.loadingResults, [diagnosticName]: false },
+          };
+        });
       } else {
-        set((state) => ({
-          error: `Failed to fetch diagnostic result for ${diagnosticName}`,
-          loadingResults: { ...state.loadingResults, [diagnosticName]: false },
-        }));
+        set((state) => {
+          if (state.currentSessionId && state.currentSessionId !== sessionId) return state;
+          return {
+            error: `Failed to fetch diagnostic result for ${diagnosticName}`,
+            loadingResults: { ...state.loadingResults, [diagnosticName]: false },
+          };
+        });
       }
     } catch (err) {
       set((state) => ({
@@ -94,6 +116,8 @@ export const useDiagnosticStore = create<DiagnosticState>((set, get) => ({
 
   reset: () => {
     set({
+      currentSessionId: undefined,
+      currentCaseId: undefined,
       availableDiagnostics: [],
       usedDiagnostics: [],
       diagnosticResults: {},
