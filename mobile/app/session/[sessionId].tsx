@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSessionStore } from '@/stores/useSessionStore';
 import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 import { getCaseImage } from '@/lib/cases/case';
+import { useIsFocused } from '@react-navigation/native';
 
 type SessionProfile = {
   title: string;
@@ -61,8 +62,11 @@ export default function SessionScreen() {
   const [draft, setDraft] = useState('');
   const [isDiagnosticsVisible, setIsDiagnosticsVisible] = useState(false);
   const messageScrollRef = useRef<ScrollView>(null);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
+    if (!isFocused) return;
+
     if (session.sessionId !== sessionId) {
       useSessionStore.setState({ sessionId, loaded: false });
       useDiagnosticStore.getState().reset();
@@ -75,6 +79,7 @@ export default function SessionScreen() {
       void fetchUsedDiagnostics(sessionId, session.case.id);
     }
   }, [
+    isFocused,
     loadSession,
     session.loaded,
     session.case?.id,
