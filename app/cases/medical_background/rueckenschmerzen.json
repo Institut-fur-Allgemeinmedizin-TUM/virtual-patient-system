@@ -12,13 +12,13 @@
         "display_name": "Hautkolorit",
         "unit": "",
         "data_type": "string",
-        "data": "unauffaellig, ggf. leicht schweissig durch Schmerzreiz"
+        "data": "unauffällig, ggf. leicht schweissig durch Schmerzreiz"
       },
       "haltung_gangbild": {
         "display_name": "Haltung & Gangbild",
         "unit": "",
         "data_type": "string",
-        "data": "vorsichtiges, kleinschrittiges Gangbild; haelt sich beim Aufstehen ab; Ausweichhaltung des Rumpfes nach rechts"
+        "data": "vorsichtiges, kleinschrittiges Gangbild; hält sich beim Aufstehen ab; Ausweichhaltung des Rumpfes nach rechts"
       },
       "bewusstsein": {
         "display_name": "Bewusstsein",
@@ -41,7 +41,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "74, regelmaessig"
+        "data": "74, regelmässig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -59,7 +59,7 @@
         "display_name": "Temperatur",
         "unit": "°C",
         "data_type": "string",
-        "data": "36,6 (aurikulaer)"
+        "data": "36,6 (aurikulär)"
       }
     }
   },
@@ -256,19 +256,19 @@
         "display_name": "Herz",
         "unit": "",
         "data_type": "string",
-        "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
+        "data": "Herztöne rein, regelmässig, keine Herzgeräusche"
       },
       "lunge": {
         "display_name": "Lunge",
         "unit": "",
         "data_type": "string",
-        "data": "Vesikulaeratmen seitengleich, keine Nebengeraeusche"
+        "data": "Vesikuläratmen seitengleich, keine Nebengeräusche"
       },
       "abdomen": {
         "display_name": "Abdomen",
         "unit": "",
         "data_type": "string",
-        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
+        "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
       }
     }
   }

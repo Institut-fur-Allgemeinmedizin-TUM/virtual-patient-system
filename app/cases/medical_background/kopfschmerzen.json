@@ -12,7 +12,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "80, regelmaessig"
+        "data": "80, regelmässig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -30,7 +30,7 @@
         "display_name": "Temperatur",
         "unit": "°C",
         "data_type": "string",
-        "data": "36,5 (aurikulaer)"
+        "data": "36,5 (aurikulär)"
       }
     }
   },
@@ -47,13 +47,13 @@
         "display_name": "Hautkolorit",
         "unit": "",
         "data_type": "string",
-        "data": "unauffaellig"
+        "data": "unauffällig"
       },
       "haltung_gangbild": {
         "display_name": "Haltung/Gangbild",
         "unit": "",
         "data_type": "string",
-        "data": "unauffaellig"
+        "data": "unauffällig"
       },
       "bewusstsein": {
         "display_name": "Bewusstsein",
@@ -256,19 +256,19 @@
         "display_name": "Herz (Auskultation)",
         "unit": "",
         "data_type": "string",
-        "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
+        "data": "Herztöne rein, regelmässig, keine Herzgeräusche"
       },
       "lunge": {
         "display_name": "Lunge (Auskultation)",
         "unit": "",
         "data_type": "string",
-        "data": "Vesikulaeratmen seitengleich, keine Nebengeraeusche"
+        "data": "Vesikuläratmen seitengleich, keine Nebengeräusche"
       },
       "abdomen": {
         "display_name": "Abdomen (Auskultation)",
         "unit": "",
         "data_type": "string",
-        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
+        "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
       }
     }
   }
