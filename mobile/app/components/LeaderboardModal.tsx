@@ -16,7 +16,6 @@ export default function LeaderboardModal({ visible, caseId, onClose }: Leaderboa
     useLeaderboardStore();
   const preferredUsername = useAuthStore((state) => state.user?.display_name);
 
-  // Fetch data inside the modal when visibility changes or caseId changes
   useEffect(() => {
     if (visible && caseId) {
       fetchLeaderboard(caseId);
@@ -55,9 +54,17 @@ export default function LeaderboardModal({ visible, caseId, onClose }: Leaderboa
                   },
                 ]}
               >
-                <Text style={{ width: 40, fontWeight: '700' }}>#{leaderboardEntry.rank}</Text>
-                <Text style={{ flex: 1 }}>{leaderboardEntry.username}</Text>
-                <Text style={{ fontWeight: '600' }}>{leaderboardEntry.average_points} / 5 Pts</Text>
+                <Text style={styles.rankText}>#{leaderboardEntry.rank}</Text>
+                <Text
+                  style={styles.usernameText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {leaderboardEntry.username}
+                </Text>
+                <Text style={styles.scoreText} numberOfLines={1}>
+                  {leaderboardEntry.average_points} / 5 Pts
+                </Text>
               </View>
             );
           })
@@ -82,5 +89,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     borderBottomWidth: 1,
+  },
+  rankText: {
+    width: 36,
+    fontWeight: '700',
+  },
+  usernameText: {
+    flex: 1,
+    marginRight: 8,
+  },
+  scoreText: {
+    fontWeight: '600',
+    textAlign: 'right',
   },
 });
