@@ -387,9 +387,10 @@ export function AppHeader() {
                 textAlign: 'center',
               }}
             >
-              Bitte teile uns mit, wie du angesprochen werden möchtest. Für eine neutrale Ansprache
-              kannst du die Angabe einfach leer lassen. Du kannst unten eine Option auswählen oder
-              deine Pronomen später im Profil anpassen.
+              Teile uns bitte mit, wie du von den Patientinnen und Patienten angesprochen werden
+              möchtest. Wenn du eine neutrale Ansprache bevorzugst, kannst du diese Angabe einfach
+              leer lassen. Du kannst unten eine Option auswählen oder deine Pronomen später im
+              Profil anpassen.
             </Text>
           </Dialog.Content>
           <Dialog.Actions
