@@ -4,7 +4,7 @@ import json
 import os
 import time as pytime
 import uuid
-from datetime import datetime, time as dt_time, timedelta
+from datetime import datetime, time as dt_time, timedelta, timezone
 from random import Random
 from typing import List, Optional
 
@@ -24,6 +24,7 @@ from pydantic import BaseModel
 from langchain.agents import create_agent
 from sqlalchemy import func, select, desc
 from sqlalchemy.orm import Session as OrmSession
+from sqlalchemy.sql.functions import coalesce
 from starlette.responses import JSONResponse
 
 from app.api.medical_background import get_medical_background, BACKGROUNDS
@@ -668,6 +669,7 @@ async def get_session_messages(
     )
 
 
+# Method polished with Google Gemini
 @sessionRouter.get("/api/sessions/{session_id}/ranking", response_model=RankingResponse)
 async def get_ranking(
     session_id: str, request: Request, db: OrmSession = Depends(get_db)
@@ -680,23 +682,23 @@ async def get_ranking(
             detail="Ranking feature is only available for TUM users",
         )
 
-    # Check if session is in VHB sessions (shouldn't happen, but double-check)
     if session_id in vhb_sessions:
         raise HTTPException(
             status_code=403, detail="Ranking not available for VHB sessions"
         )
 
     session = db.get(ChatSession, session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
     tum_id = user.get("tum_id") or user.get("sub")
 
-    if not user.is_admin():
-        if not session.user_id == tum_id:
-            raise HTTPException(status_code=403, detail="Invalid user id")
+    if not user.is_admin() and session.user_id != tum_id:
+        raise HTTPException(status_code=403, detail="Invalid user id")
 
-    # Calculate current position of session (based on total scored points)
     case_id = session.case_id
+    one_year_ago = datetime.now(timezone.utc) - timedelta(days=365)
 
-    one_year_ago = datetime.now() - timedelta(days=365)
     total_score_expr = (
         Evaluation.criterion1_score
         + Evaluation.criterion2_score
@@ -713,38 +715,38 @@ async def get_ranking(
         order_by=total_score_expr.desc(),
     )
 
-    base_sessions_subquery = (
+    session_scores = (
         select(
-            Session.id.label("session_id"),
-            Session.user_id.label("user_id"),
+            ChatSession.id.label("session_id"),
+            ChatSession.user_id.label("user_id"),
             total_score_expr.label("total_score"),
-            user_best_window.label("user_session_rank"),
+            func.row_number()
+            .over(
+                partition_by=ChatSession.user_id,
+                order_by=total_score_expr.desc(),
+            )
+            .label("user_session_rank"),
         )
-        .join(Evaluation, Session.id == Evaluation.session_id)
-        .where(Session.case_id == case_id)
-        .where(Session.started_at >= one_year_ago)
-        .subquery()
+        .join(Evaluation, ChatSession.id == Evaluation.session_id)
+        .where(ChatSession.case_id == case_id)
+        .where(ChatSession.started_at >= one_year_ago)
+        .cte("session_scores")
     )
 
-    global_rank_window = func.rank().over(
-        order_by=desc(base_sessions_subquery.c.total_score)
-    )
-
-    ranked_best_subquery = (
+    user_best_scores = (
         select(
-            base_sessions_subquery.c.session_id,
-            base_sessions_subquery.c.total_score,
-            global_rank_window.label("rank"),
+            session_scores.c.user_id,
+            session_scores.c.total_score,
+            func.rank()
+            .over(order_by=desc(session_scores.c.total_score))
+            .label("rank"),
         )
-        .where(base_sessions_subquery.c.user_session_rank == 1)
-        .subquery()
+        .where(session_scores.c.user_session_rank == 1)
+        .cte("user_best_scores")
     )
 
-    total_count_stmt = (
-        select(func.count())
-        .select_from(base_sessions_subquery)
-        .where(base_sessions_subquery.c.user_session_rank == 1)
-    )
+    # Get total unique participants count
+    total_count_stmt = select(func.count()).select_from(user_best_scores)
     total_count = db.execute(total_count_stmt).scalar() or 0
 
     if total_count == 0:
@@ -752,16 +754,17 @@ async def get_ranking(
             session_id=session_id, rank=0, top_percentage=0, total_participants=0
         )
 
-    target_stmt = select(ranked_best_subquery.c.rank).where(
-        ranked_best_subquery.c.session_id == session_id
+    # Retrieve rank for the session owner's best score
+    target_stmt = select(user_best_scores.c.rank).where(
+        user_best_scores.c.user_id == session.user_id
     )
-    result = db.execute(target_stmt).first()
-    if not result:
+    current_rank = db.execute(target_stmt).scalar()
+
+    if current_rank is None:
         return RankingResponse(
             session_id=session_id, rank=0, top_percentage=0, total_participants=0
         )
 
-    current_rank = result.rank
     top_percentage = round((current_rank / total_count) * 100, 2)
     return RankingResponse(
         session_id=session_id,
