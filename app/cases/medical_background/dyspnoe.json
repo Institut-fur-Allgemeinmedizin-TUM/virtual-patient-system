@@ -41,7 +41,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "88/min, regelmässig"
+        "data": "88/min, regelmäßig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -256,7 +256,7 @@
         "display_name": "Herz Auskultation",
         "unit": "",
         "data_type": "string",
-        "data": "Herztöne rein, regelmässig, kein Systolikum; diskreter 3. Herzton auskultierbar"
+        "data": "Herztöne rein, regelmäßig, kein Systolikum; diskreter 3. Herzton auskultierbar"
       },
       "lunge_auskultation": {
         "display_name": "Lunge Auskultation",

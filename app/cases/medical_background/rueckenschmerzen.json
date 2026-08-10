@@ -12,7 +12,7 @@
         "display_name": "Hautkolorit",
         "unit": "",
         "data_type": "string",
-        "data": "unauffällig, ggf. leicht schweissig durch Schmerzreiz"
+        "data": "unauffällig, ggf. leicht schweißig durch Schmerzreiz"
       },
       "haltung_gangbild": {
         "display_name": "Haltung & Gangbild",
@@ -41,7 +41,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "74, regelmässig"
+        "data": "74, regelmäßig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -256,7 +256,7 @@
         "display_name": "Herz",
         "unit": "",
         "data_type": "string",
-        "data": "Herztöne rein, regelmässig, keine Herzgeräusche"
+        "data": "Herztöne rein, regelmäßig, keine Herzgeräusche"
       },
       "lunge": {
         "display_name": "Lunge",
