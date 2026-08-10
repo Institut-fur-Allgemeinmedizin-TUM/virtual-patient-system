@@ -1,4 +1,33 @@
 {
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand",
+        "unit": "",
+        "data_type": "string",
+        "data": "guter AZ, leicht angespannte Stirn-/Nackenmuskulatur, kein Distress"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig"
+      },
+      "haltung_gangbild": {
+        "display_name": "Haltung/Gangbild",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, voll orientiert"
+      }
+    }
+  },
   "vitalparameter": {
     "display_name": "Vitalparameter",
     "data": {
@@ -31,35 +60,6 @@
         "unit": "°C",
         "data_type": "string",
         "data": "36,5 (aurikulär)"
-      }
-    }
-  },
-  "allgemeinzustand": {
-    "display_name": "Allgemeinzustand",
-    "data": {
-      "allgemeinzustand": {
-        "display_name": "Allgemeinzustand",
-        "unit": "",
-        "data_type": "string",
-        "data": "guter AZ, leicht angespannte Stirn-/Nackenmuskulatur, kein Distress"
-      },
-      "hautkolorit": {
-        "display_name": "Hautkolorit",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffällig"
-      },
-      "haltung_gangbild": {
-        "display_name": "Haltung/Gangbild",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffällig"
-      },
-      "bewusstsein": {
-        "display_name": "Bewusstsein",
-        "unit": "",
-        "data_type": "string",
-        "data": "wach, voll orientiert"
       }
     }
   },
@@ -249,26 +249,112 @@
       }
     }
   },
-  "auskultation": {
-    "display_name": "Auskultation",
+  "herz": {
+    "display_name": "Herz Untersuchung",
     "data": {
-      "herz": {
-        "display_name": "Herz (Auskultation)",
+      "herz_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, keine gestauten Halsvenen, keine Ödeme"
+      },
+      "herz_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Herztöne rein, regelmäßig, keine Herzgeräusche"
       },
-      "lunge": {
-        "display_name": "Lunge (Auskultation)",
+      "herz_peripherer_puls": {
+        "display_name": "Peripherer Puls",
+        "unit": "",
+        "data_type": "string",
+        "data": "A. radialis beidseits kräftig und seitengleich tastbar"
+      }
+    }
+  },
+  "lunge": {
+    "display_name": "Lunge Untersuchung",
+    "data": {
+      "lunge_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, seitengleiche Atemexkursion"
+      },
+      "lunge_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Vesikuläratmen seitengleich, keine Nebengeräusche"
       },
-      "abdomen": {
-        "display_name": "Abdomen (Auskultation)",
+      "lunge_perkussion": {
+        "display_name": "Perkussion",
+        "unit": "",
+        "data_type": "string",
+        "data": "Klopfschall sonor, seitengleich"
+      }
+    }
+  },
+  "neurologischer_status": {
+    "display_name": "Neurologischer Status Untersuchung",
+    "data": {
+      "neurologischer_status_meningismus": {
+        "display_name": "Meningismus",
+        "unit": "",
+        "data_type": "string",
+        "data": "kein Meningismus (Kernig/Brudzinski negativ, keine Nackensteife)"
+      },
+      "neurologischer_status_hirnnerven_pupillen": {
+        "display_name": "Hirnnerven / Pupillen",
+        "unit": "",
+        "data_type": "string",
+        "data": "Hirnnerven grob unauffällig, Pupillen isokor und prompt lichtreagibel"
+      },
+      "neurologischer_status_motorik_sensibilitaet_koordination": {
+        "display_name": "Motorik / Sensibilität / Koordination",
+        "unit": "",
+        "data_type": "string",
+        "data": "seitengleich unauffällig, Finger-Nase-Versuch sicher, Gangbild unauffällig"
+      },
+      "neurologischer_status_perikranielle_muskulatur": {
+        "display_name": "Perikranielle Muskulatur",
+        "unit": "",
+        "data_type": "string",
+        "data": "Nacken-/Schläfenmuskulatur beidseits leicht druckschmerzhaft (myogen); Temporalarterien unauffällig, nicht druckschmerzhaft"
+      }
+    }
+  },
+  "abdomen": {
+    "display_name": "Abdomen Untersuchung",
+    "data": {
+      "abdomen_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, keine Narben"
+      },
+      "abdomen_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
+      },
+      "abdomen_palpation": {
+        "display_name": "Palpation",
+        "unit": "",
+        "data_type": "string",
+        "data": "weich, kein Druckschmerz, keine Abwehrspannung, keine Resistenzen, Nierenlager beidseits nicht klopfschmerzhaft"
+      }
+    }
+  },
+  "beine": {
+    "display_name": "Beine Untersuchung",
+    "data": {
+      "beine_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen"
       }
     }
   }

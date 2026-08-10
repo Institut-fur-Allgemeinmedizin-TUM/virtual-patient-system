@@ -249,32 +249,100 @@
       }
     }
   },
-  "auskultation": {
-    "display_name": "Auskultation",
+  "herz": {
+    "display_name": "Herz Untersuchung",
     "data": {
+      "herz_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine gestauten Halsvenen, keine Ödeme, Herzspitzenstoß nicht sichtbar"
+      },
       "herz_auskultation": {
-        "display_name": "Herz",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Herztöne rein, regelmäßig, keine Herzgeräusche"
       },
+      "herz_peripherer_puls": {
+        "display_name": "Peripherer Puls",
+        "unit": "",
+        "data_type": "string",
+        "data": "A. radialis kräftig, seitengleich tastbar"
+      }
+    }
+  },
+  "lunge": {
+    "display_name": "Lunge Untersuchung",
+    "data": {
+      "lunge_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "seitengleiche Atemexkursion, kein Einsatz der Atemhilfsmuskulatur"
+      },
       "lunge_auskultation": {
-        "display_name": "Lunge",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Vesikuläratmen seitengleich, kein Giemen in Ruhe, keine Rasselgeräusche"
       },
       "lunge_auskultation_forciert": {
-        "display_name": "Lunge (forciert)",
+        "display_name": "Auskultation (forciert)",
         "unit": "",
         "data_type": "string",
-        "data": "nach forciertem Hustenstoss vereinzelt exspiratorisches Giemen, sonst kein pathologisches Nebengeräusch"
+        "data": "nach forciertem Hustenstoß vereinzelt exspiratorisches Giemen, sonst kein pathologisches Nebengeräusch"
+      },
+      "lunge_perkussion": {
+        "display_name": "Perkussion",
+        "unit": "",
+        "data_type": "string",
+        "data": "Klopfschall sonor, seitengleich"
+      }
+    }
+  },
+  "hno_rachen": {
+    "display_name": "HNO/Rachen Untersuchung",
+    "data": {
+      "hno_rachen_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "Rachenring reizlos, keine Rötung/Beläge, keine zervikale Lymphadenopathie, Nasenatmung frei"
+      }
+    }
+  },
+  "abdomen": {
+    "display_name": "Abdomen Untersuchung",
+    "data": {
+      "abdomen_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, kein Meteorismus, keine Narben"
       },
       "abdomen_auskultation": {
-        "display_name": "Abdomen",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
+      },
+      "abdomen_palpation": {
+        "display_name": "Palpation",
+        "unit": "",
+        "data_type": "string",
+        "data": "weich, kein Druckschmerz, keine Abwehrspannung, keine Resistenzen, Leber/Milz nicht vergrößert tastbar, Nierenlager beidseits nicht klopfschmerzhaft"
+      }
+    }
+  },
+  "beine": {
+    "display_name": "Beine Untersuchung",
+    "data": {
+      "beine_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen, seitengleiches Hautkolorit"
       }
     }
   }

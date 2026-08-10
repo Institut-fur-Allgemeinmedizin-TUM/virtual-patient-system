@@ -249,26 +249,112 @@
       }
     }
   },
-  "auskultation": {
-    "display_name": "Auskultation",
+  "herz": {
+    "display_name": "Herz Untersuchung",
     "data": {
-      "herz": {
-        "display_name": "Herz",
+      "herz_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, keine gestauten Halsvenen, keine Ödeme"
+      },
+      "herz_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Herztöne rein, regelmäßig, keine Herzgeräusche"
       },
-      "lunge": {
-        "display_name": "Lunge",
+      "herz_peripherer_puls": {
+        "display_name": "Peripherer Puls",
+        "unit": "",
+        "data_type": "string",
+        "data": "A. radialis beidseits kräftig und seitengleich tastbar"
+      }
+    }
+  },
+  "lunge": {
+    "display_name": "Lunge Untersuchung",
+    "data": {
+      "lunge_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, seitengleiche Atemexkursion"
+      },
+      "lunge_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Vesikuläratmen seitengleich, keine Nebengeräusche"
       },
-      "abdomen": {
-        "display_name": "Abdomen",
+      "lunge_perkussion": {
+        "display_name": "Perkussion",
+        "unit": "",
+        "data_type": "string",
+        "data": "Klopfschall sonor, seitengleich"
+      }
+    }
+  },
+  "wirbelsaeule_neurologie_bein": {
+    "display_name": "Wirbelsäule & Neurologie Bein Untersuchung",
+    "data": {
+      "wirbelsaeule_neurologie_bein_palpation_wirbelsaeule": {
+        "display_name": "Palpation Wirbelsäule",
+        "unit": "",
+        "data_type": "string",
+        "data": "Klopf-/Druckschmerz über LWK 4/5 paravertebral links, Hartspann paravertebral links"
+      },
+      "wirbelsaeule_neurologie_bein_beweglichkeit": {
+        "display_name": "Beweglichkeit",
+        "unit": "",
+        "data_type": "string",
+        "data": "schmerzhaft eingeschränkt bei Flexion/Rotation, deutliche Besserung in Ruhe/Liegen"
+      },
+      "wirbelsaeule_neurologie_bein_lasegue_kraft_sensibilitaet": {
+        "display_name": "Lasègue / Kraft / Sensibilität",
+        "unit": "",
+        "data_type": "string",
+        "data": "Lasègue links positiv bei ca. 40°, rechts negativ; Kraft der Kennmuskulatur beidseits 5/5, Sensibilität seitengleich unauffällig"
+      },
+      "wirbelsaeule_neurologie_bein_reflexe_kauda_screening": {
+        "display_name": "Reflexe & Kauda-Screening",
+        "unit": "",
+        "data_type": "string",
+        "data": "PSR/ASR seitengleich normal auslösbar; Reithosensensibilität unauffällig, keine Blasen-/Mastdarmstörung"
+      }
+    }
+  },
+  "abdomen": {
+    "display_name": "Abdomen Untersuchung",
+    "data": {
+      "abdomen_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, keine Narben"
+      },
+      "abdomen_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
+      },
+      "abdomen_palpation": {
+        "display_name": "Palpation",
+        "unit": "",
+        "data_type": "string",
+        "data": "weich, kein Druckschmerz, keine Abwehrspannung, keine Resistenzen, Nierenlager beidseits nicht klopfschmerzhaft"
+      }
+    }
+  },
+  "beine": {
+    "display_name": "Beine Untersuchung",
+    "data": {
+      "beine_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen"
       }
     }
   }
