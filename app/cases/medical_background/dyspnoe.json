@@ -249,26 +249,83 @@
       }
     }
   },
-  "auskultation": {
-    "display_name": "Auskultation",
+  "herz": {
+    "display_name": "Herz Untersuchung",
     "data": {
+      "herz_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "Halsvenen leicht gestaut im Sitzen; Herzspitzenstoß nach lateral verlagert tastbar"
+      },
       "herz_auskultation": {
-        "display_name": "Herz Auskultation",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Herztöne rein, regelmäßig, kein Systolikum; diskreter 3. Herzton auskultierbar"
       },
+      "herz_peripherer_puls": {
+        "display_name": "Peripherer Puls",
+        "unit": "",
+        "data_type": "string",
+        "data": "A. radialis beidseits kräftig und seitengleich tastbar"
+      }
+    }
+  },
+  "lunge": {
+    "display_name": "Lunge Untersuchung",
+    "data": {
+      "lunge_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "leicht erhöhte Atemfrequenz (20/min), keine Einziehungen, kein Einsatz der Atemhilfsmuskulatur"
+      },
       "lunge_auskultation": {
-        "display_name": "Lunge Auskultation",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "beidseitig feinblasige Rasselgeräusche; sonst Vesikuläratmen, kein Giemen"
       },
+      "lunge_perkussion": {
+        "display_name": "Perkussion",
+        "unit": "",
+        "data_type": "string",
+        "data": "beidseitig leicht gedämpfter Klopfschall"
+      }
+    }
+  },
+  "abdomen": {
+    "display_name": "Abdomen Untersuchung",
+    "data": {
+      "abdomen_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, kein sichtbarer Aszites, keine Narben"
+      },
       "abdomen_auskultation": {
-        "display_name": "Abdomen Auskultation",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
+      },
+      "abdomen_palpation": {
+        "display_name": "Palpation",
+        "unit": "",
+        "data_type": "string",
+        "data": "weich, kein Druckschmerz, keine Abwehrspannung, Leber am Rippenbogen tastbar, nicht sicher vergrößert, kein Aszites, Nierenlager beidseits nicht klopfschmerzhaft"
+      }
+    }
+  },
+  "beine": {
+    "display_name": "Beine Untersuchung",
+    "data": {
+      "beine_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "symmetrische, eindrückbare Unterschenkel-/Knöcheledeme beidseits, kein Wadendruckschmerz, kein Homans-Zeichen, Hautkolorit livide-blass"
       }
     }
   }

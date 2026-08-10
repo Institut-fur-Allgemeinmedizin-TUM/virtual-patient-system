@@ -255,20 +255,95 @@
       }
     }
   },
-  "auskultation": {
-    "display_name": "Auskultation",
+  "herz": {
+    "display_name": "Herz Untersuchung",
     "data": {
+      "herz_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine gestauten Halsvenen, keine peripheren Ödeme, kein sichtbarer Herzspitzenstoß"
+      },
       "herz_auskultation": {
-        "display_name": "Auskultation Herz",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Herztöne rein und regelmäßig, keine Herzgeräusche, kein Perikardreiben, keine Extratöne"
       },
+      "herz_peripherer_puls": {
+        "display_name": "Peripherer Puls",
+        "unit": "",
+        "data_type": "string",
+        "data": "A. radialis beidseits kräftig und seitengleich tastbar"
+      },
+      "herz_blutdruck": {
+        "display_name": "Blutdruck",
+        "unit": "",
+        "data_type": "string",
+        "data": "128/82 mmHg rechts, 126/80 mmHg links"
+      }
+    }
+  },
+  "lunge": {
+    "display_name": "Lunge Untersuchung",
+    "data": {
+      "lunge_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "Atemfrequenz 16/min, seitengleiche Atemexkursion, keine Einziehungen, kein Einsatz der Atemhilfsmuskulatur"
+      },
       "lunge_auskultation": {
-        "display_name": "Auskultation Lunge",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Vesikuläratmen seitengleich über allen Lungenfeldern; keine Nebengeräusche (kein Giemen, keine Rasselgeräusche, kein Pleurareiben)"
+      },
+      "lunge_perkussion": {
+        "display_name": "Perkussion",
+        "unit": "",
+        "data_type": "string",
+        "data": "Klopfschall seitengleich sonor; kein Hinweis auf Erguss oder Pneumothorax"
+      }
+    }
+  },
+  "brustwand": {
+    "display_name": "Brustwand Untersuchung",
+    "data": {
+      "brustwand_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine Rötung, keine Schwellung, keine Hämatome im Bereich der linken anterioren Brustwand"
+      },
+      "brustwand_palpation": {
+        "display_name": "Palpation",
+        "unit": "",
+        "data_type": "string",
+        "data": "ausgeprägter, punktförmiger und reproduzierbarer Druckschmerz über dem 3.–4. Kostochondralgelenk links parasternal; Patient zeigt spontan auf den Schmerzpunkt; kein Krepitieren, keine Schwellung, keine Frakturzeichen"
+      },
+      "brustwand_thoraxkompression": {
+        "display_name": "Thoraxkompression",
+        "unit": "",
+        "data_type": "string",
+        "data": "laterale Kompression provoziert leichten Schmerz links, sonst schmerzfrei"
+      },
+      "brustwand_atem_bewegungsabhaengigkeit": {
+        "display_name": "Atem- / Bewegungsabhängigkeit",
+        "unit": "",
+        "data_type": "string",
+        "data": "Schmerzverstärkung bei tiefer Inspiration und Rumpfrotation nach links, nicht belastungsabhängig"
+      }
+    }
+  },
+  "beine": {
+    "display_name": "Beine Untersuchung",
+    "data": {
+      "beine_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine Beinschwellung, kein Wadendruckschmerz, keine Überwärmung, kein Meyer-/Homans-Zeichen, seitengleiches Hautkolorit"
       }
     }
   }

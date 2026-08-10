@@ -249,26 +249,83 @@
       }
     }
   },
-  "auskultation": {
-    "display_name": "Auskultation",
+  "herz": {
+    "display_name": "Herz Untersuchung",
     "data": {
+      "herz_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, keine gestauten Halsvenen, keine Ödeme"
+      },
       "herz_auskultation": {
-        "display_name": "Herz",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Herztöne rein, regelmäßig, keine Herzgeräusche"
       },
+      "herz_peripherer_puls": {
+        "display_name": "Peripherer Puls",
+        "unit": "",
+        "data_type": "string",
+        "data": "A. radialis kräftig, seitengleich tastbar"
+      }
+    }
+  },
+  "lunge": {
+    "display_name": "Lunge Untersuchung",
+    "data": {
+      "lunge_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, seitengleiche Atemexkursion"
+      },
       "lunge_auskultation": {
-        "display_name": "Lunge",
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Vesikuläratmen seitengleich, keine Nebengeräusche"
       },
-      "abdomen_auskultation": {
-        "display_name": "Abdomen",
+      "lunge_perkussion": {
+        "display_name": "Perkussion",
         "unit": "",
         "data_type": "string",
-        "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
+        "data": "Klopfschall sonor, seitengleich"
+      }
+    }
+  },
+  "abdomen": {
+    "display_name": "Abdomen Untersuchung",
+    "data": {
+      "abdomen_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, keine Narben"
+      },
+      "abdomen_auskultation": {
+        "display_name": "Auskultation",
+        "unit": "",
+        "data_type": "string",
+        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
+      },
+      "abdomen_palpation": {
+        "display_name": "Palpation",
+        "unit": "",
+        "data_type": "string",
+        "data": "deutlicher Druckschmerz epigastrisch, keine Abwehrspannung, kein Loslassschmerz, Murphy-Zeichen negativ, Lanz- & McBurney-Zeichen negativ, keine tastbaren Resistenzen, Nierenlager beidseits nicht klopfschmerzhaft"
+      }
+    }
+  },
+  "beine": {
+    "display_name": "Beine Untersuchung",
+    "data": {
+      "beine_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen"
       }
     }
   }

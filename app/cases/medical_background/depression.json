@@ -1,4 +1,33 @@
 {
+  "allgemeinzustand": {
+    "display_name": "Allgemeinzustand",
+    "data": {
+      "allgemeinzustand": {
+        "display_name": "Allgemeinzustand (Erstblick)",
+        "unit": "",
+        "data_type": "string",
+        "data": "reduzierter Antrieb, verlangsamte Psychomotorik, insgesamt kooperativ, kein akuter Distress"
+      },
+      "hautkolorit": {
+        "display_name": "Hautkolorit",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig"
+      },
+      "haltung_gangbild": {
+        "display_name": "Haltung & Gangbild",
+        "unit": "",
+        "data_type": "string",
+        "data": "gebeugte Haltung, wenig Blickkontakt; Gangbild selbst unauffällig"
+      },
+      "bewusstsein": {
+        "display_name": "Bewusstsein",
+        "unit": "",
+        "data_type": "string",
+        "data": "wach, voll orientiert, kein Anhalt für kognitive Einschränkung im Gespräch"
+      }
+    }
+  },
   "vitalparameter": {
     "display_name": "Vitalparameter",
     "data": {
@@ -31,35 +60,6 @@
         "unit": "°C",
         "data_type": "string",
         "data": "36,6 (aurikulär)"
-      }
-    }
-  },
-  "allgemeinzustand": {
-    "display_name": "Allgemeinzustand",
-    "data": {
-      "allgemeinzustand": {
-        "display_name": "Allgemeinzustand (Erstblick)",
-        "unit": "",
-        "data_type": "string",
-        "data": "reduzierter Antrieb, verlangsamte Psychomotorik, insgesamt kooperativ, kein akuter Distress"
-      },
-      "hautkolorit": {
-        "display_name": "Hautkolorit",
-        "unit": "",
-        "data_type": "string",
-        "data": "unauffällig"
-      },
-      "haltung_gangbild": {
-        "display_name": "Haltung & Gangbild",
-        "unit": "",
-        "data_type": "string",
-        "data": "gebeugte Haltung, wenig Blickkontakt; Gangbild selbst unauffällig"
-      },
-      "bewusstsein": {
-        "display_name": "Bewusstsein",
-        "unit": "",
-        "data_type": "string",
-        "data": "wach, voll orientiert, kein Anhalt für kognitive Einschränkung im Gespräch"
       }
     }
   },
@@ -249,26 +249,117 @@
       }
     }
   },
-  "auskultation": {
-    "display_name": "Auskultation",
+  "herz": {
+    "display_name": "Herz Untersuchung",
     "data": {
-      "herz": {
-        "display_name": "Auskultation Herz",
+      "herz_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, keine gestauten Halsvenen, keine Ödeme"
+      },
+      "herz_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Herztöne rein, regelmäßig, keine Herzgeräusche"
       },
-      "lunge": {
-        "display_name": "Auskultation Lunge",
+      "herz_peripherer_puls": {
+        "display_name": "Peripherer Puls",
+        "unit": "",
+        "data_type": "string",
+        "data": "A. radialis beidseits kräftig und seitengleich tastbar"
+      }
+    }
+  },
+  "lunge": {
+    "display_name": "Lunge Untersuchung",
+    "data": {
+      "lunge_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, seitengleiche Atemexkursion"
+      },
+      "lunge_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "Vesikuläratmen seitengleich, keine Nebengeräusche"
       },
-      "abdomen": {
-        "display_name": "Auskultation Abdomen",
+      "lunge_perkussion": {
+        "display_name": "Perkussion",
+        "unit": "",
+        "data_type": "string",
+        "data": "Klopfschall sonor, seitengleich"
+      }
+    }
+  },
+  "hno": {
+    "display_name": "HNO Untersuchung",
+    "data": {
+      "hno_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "Oropharynx unauffällig, Tonsillen nicht vergrößert, Nasenatmung frei, Halsumfang unauffällig - kein anatomisches Korrelat für das berichtete Schnarchen erkennbar"
+      }
+    }
+  },
+  "psychiatrischer_kurzbefund": {
+    "display_name": "Psychiatrischer Kurzbefund",
+    "data": {
+      "psychiatrischer_kurzbefund_stimmung_antrieb": {
+        "display_name": "Stimmung / Antrieb",
+        "unit": "",
+        "data_type": "string",
+        "data": "gedrückte Stimmung, deutlich reduzierter Antrieb, verlangsamte Psychomotorik, eingeengter Affekt"
+      },
+      "psychiatrischer_kurzbefund_denken_wahrnehmung": {
+        "display_name": "Denken / Wahrnehmung",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine formalen oder inhaltlichen Denkstörungen, keine Halluzinationen"
+      },
+      "psychiatrischer_kurzbefund_suizidalitaet": {
+        "display_name": "Suizidazität",
+        "unit": "",
+        "data_type": "string",
+        "data": "im Gespräch keine akute Selbst-/Fremdgefährdung feststellbar (PHQ-9 Frage 9 verneint)"
+      }
+    }
+  },
+  "abdomen": {
+    "display_name": "Abdomen Untersuchung",
+    "data": {
+      "abdomen_inspektion": {
+        "display_name": "Inspektion",
+        "unit": "",
+        "data_type": "string",
+        "data": "unauffällig, keine Narben"
+      },
+      "abdomen_auskultation": {
+        "display_name": "Auskultation",
         "unit": "",
         "data_type": "string",
         "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
+      },
+      "abdomen_palpation": {
+        "display_name": "Palpation",
+        "unit": "",
+        "data_type": "string",
+        "data": "weich, kein Druckschmerz, keine Abwehrspannung, keine Resistenzen, Nierenlager beidseits nicht klopfschmerzhaft"
+      }
+    }
+  },
+  "beine": {
+    "display_name": "Beine Untersuchung",
+    "data": {
+      "beine_befund": {
+        "display_name": "Befund",
+        "unit": "",
+        "data_type": "string",
+        "data": "keine Schwellung, kein Wadendruckschmerz, kein Homans-Zeichen"
       }
     }
   }
