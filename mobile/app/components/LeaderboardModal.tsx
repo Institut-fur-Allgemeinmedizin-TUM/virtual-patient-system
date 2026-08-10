@@ -55,11 +55,7 @@ export default function LeaderboardModal({ visible, caseId, onClose }: Leaderboa
                 ]}
               >
                 <Text style={styles.rankText}>#{leaderboardEntry.rank}</Text>
-                <Text
-                  style={styles.usernameText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
+                <Text style={styles.usernameText} numberOfLines={1} ellipsizeMode="tail">
                   {leaderboardEntry.username}
                 </Text>
                 <Text style={styles.scoreText} numberOfLines={1}>

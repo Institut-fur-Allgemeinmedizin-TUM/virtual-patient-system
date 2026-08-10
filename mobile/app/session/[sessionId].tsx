@@ -19,7 +19,7 @@ import { useSessionStore } from '@/stores/useSessionStore';
 import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 import { getCaseImage } from '@/lib/cases/case';
 import { useIsFocused } from '@react-navigation/native';
-import {Icon} from "react-native-paper/src";
+import { Icon } from 'react-native-paper/src';
 
 type SessionProfile = {
   title: string;
