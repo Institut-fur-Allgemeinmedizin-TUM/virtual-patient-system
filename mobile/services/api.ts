@@ -433,6 +433,8 @@ export interface UserProfileResponse {
   tum_id?: string | null;
   /** Pronouns */
   pronouns: string;
+  /** Display Name */
+  display_name: string;
   /** Roles */
   roles: string[];
 }
@@ -441,6 +443,8 @@ export interface UserProfileResponse {
 export interface UserProfileUpdateRequest {
   /** Pronouns */
   pronouns?: string | null;
+  /** Display Name */
+  display_name?: string | null;
 }
 
 /** UserSessionFeedBack */

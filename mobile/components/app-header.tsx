@@ -35,16 +35,22 @@ export function AppHeader() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const pronouns = useAuthStore((state) => state.user?.pronouns);
   const updatePronouns = useAuthStore((state) => state.updatePronouns);
+  const updateDisplayName = useAuthStore((state) => state.updateDisplayName);
 
   const getDisplayPronouns = (p?: string) => (p && p !== 'not_specified' ? p : '');
 
   const [localPronouns, setLocalPronouns] = useState(getDisplayPronouns(pronouns));
+  const [localUsername, setLocalUsername] = useState(preferredUsername || '');
   const [pronounModalVisible, setPronounModalVisible] = useState(false);
   const [hasShownPronounModal, setHasShownPronounModal] = useState(false);
 
   useEffect(() => {
     setLocalPronouns(getDisplayPronouns(pronouns));
   }, [pronouns]);
+
+  useEffect(() => {
+    setLocalUsername(preferredUsername || '');
+  }, [preferredUsername]);
 
   useEffect(() => {
     if (isAuthenticated && !hasShownPronounModal && (!pronouns || pronouns === 'not_specified')) {
@@ -64,6 +70,12 @@ export function AppHeader() {
       if (!localPronouns) {
         setLocalPronouns('');
       }
+    }
+  };
+
+  const handleUsernameBlur = () => {
+    if (localUsername !== (preferredUsername || '')) {
+      updateDisplayName(localUsername);
     }
   };
 
@@ -203,38 +215,6 @@ export function AppHeader() {
                 />
               </Appbar.Header>
 
-              {preferredUsername ? (
-                <>
-                  <View style={[styles.profileIdentityRow, { flexDirection: 'row' }]}>
-                    <Text
-                      style={[
-                        styles.profileName,
-                        {
-                          color: colors.onSurfaceVariant,
-                          textDecorationColor: colors.onSurfaceVariant,
-                          paddingRight: 5,
-                          fontWeight: 'bold',
-                        },
-                      ]}
-                    >
-                      Username:
-                    </Text>
-                    <Text
-                      style={[
-                        styles.profileName,
-                        {
-                          color: colors.onSurfaceVariant,
-                          textDecorationColor: colors.onSurfaceVariant,
-                        },
-                      ]}
-                    >
-                      {preferredUsername}
-                    </Text>
-                  </View>
-                  <Divider />
-                </>
-              ) : null}
-
               <Divider />
               {tumId ? (
                 <View style={styles.profileIdentityRow}>
@@ -261,6 +241,16 @@ export function AppHeader() {
                       Roles: {roles.join(', ')}
                     </Text>
                   )}
+                  <TextInput
+                    mode="outlined"
+                    label="Username"
+                    value={localUsername}
+                    onChangeText={setLocalUsername}
+                    onBlur={handleUsernameBlur}
+                    onSubmitEditing={handleUsernameBlur}
+                    style={styles.pronounsInput}
+                    dense
+                  />
                   <TextInput
                     mode="outlined"
                     label="Pronouns"

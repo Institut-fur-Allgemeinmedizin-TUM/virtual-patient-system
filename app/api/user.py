@@ -29,6 +29,7 @@ async def get_user_profile(
         sub=user_dict.get("sub", ""),
         tum_id=tum_id,
         pronouns=db_user.pronouns,
+        display_name=db_user.preferred_username or "",
         roles=user_dict.get("roles", []),
     )
 
@@ -52,6 +53,9 @@ async def update_user_profile(
     if req.pronouns is not None:
         db_user.pronouns = req.pronouns
 
+    if req.display_name is not None and req.display_name.strip() != "":
+        db_user.preferred_username = req.display_name
+
     db.commit()
     db.refresh(db_user)
 
@@ -59,5 +63,6 @@ async def update_user_profile(
         sub=user_dict.get("sub", ""),
         tum_id=tum_id,
         pronouns=db_user.pronouns,
+        display_name=db_user.preferred_username or "",
         roles=user_dict.get("roles", []),
     )

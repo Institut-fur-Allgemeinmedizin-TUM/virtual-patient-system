@@ -238,7 +238,7 @@ export function useLiveAudioSession(
                 currentSoundRef.current = null;
               }
               isPlayingRef.current = false;
-              
+
               // Clean up the temp file
               FileSystem.deleteAsync(fileUri, { idempotent: true }).catch(() => {});
 
