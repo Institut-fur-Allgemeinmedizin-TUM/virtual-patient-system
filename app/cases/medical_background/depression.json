@@ -12,7 +12,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "76, regelmaessig"
+        "data": "76, regelmässig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -30,7 +30,7 @@
         "display_name": "Temperatur",
         "unit": "°C",
         "data_type": "string",
-        "data": "36,6 (aurikulaer)"
+        "data": "36,6 (aurikulär)"
       }
     }
   },
@@ -47,19 +47,19 @@
         "display_name": "Hautkolorit",
         "unit": "",
         "data_type": "string",
-        "data": "unauffaellig"
+        "data": "unauffällig"
       },
       "haltung_gangbild": {
         "display_name": "Haltung & Gangbild",
         "unit": "",
         "data_type": "string",
-        "data": "gebeugte Haltung, wenig Blickkontakt; Gangbild selbst unauffaellig"
+        "data": "gebeugte Haltung, wenig Blickkontakt; Gangbild selbst unauffällig"
       },
       "bewusstsein": {
         "display_name": "Bewusstsein",
         "unit": "",
         "data_type": "string",
-        "data": "wach, voll orientiert, kein Anhalt fuer kognitive Einschraenkung im Gespraech"
+        "data": "wach, voll orientiert, kein Anhalt für kognitive Einschränkung im Gespräch"
       }
     }
   },
@@ -256,19 +256,19 @@
         "display_name": "Auskultation Herz",
         "unit": "",
         "data_type": "string",
-        "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
+        "data": "Herztöne rein, regelmässig, keine Herzgeräusche"
       },
       "lunge": {
         "display_name": "Auskultation Lunge",
         "unit": "",
         "data_type": "string",
-        "data": "Vesikulaeratmen seitengleich, keine Nebengeraeusche"
+        "data": "Vesikuläratmen seitengleich, keine Nebengeräusche"
       },
       "abdomen": {
         "display_name": "Auskultation Abdomen",
         "unit": "",
         "data_type": "string",
-        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
+        "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
       }
     }
   }

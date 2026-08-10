@@ -6,19 +6,19 @@
         "display_name": "Allgemeinzustand",
         "unit": "",
         "data_type": "string",
-        "data": "guter AZ, leicht angespannt wirkend, kein Distress, keine Schmerzaeusserung in Ruhe"
+        "data": "guter AZ, leicht angespannt wirkend, kein Distress, keine Schmerzäusserung in Ruhe"
       },
       "hautkolorit": {
         "display_name": "Hautkolorit",
         "unit": "",
         "data_type": "string",
-        "data": "unauffaellig, keine Blaesse, kein Ikterus"
+        "data": "unauffällig, keine Blässe, kein Ikterus"
       },
       "haltung_gangbild": {
         "display_name": "Haltung / Gangbild",
         "unit": "",
         "data_type": "string",
-        "data": "unauffaellig"
+        "data": "unauffällig"
       },
       "bewusstsein": {
         "display_name": "Bewusstsein",
@@ -41,7 +41,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "84/min, regelmaessig"
+        "data": "84/min, regelmässig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -59,7 +59,7 @@
         "display_name": "Temperatur",
         "unit": "°C",
         "data_type": "string",
-        "data": "36,8 °C (aurikulaer)"
+        "data": "36,8 °C (aurikulär)"
       }
     }
   },
@@ -256,19 +256,19 @@
         "display_name": "Herz",
         "unit": "",
         "data_type": "string",
-        "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
+        "data": "Herztöne rein, regelmässig, keine Herzgeräusche"
       },
       "lunge_auskultation": {
         "display_name": "Lunge",
         "unit": "",
         "data_type": "string",
-        "data": "Vesikulaeratmen seitengleich, keine Nebengeraeusche"
+        "data": "Vesikuläratmen seitengleich, keine Nebengeräusche"
       },
       "abdomen_auskultation": {
         "display_name": "Abdomen",
         "unit": "",
         "data_type": "string",
-        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
+        "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
       }
     }
   }

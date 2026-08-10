@@ -6,25 +6,25 @@
         "display_name": "Allgemeinzustand",
         "unit": "",
         "data_type": "string",
-        "data": "guter AZ, wach, kooperativ; gelegentlicher Raeusperzwang/Hustenreiz im Gespraech, kein Distress"
+        "data": "guter AZ, wach, kooperativ; gelegentlicher Räusperzwang/Hustenreiz im Gespräch, kein Distress"
       },
       "hautkolorit": {
         "display_name": "Hautkolorit",
         "unit": "",
         "data_type": "string",
-        "data": "rosig, keine Blaesse, keine Zyanose"
+        "data": "rosig, keine Blässe, keine Zyanose"
       },
       "haltung_gangbild": {
         "display_name": "Haltung / Gangbild",
         "unit": "",
         "data_type": "string",
-        "data": "unauffaellig, sicheres Gangbild"
+        "data": "unauffällig, sicheres Gangbild"
       },
       "bewusstsein": {
         "display_name": "Bewusstsein",
         "unit": "",
         "data_type": "string",
-        "data": "wach, voll orientiert, fluessige Sprache"
+        "data": "wach, voll orientiert, flüssige Sprache"
       }
     }
   },
@@ -41,7 +41,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "76, regelmaessig"
+        "data": "76, regelmässig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -59,7 +59,7 @@
         "display_name": "Temperatur",
         "unit": "°C",
         "data_type": "string",
-        "data": "36,6 (aurikulaer)"
+        "data": "36,6 (aurikulär)"
       }
     }
   },
@@ -256,25 +256,25 @@
         "display_name": "Herz",
         "unit": "",
         "data_type": "string",
-        "data": "Herztoene rein, regelmaessig, keine Herzgeraeusche"
+        "data": "Herztöne rein, regelmässig, keine Herzgeräusche"
       },
       "lunge_auskultation": {
         "display_name": "Lunge",
         "unit": "",
         "data_type": "string",
-        "data": "Vesikulaeratmen seitengleich, kein Giemen in Ruhe, keine Rasselgeraeusche"
+        "data": "Vesikuläratmen seitengleich, kein Giemen in Ruhe, keine Rasselgeräusche"
       },
       "lunge_auskultation_forciert": {
         "display_name": "Lunge (forciert)",
         "unit": "",
         "data_type": "string",
-        "data": "nach forciertem Hustenstoss vereinzelt exspiratorisches Giemen, sonst kein pathologisches Nebengeraeusch"
+        "data": "nach forciertem Hustenstoss vereinzelt exspiratorisches Giemen, sonst kein pathologisches Nebengeräusch"
       },
       "abdomen_auskultation": {
         "display_name": "Abdomen",
         "unit": "",
         "data_type": "string",
-        "data": "regelrechte Darmgeraeusche in allen 4 Quadranten"
+        "data": "regelrechte Darmgeräusche in allen 4 Quadranten"
       }
     }
   }
