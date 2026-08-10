@@ -41,7 +41,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "76, regelmässig"
+        "data": "76, regelmäßig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -256,7 +256,7 @@
         "display_name": "Herz",
         "unit": "",
         "data_type": "string",
-        "data": "Herztöne rein, regelmässig, keine Herzgeräusche"
+        "data": "Herztöne rein, regelmäßig, keine Herzgeräusche"
       },
       "lunge_auskultation": {
         "display_name": "Lunge",

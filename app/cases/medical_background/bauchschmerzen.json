@@ -6,7 +6,7 @@
         "display_name": "Allgemeinzustand",
         "unit": "",
         "data_type": "string",
-        "data": "guter AZ, leicht angespannt wirkend, kein Distress, keine Schmerzäusserung in Ruhe"
+        "data": "guter AZ, leicht angespannt wirkend, kein Distress, keine Schmerzäußerung in Ruhe"
       },
       "hautkolorit": {
         "display_name": "Hautkolorit",
@@ -41,7 +41,7 @@
         "display_name": "Puls",
         "unit": "/min",
         "data_type": "string",
-        "data": "84/min, regelmässig"
+        "data": "84/min, regelmäßig"
       },
       "atemfrequenz": {
         "display_name": "Atemfrequenz",
@@ -256,7 +256,7 @@
         "display_name": "Herz",
         "unit": "",
         "data_type": "string",
-        "data": "Herztöne rein, regelmässig, keine Herzgeräusche"
+        "data": "Herztöne rein, regelmäßig, keine Herzgeräusche"
       },
       "lunge_auskultation": {
         "display_name": "Lunge",
