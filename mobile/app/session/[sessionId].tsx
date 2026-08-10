@@ -19,6 +19,7 @@ import { useSessionStore } from '@/stores/useSessionStore';
 import { useDiagnosticStore } from '@/stores/useDiagnosticStore';
 import { getCaseImage } from '@/lib/cases/case';
 import { useIsFocused } from '@react-navigation/native';
+import {Icon} from "react-native-paper/src";
 
 type SessionProfile = {
   title: string;
@@ -472,15 +473,12 @@ export default function SessionScreen() {
               />
             </View>
 
-            <Button
-              mode="text"
-              icon="information-outline"
-              compact
-              style={styles.footerHint}
-              labelStyle={{ textAlign: 'left', color: '#ea0606' }}
-            >
-              Antworten sind KI generiert. Geben Sie keine sensiblen Daten ein!
-            </Button>
+            <View style={styles.footerHintContainer}>
+              <Icon source="information-outline" size={18} color="#ea0606" />
+              <Text style={styles.footerHintText}>
+                Antworten sind KI generiert. Geben Sie keine sensiblen Daten ein!
+              </Text>
+            </View>
           </Surface>
 
           {!isMobile && <DiagnosticsPanel isMobile={false} />}
@@ -581,11 +579,18 @@ const styles = StyleSheet.create({
   composerInput: {
     flex: 1,
   },
-  footerHint: {
-    alignSelf: 'flex-start',
+  footerHintContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     marginTop: 2,
-    marginLeft: 8,
+    marginHorizontal: 8,
     marginBottom: 4,
+    gap: 6,
+  },
+  footerHintText: {
+    flex: 1,
+    color: '#ea0606',
+    fontSize: 12,
   },
   chatIntroBlock: {
     alignItems: 'center',
