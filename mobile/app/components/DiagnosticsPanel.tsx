@@ -232,7 +232,10 @@ export default function DiagnosticsPanel({
             Diagnostik
           </Text>
           <Text variant="bodySmall" style={{ color: theme.colors.secondary, marginBottom: 16 }}>
-            Wählen Sie eine Diagnostik, um die Werte abzurufen.
+            Bevor du Laborwerte oder Untersuchungsschritte anforderst: Überlege, welche
+            Verdachtsdiagnose oder welche Red Flag du damit prüfst. Wahllos angeforderte Parameter
+            kosten in der echten Praxis Zeit, Geld und belasten Patient:innen unnötig (z. B. durch
+            falsch-positive Zufallsbefunde) – dies fließt auch hier in die Evaluation mit ein.
           </Text>
         </View>
       )}
