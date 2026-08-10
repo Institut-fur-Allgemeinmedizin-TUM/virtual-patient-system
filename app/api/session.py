@@ -737,9 +737,7 @@ async def get_ranking(
         select(
             session_scores.c.user_id,
             session_scores.c.total_score,
-            func.rank()
-            .over(order_by=desc(session_scores.c.total_score))
-            .label("rank"),
+            func.rank().over(order_by=desc(session_scores.c.total_score)).label("rank"),
         )
         .where(session_scores.c.user_session_rank == 1)
         .cte("user_best_scores")
