@@ -63,6 +63,10 @@ An die Programmierschnittstelle (API) von Google werden die im Rahmen des Lehrge
 
 Weitere Informationen zum Datenschutz bei Google finden Sie unter: [https://policies.google.com/privacy](https://policies.google.com/privacy)
 
+### Freiwillige Angabe der Pronomen
+
+Nutzerinnen und Nutzer können freiwillig ihre Pronomen (z. B. "er", "sie", "they") angeben. Diese Angabe wird in der Anwendung gespeichert und ausschließlich an das eingesetzte KI-Sprachmodell weitergegeben, um die korrekte und persönliche Ansprache im Chat zu ermöglichen. Die Pronomen werden nicht für andere Zwecke verwendet und nicht an weitere Dritte übermittelt.
+
 ## Speicherung von Gesprächsprotokollen
 
 Die während der Lehrsitzungen aufgezeichneten Gesprächstranskripte werden auf Servern der Google Cloud Platform gespeichert.
