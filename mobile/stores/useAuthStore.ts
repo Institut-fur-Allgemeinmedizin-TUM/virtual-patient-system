@@ -29,6 +29,7 @@ interface AuthState {
   loginWithVhb: (password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   updatePronouns: (pronouns: string) => Promise<boolean>;
+  updateDisplayName: (displayName: string) => Promise<boolean>;
 }
 
 function readApiErrorMessage(error: unknown, fallback: string) {
@@ -205,6 +206,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return false;
     } catch (error) {
       console.error('Failed to update pronouns:', error);
+      return false;
+    }
+  },
+
+  updateDisplayName: async (displayName: string) => {
+    try {
+      const res = await apiClient.api.updateUserProfileApiUserProfilePut({
+        display_name: displayName,
+      });
+      if (res.status === 200) {
+        set((state) => ({
+          user: state.user ? { ...state.user, display_name: res.data.display_name } : undefined,
+        }));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Failed to update display name:', error);
       return false;
     }
   },

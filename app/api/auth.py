@@ -192,7 +192,7 @@ async def auth_me(request: Request, db: OrmSession = Depends(get_db)) -> JSONRes
     if tum_id:
         db_user = db.query(User).filter(User.oidc_id == tum_id).first()
         if db_user:
-            db_username = str(db_user.preferred_username)
+            db_username = db_user.preferred_username or ""
             db_pronouns = db_user.pronouns
 
     return JSONResponse(
