@@ -85,17 +85,17 @@ export default function LandingPage() {
 
   const getRankStyle = (percentage: number, rank: number) => {
     if (theme.dark) {
-      if (percentage > 66 || rank < 3) {
+      if (percentage < 33 || rank < 3) {
         return { bg: '#1b2e1d', text: '#81c784' };
-      } else if (percentage > 33) {
+      } else if (percentage < 66) {
         return { bg: '#2b261b', text: '#ffd54f' };
       } else {
         return { bg: '#2b261b', text: '#ffd54f' };
       }
     } else {
-      if (percentage > 66 || rank < 3) {
+      if (percentage < 33 || rank < 3) {
         return { bg: '#e8f5e9', text: '#2e7d32' };
-      } else if (percentage > 33) {
+      } else if (percentage < 66) {
         return { bg: '#fffbeb', text: '#92400e' };
       } else {
         return { bg: '#fdf2f2', text: '#c0392b' };
