@@ -193,8 +193,8 @@ export default function SessionScreen() {
     >
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
+        behavior={'padding'}
+        keyboardVerticalOffset={headerHeight}
       >
         <View
           style={[
