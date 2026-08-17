@@ -535,6 +535,7 @@ async def live_websocket(
                                 )
                                 db.commit()
                                 current_model_transcript = ""
+                            await websocket.send_json({"type": "turn_complete"})
 
             relay_tasks = [
                 asyncio.create_task(browser_to_gemini()),
