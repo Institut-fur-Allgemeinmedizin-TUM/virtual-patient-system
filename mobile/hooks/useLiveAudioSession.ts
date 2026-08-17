@@ -383,6 +383,15 @@ export function useLiveAudioSession(
             return;
           }
 
+          const isAIPlayingWeb =
+            isReceivingRef.current ||
+            playingSourcesRef.current.length > 0 ||
+            playbackCursorRef.current > (audioContextRef.current?.currentTime || 0);
+
+          if (isAIPlayingWeb) {
+            return;
+          }
+
           const channelData = event.inputBuffer.getChannelData(0);
           const base64Audio = floatToPCM16Base64(channelData);
           ws.send(
@@ -397,6 +406,15 @@ export function useLiveAudioSession(
         // 4. Send mic chunks to server
         LiveAudioStream.on('data', (base64Audio) => {
           if (ws.readyState === WebSocket.OPEN) {
+            const isAIPlayingNative =
+              isReceivingRef.current ||
+              isPlayingRef.current ||
+              playbackBufferRef.current.length > 0;
+
+            if (isAIPlayingNative) {
+              return;
+            }
+
             ws.send(
               JSON.stringify({
                 type: 'audio',
