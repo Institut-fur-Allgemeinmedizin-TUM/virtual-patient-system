@@ -225,7 +225,7 @@ export default function DiagnosticsPanel({
   };
 
   const renderPanelContent = () => (
-    <View style={styles.content}>
+      <View style={[styles.content, isMobile && { flex: 0, flexShrink: 1 }]}>
       {!isMobile && (
         <View>
           <Text variant="titleMedium" style={styles.title}>
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     margin: 20,
     borderRadius: 12,
     padding: 16,
-    maxHeight: '80%',
+    maxHeight: '100%',
   },
   modalHeader: {
     flexDirection: 'row',
