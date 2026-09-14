@@ -225,7 +225,7 @@ export default function DiagnosticsPanel({
   };
 
   const renderPanelContent = () => (
-      <View style={[styles.content, isMobile && { flex: 0, flexShrink: 1 }]}>
+    <View style={[styles.content, isMobile && { flex: 0, flexShrink: 1 }]}>
       {!isMobile && (
         <View>
           <Text variant="titleMedium" style={styles.title}>
